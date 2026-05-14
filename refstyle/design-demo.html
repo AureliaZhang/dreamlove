@@ -1,0 +1,2431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>岩筑 YánZhù · 前端设计标准 Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* =============================================
+       岩筑 YánZhù Design System v2.0
+       精密建造 · Precision Construction
+       ============================================= */
+
+    :root {
+      /* ── 底色层级 ── */
+      --bg-primary: #f2f0eb;
+      --bg-secondary: #e9e6e0;
+      --bg-tertiary: #faf9f6;
+      --bg-card: #faf9f6;
+      --bg-input: #f2f0eb;
+      --bg-header: #faf9f6;
+      --bg-code: #e9e6e0;
+
+      /* ── 结构线 ── */
+      --border: #ccc8c0;
+      --border-hover: #9e9a91;
+      --border-strong: #6b675e;
+      --rule: #d5d1ca;
+      --rule-light: #e0ddd7;
+
+      /* ── 文字阶序 ── */
+      --text-primary: #1c1b18;
+      --text-secondary: #5c5850;
+      --text-tertiary: #8e8a80;
+      --text-disabled: #b8b4aa;
+
+      /* ── 主强调 · 氧化铜绿 (Patina) ── */
+      --accent: #3a7a6c;
+      --accent-hover: #2c5f54;
+      --accent-light: #e4edeb;
+      --accent-muted: #a8c5be;
+
+      /* ── 辅助强调 · 琥珀 (Amber) ── */
+      --amber: #b87328;
+      --amber-hover: #9a5f1e;
+      --amber-light: #fdf3e6;
+
+      /* ── 状态色 ── */
+      --success: #4a7a56;
+      --success-light: #eaf2ec;
+      --warning: #8a6a1a;
+      --warning-light: #f5efe2;
+      --error: #8a3232;
+      --error-light: #f5e8e8;
+
+      /* ── 标识 ── */
+      --logo-bg: #2c5f54;
+      --logo-text: #d4e4df;
+
+      /* ── Surface 灰阶 ── */
+      --surface-50: #f2f0eb;
+      --surface-100: #e9e6e0;
+      --surface-200: #ddd9d1;
+      --surface-300: #ccc8c0;
+      --surface-400: #9e9a91;
+      --surface-500: #8e8a80;
+      --surface-600: #5c5850;
+      --surface-700: #3a3832;
+      --surface-800: #28271f;
+      --surface-900: #1c1b18;
+
+      /* ── 阴影（极克制） ── */
+      --shadow-soft: 0 1px 0 var(--surface-200);
+      --shadow-float: 0 2px 0 var(--surface-300);
+
+      /* ── 圆角 ── */
+      --radius-sm: 2px;
+      --radius-md: 2px;
+      --radius-lg: 3px;
+
+      /* ── 间距模数 ── */
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 20px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-10: 40px;
+      --sp-12: 48px;
+      --sp-16: 64px;
+
+      /* ── 字号 ── */
+      --text-xs: 11px;
+      --text-sm: 12px;
+      --text-base: 14px;
+      --text-md: 15px;
+      --text-lg: 18px;
+      --text-xl: 20px;
+      --text-2xl: 28px;
+      --text-3xl: 36px;
+
+      /* ── 动效 ── */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-fast: 120ms;
+      --duration-normal: 200ms;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+      font-size: var(--text-base);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── 滚动条 ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface-300); border-radius: 0; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--surface-400); }
+
+    /* ── 聚焦态 ── */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* ── 选中文本 ── */
+    ::selection {
+      background: var(--accent-muted);
+      color: var(--surface-900);
+    }
+
+    /* =============================================
+       Layout
+       ============================================= */
+
+    .page-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--sp-6);
+    }
+
+    /* ── 顶部导航 ── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header .page-wrap {
+      display: flex;
+      align-items: center;
+      height: 56px;
+      gap: var(--sp-6);
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      text-decoration: none;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+    .header-logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--logo-bg);
+      color: var(--logo-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .header-logo-text {
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 600;
+      font-size: var(--text-md);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+    .header-logo-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+      border-left: 1px solid var(--border);
+      padding-left: var(--sp-3);
+      white-space: nowrap;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-1);
+      margin-left: auto;
+    }
+    .header-nav a {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: var(--sp-2) var(--sp-3);
+      border-bottom: 2px solid transparent;
+      transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+    }
+    .header-nav a:hover {
+      color: var(--text-primary);
+      border-bottom-color: var(--border-hover);
+    }
+    .header-nav a.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* ── 页面区域 ── */
+    .page-section {
+      padding: var(--sp-16) 0;
+      border-bottom: 1px solid var(--rule-light);
+    }
+    .page-section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: var(--sp-2);
+    }
+    .section-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: var(--sp-2);
+    }
+    .section-desc {
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      max-width: 640px;
+      line-height: 1.7;
+      margin-bottom: var(--sp-10);
+    }
+
+    /* =============================================
+       Hero
+       ============================================= */
+
+    .hero {
+      padding: var(--sp-16) 0 var(--sp-12);
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--rule-light) 1px, transparent 1px),
+        linear-gradient(90deg, var(--rule-light) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      padding: var(--sp-1) var(--sp-3);
+      border: 1px solid var(--accent-muted);
+      background: var(--accent-light);
+      margin-bottom: var(--sp-6);
+      position: relative;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      display: inline-block;
+    }
+    .hero h1 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: var(--sp-4);
+      position: relative;
+    }
+    .hero h1 span {
+      color: var(--accent);
+    }
+    .hero-subtitle {
+      font-size: var(--text-lg);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 560px;
+      position: relative;
+    }
+    .hero-meta {
+      display: flex;
+      gap: var(--sp-8);
+      margin-top: var(--sp-10);
+      position: relative;
+    }
+    .hero-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hero-meta-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xl);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .hero-meta-label {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+    }
+
+    /* =============================================
+       Color Palette
+       ============================================= */
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--sp-4);
+    }
+    .color-swatch {
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color var(--duration-fast) ease;
+    }
+    .color-swatch:hover {
+      border-color: var(--border-hover);
+    }
+    .color-swatch-fill {
+      height: 64px;
+      position: relative;
+    }
+    .color-swatch-fill::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(0,0,0,0.08);
+    }
+    .color-swatch-info {
+      padding: var(--sp-3);
+      background: var(--bg-card);
+    }
+    .color-swatch-name {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .color-swatch-hex {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: 0.04em;
+    }
+
+    /* =============================================
+       Typography
+       ============================================= */
+
+    .type-specimen {
+      margin-bottom: var(--sp-10);
+    }
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      padding: var(--sp-3) 0;
+      border-bottom: 1px solid var(--rule-light);
+      gap: var(--sp-6);
+    }
+    .type-row:last-child { border-bottom: none; }
+    .type-meta {
+      width: 140px;
+      flex-shrink: 0;
+    }
+    .type-meta-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: 0.04em;
+    }
+    .type-meta-name {
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .type-sample {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* =============================================
+       Buttons
+       ============================================= */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: var(--text-base);
+      font-weight: 500;
+      line-height: 1;
+      padding: 0 var(--sp-5);
+      height: 40px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--duration-fast) ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent);
+      border-color: transparent;
+    }
+    .btn-ghost:hover { background: var(--accent-light); }
+
+    .btn-danger {
+      background: var(--error);
+      color: #fff;
+      border-color: var(--error);
+    }
+    .btn-danger:hover { background: #722a2a; border-color: #722a2a; }
+
+    .btn-sm { height: 32px; padding: 0 var(--sp-4); font-size: var(--text-sm); }
+    .btn-lg { height: 48px; padding: 0 var(--sp-8); font-size: var(--text-md); }
+
+    .btn[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      flex-wrap: wrap;
+    }
+    .btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-6);
+    }
+    .btn-row-label {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--sp-1);
+    }
+
+    /* =============================================
+       Form Inputs
+       ============================================= */
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+      margin-bottom: var(--sp-5);
+    }
+    .form-label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .form-label-required::after {
+      content: ' *';
+      color: var(--error);
+    }
+    .form-hint {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+    }
+    .form-error {
+      font-size: var(--text-xs);
+      color: var(--error);
+    }
+
+    .input {
+      height: 40px;
+      padding: 0 var(--sp-3);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: var(--text-base);
+      transition: border-color var(--duration-fast) ease;
+      width: 100%;
+    }
+    .input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+    .input::placeholder {
+      color: var(--text-disabled);
+      font-style: italic;
+    }
+    .input.is-error {
+      border-color: var(--error);
+    }
+    .input.is-error:focus {
+      box-shadow: inset 0 0 0 1px var(--error);
+    }
+
+    .textarea {
+      min-height: 100px;
+      padding: var(--sp-3);
+      resize: vertical;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: var(--text-base);
+      line-height: 1.7;
+      transition: border-color var(--duration-fast) ease;
+      width: 100%;
+    }
+    .textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .select-wrap {
+      position: relative;
+    }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: var(--sp-3);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+      pointer-events: none;
+    }
+    .select {
+      appearance: none;
+      height: 40px;
+      padding: 0 var(--sp-8) 0 var(--sp-3);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: var(--text-base);
+      cursor: pointer;
+      width: 100%;
+      transition: border-color var(--duration-fast) ease;
+    }
+    .select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      cursor: pointer;
+      font-size: var(--text-base);
+    }
+    .checkbox {
+      width: 18px;
+      height: 18px;
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .checkbox:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 5px;
+      height: 9px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      cursor: pointer;
+      font-size: var(--text-base);
+    }
+    .radio {
+      width: 18px;
+      height: 18px;
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      cursor: pointer;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .radio:checked {
+      border-color: var(--accent);
+      border-width: 5px;
+      background: #fff;
+    }
+
+    /* =============================================
+       Cards
+       ============================================= */
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: border-color var(--duration-normal) var(--ease-out);
+    }
+    .card:hover {
+      border-color: var(--border-hover);
+    }
+    .card-body {
+      padding: var(--sp-6);
+    }
+    .card-header {
+      padding: var(--sp-5) var(--sp-6);
+      border-bottom: 1px solid var(--rule-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-footer {
+      padding: var(--sp-4) var(--sp-6);
+      border-top: 1px solid var(--rule-light);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+    .card-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: var(--text-md);
+      font-weight: 600;
+    }
+    .card-text {
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+    }
+
+    /* Stat card */
+    .stat-card {
+      padding: var(--sp-5);
+    }
+    .stat-label {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--sp-2);
+    }
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-2xl);
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: var(--sp-2);
+    }
+    .stat-change {
+      font-size: var(--text-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-1);
+    }
+    .stat-up { color: var(--success); }
+    .stat-down { color: var(--error); }
+    .stat-neutral { color: var(--text-tertiary); }
+
+    /* =============================================
+       Data Table
+       ============================================= */
+
+    .data-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-base);
+    }
+    .data-table th {
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: var(--sp-3) var(--sp-4);
+      border-bottom: 1px solid var(--rule-light);
+      vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tbody tr {
+      transition: background var(--duration-fast) ease;
+    }
+    .data-table tbody tr:hover {
+      background: var(--accent-light);
+    }
+    .table-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-sm);
+    }
+
+    /* =============================================
+       Tabs
+       ============================================= */
+
+    .tabs-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--sp-6);
+    }
+    .tab-item {
+      padding: var(--sp-3) var(--sp-5);
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: 'Noto Sans SC', sans-serif;
+    }
+    .tab-item:hover {
+      color: var(--text-primary);
+      border-bottom-color: var(--border-hover);
+    }
+    .tab-item.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* =============================================
+       Badges & Tags
+       ============================================= */
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      padding: 2px var(--sp-2);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .badge-default {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+    .badge-accent {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    .badge-amber {
+      background: var(--amber-light);
+      color: var(--amber);
+    }
+    .badge-success {
+      background: var(--success-light);
+      color: var(--success);
+    }
+    .badge-warning {
+      background: var(--warning-light);
+      color: var(--warning);
+    }
+    .badge-error {
+      background: var(--error-light);
+      color: var(--error);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .badge-dot-success { background: var(--success); }
+    .badge-dot-warning { background: var(--warning); }
+    .badge-dot-error { background: var(--error); }
+    .badge-dot-neutral { background: var(--surface-400); }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1);
+      font-size: var(--text-xs);
+      padding: var(--sp-1) var(--sp-3);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      background: var(--bg-card);
+    }
+    .tag-close {
+      cursor: pointer;
+      color: var(--text-disabled);
+      font-size: 14px;
+      line-height: 1;
+      transition: color var(--duration-fast) ease;
+    }
+    .tag-close:hover { color: var(--error); }
+
+    /* =============================================
+       Toast
+       ============================================= */
+
+    .toast-container {
+      position: fixed;
+      top: 68px;
+      right: var(--sp-6);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      pointer-events: none;
+    }
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+      background: var(--surface-900);
+      color: #fff;
+      padding: var(--sp-3) var(--sp-5);
+      min-width: 300px;
+      max-width: 420px;
+      border-left: 3px solid var(--surface-500);
+      pointer-events: auto;
+      animation: toast-in 300ms var(--ease-out);
+      font-size: var(--text-base);
+    }
+    .toast-success { border-left-color: var(--success); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--surface-400);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .toast-close:hover { color: #fff; }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* =============================================
+       Modal
+       ============================================= */
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(28,27,24,0.55);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-6);
+      animation: modal-overlay-in 200ms ease;
+    }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 520px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: modal-in 250ms var(--ease-out);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-5) var(--sp-6);
+      border-bottom: 1px solid var(--rule-light);
+    }
+    .modal-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: var(--text-lg);
+      font-weight: 600;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      padding: var(--sp-1);
+      transition: color var(--duration-fast) ease;
+    }
+    .modal-close:hover { color: var(--text-primary); }
+    .modal-body {
+      padding: var(--sp-6);
+    }
+    .modal-footer {
+      padding: var(--sp-4) var(--sp-6);
+      border-top: 1px solid var(--rule-light);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--sp-3);
+    }
+
+    @keyframes modal-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modal-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* =============================================
+       Loading & Skeleton
+       ============================================= */
+
+    .skeleton {
+      background: var(--bg-secondary);
+      position: relative;
+      overflow: hidden;
+    }
+    .skeleton::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, var(--surface-200), transparent);
+      animation: skeleton-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes skeleton-pulse {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .skeleton-text { height: 14px; margin-bottom: var(--sp-2); }
+    .skeleton-text:last-child { width: 60%; }
+    .skeleton-heading { height: 20px; width: 45%; margin-bottom: var(--sp-4); }
+    .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+    .skeleton-image { height: 140px; margin-bottom: var(--sp-4); }
+
+    /* ── Progress bar ── */
+    .progress-bar {
+      height: 2px;
+      background: var(--bg-secondary);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      animation: progress-indeterminate 1.4s ease infinite;
+    }
+    @keyframes progress-indeterminate {
+      0% { transform: translateX(-100%); width: 40%; }
+      50% { width: 70%; }
+      100% { transform: translateX(200%); width: 40%; }
+    }
+
+    /* =============================================
+       Empty State
+       ============================================= */
+
+    .empty-state {
+      border: 1px dashed var(--border);
+      padding: var(--sp-12) var(--sp-6);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+    .empty-state-icon {
+      font-size: 32px;
+      color: var(--text-disabled);
+      line-height: 1;
+    }
+    .empty-state-title {
+      font-size: var(--text-md);
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .empty-state-desc {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+      max-width: 360px;
+    }
+
+    /* =============================================
+       Inline Confirmation
+       ============================================= */
+
+    .confirm-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--error-light);
+      border: 1px solid var(--error);
+      font-size: var(--text-sm);
+      color: var(--error);
+    }
+
+    /* =============================================
+       Layout Examples
+       ============================================= */
+
+    .layout-demo {
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: var(--sp-6);
+    }
+    .layout-demo-header {
+      height: 40px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--sp-3);
+      gap: var(--sp-2);
+    }
+    .layout-demo-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--surface-400);
+    }
+    .layout-demo-body {
+      display: flex;
+      min-height: 160px;
+    }
+    .layout-demo-sidebar {
+      width: 160px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: var(--sp-3);
+    }
+    .layout-demo-sidebar-item {
+      height: 12px;
+      background: var(--surface-300);
+      margin-bottom: var(--sp-2);
+    }
+    .layout-demo-sidebar-item:last-child { width: 60%; }
+    .layout-demo-main {
+      flex: 1;
+      padding: var(--sp-4);
+    }
+    .layout-demo-main-row {
+      display: flex;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-3);
+    }
+    .layout-demo-block {
+      height: 40px;
+      border: 1px dashed var(--border);
+      background: var(--bg-card);
+    }
+
+    /* =============================================
+       Design Token Code Block
+       ============================================= */
+
+    .code-block {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      padding: var(--sp-5);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      line-height: 1.8;
+      overflow-x: auto;
+      color: var(--text-secondary);
+    }
+    .code-block .code-key { color: var(--accent); }
+    .code-block .code-val { color: var(--amber); }
+    .code-block .code-comment { color: var(--text-disabled); }
+
+    /* =============================================
+       Responsive Demo Grid
+       ============================================= */
+
+    .responsive-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-4);
+    }
+    .responsive-grid-item {
+      padding: var(--sp-4);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      text-align: center;
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* =============================================
+       Divider
+       ============================================= */
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--rule-light);
+      margin: var(--sp-6) 0;
+    }
+
+    .divider-text {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-4);
+      color: var(--text-tertiary);
+      font-size: var(--text-xs);
+      margin: var(--sp-6) 0;
+    }
+    .divider-text::before,
+    .divider-text::after {
+      content: '';
+      flex: 1;
+      border-top: 1px solid var(--rule-light);
+    }
+
+    /* =============================================
+       Footer
+       ============================================= */
+
+    .site-footer {
+      padding: var(--sp-12) 0;
+      text-align: center;
+    }
+    .site-footer p {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+      line-height: 1.8;
+    }
+    .site-footer-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-disabled);
+      letter-spacing: 0.04em;
+    }
+
+    /* =============================================
+       Utility
+       ============================================= */
+
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: var(--sp-2); }
+    .gap-3 { gap: var(--sp-3); }
+    .gap-4 { gap: var(--sp-4); }
+    .gap-6 { gap: var(--sp-6); }
+    .mb-2 { margin-bottom: var(--sp-2); }
+    .mb-4 { margin-bottom: var(--sp-4); }
+    .mb-6 { margin-bottom: var(--sp-6); }
+    .mb-8 { margin-bottom: var(--sp-8); }
+    .w-full { width: 100%; }
+    .text-mono { font-family: 'JetBrains Mono', monospace; }
+    .text-xs { font-size: var(--text-xs); }
+    .text-sm { font-size: var(--text-sm); }
+    .text-base { font-size: var(--text-base); }
+    .text-tertiary { color: var(--text-tertiary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-serif { font-family: 'Noto Serif SC', serif; }
+    .font-500 { font-weight: 500; }
+    .font-600 { font-weight: 600; }
+
+    /* ── Hidden states ── */
+    .is-hidden { display: none !important; }
+
+    /* =============================================
+       Responsive
+       ============================================= */
+
+    @media (max-width: 1024px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .responsive-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-meta { flex-wrap: wrap; gap: var(--sp-5); }
+    }
+
+    @media (max-width: 768px) {
+      .page-wrap { padding: 0 var(--sp-4); }
+      .page-section { padding: var(--sp-10) 0; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .responsive-grid { grid-template-columns: 1fr; }
+      .type-row { flex-direction: column; gap: var(--sp-2); }
+      .type-meta { width: auto; }
+      .layout-demo-sidebar { display: none; }
+      .header-nav { display: none; }
+      .hero { padding: var(--sp-10) 0 var(--sp-8); }
+      .color-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 28px; }
+      .color-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ Header ============ -->
+  <header class="site-header">
+    <div class="page-wrap">
+      <a class="header-logo" href="#">
+        <div class="header-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M12 2.5L2.5 7.5L12 12.5L21.5 7.5L12 2.5Z"/><path d="M2.5 12.5L12 17.5L21.5 12.5"/><path d="M2.5 17.5L12 22.5L21.5 17.5"/></svg></div>
+        <span class="header-logo-text">岩筑设计系统</span>
+        <span class="header-logo-tag">YánZhù v2.0</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#colors" class="is-active">色彩</a>
+        <a href="#typography">排版</a>
+        <a href="#layout">布局</a>
+        <a href="#components">组件</a>
+        <a href="#patterns">模式</a>
+        <a href="#responsive">响应式</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============ Hero ============ -->
+  <section class="hero">
+    <div class="page-wrap">
+      <div class="hero-badge">DESIGN SYSTEM v2.0</div>
+      <h1>精密建造<br><span>岩筑</span>设计标准</h1>
+      <p class="hero-subtitle">
+        以地下工程的精密性为设计原则，构建视觉一致、结构清晰、交互克制的界面体系。每一个像素都像结构节点一样经过计算。
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">42</span>
+          <span class="hero-meta-label">设计令牌</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">16</span>
+          <span class="hero-meta-label">组件类型</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">5</span>
+          <span class="hero-meta-label">响应断点</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">8px</span>
+          <span class="hero-meta-label">网格模数</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+
+    <!-- ============ Color System ============ -->
+    <section class="page-section" id="colors">
+      <div class="page-wrap">
+        <p class="section-label">01 / Color System</p>
+        <h2 class="section-title">色彩系统</h2>
+        <p class="section-desc">
+          色彩承担信息编码职责，不用于装饰。底色定义空间层级，结构线定义边界关系，强调色标记交互焦点，状态色仅用于状态反馈。颜色取自地下工程的自然材料：石灰岩、氧化铜、琥珀光、页岩灰。
+        </p>
+
+        <!-- Backgrounds -->
+        <p class="text-sm font-500 text-secondary mb-4">底色层级</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#f2f0eb"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">暖石灰 · Primary</div>
+              <div class="color-swatch-hex">--bg-primary · #f2f0eb</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#e9e6e0"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">浅混凝土 · Secondary</div>
+              <div class="color-swatch-hex">--bg-secondary · #e9e6e0</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#faf9f6"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">壳白 · Card</div>
+              <div class="color-swatch-hex">--bg-card · #faf9f6</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#f2f0eb"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">石灰 · Input</div>
+              <div class="color-swatch-hex">--bg-input · #f2f0eb</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Borders -->
+        <p class="text-sm font-500 text-secondary mb-4">结构线</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#ccc8c0"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">默认边框</div>
+              <div class="color-swatch-hex">--border · #ccc8c0</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#9e9a91"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">Hover 边框</div>
+              <div class="color-swatch-hex">--border-hover · #9e9a91</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#6b675e"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">强调边框</div>
+              <div class="color-swatch-hex">--border-strong · #6b675e</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text -->
+        <p class="text-sm font-500 text-secondary mb-4">文字阶序</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#1c1b18"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">焦墨 · 主文字</div>
+              <div class="color-swatch-hex">--text-primary · #1c1b18</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#5c5850"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">墨灰 · 次要</div>
+              <div class="color-swatch-hex">--text-secondary · #5c5850</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#8e8a80"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">浅墨 · 辅助</div>
+              <div class="color-swatch-hex">--text-tertiary · #8e8a80</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#b8b4aa"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">淡墨 · 禁用</div>
+              <div class="color-swatch-hex">--text-disabled · #b8b4aa</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accents -->
+        <p class="text-sm font-500 text-secondary mb-4">强调色</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#3a7a6c"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">氧化铜绿 · 主强调</div>
+              <div class="color-swatch-hex">--accent · #3a7a6c</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#2c5f54"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">深铜绿 · Hover</div>
+              <div class="color-swatch-hex">--accent-hover · #2c5f54</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#e4edeb"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">薄雾绿 · 选中底色</div>
+              <div class="color-swatch-hex">--accent-light · #e4edeb</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#b87328"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">琥珀 · 辅助强调</div>
+              <div class="color-swatch-hex">--amber · #b87328</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <p class="text-sm font-500 text-secondary mb-4">状态色</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#4a7a56"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">苔绿 · 成功</div>
+              <div class="color-swatch-hex">--success · #4a7a56</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#8a6a1a"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">赭石 · 警告</div>
+              <div class="color-swatch-hex">--warning · #8a6a1a</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#8a3232"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">砖红 · 错误</div>
+              <div class="color-swatch-hex">--error · #8a3232</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color Rules -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">色彩使用规范</span>
+            <span class="badge badge-accent">强制执行</span>
+          </div>
+          <div class="card-body">
+            <div class="data-table-wrap" style="border:none;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>规则</th>
+                    <th>说明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-500">禁止渐变背景</td>
+                    <td class="text-secondary">底色必须是纯色平面，不允许线性或径向渐变</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">禁止 glassmorphism</td>
+                    <td class="text-secondary">不使用毛玻璃、半透明叠加等破坏信息可读性的效果</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">禁止大面积纯黑纯白</td>
+                    <td class="text-secondary">#000 与 #fff 不用于底色或文字，工程材料有色温</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">禁止彩色阴影</td>
+                    <td class="text-secondary">用结构线而非阴影区分层级</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">禁止 Tailwind 默认蓝</td>
+                    <td class="text-secondary">#3B82F6 是 AI 默认色，严禁出现在任何界面中</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">同屏不超过 2 种饱和色</td>
+                    <td class="text-secondary">主强调色 + 辅助强调色为上限，状态色不计入</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Typography ============ -->
+    <section class="page-section" id="typography">
+      <div class="page-wrap">
+        <p class="section-label">02 / Typography</p>
+        <h2 class="section-title">排版规范</h2>
+        <p class="section-desc">
+          三组字体各司其职：无衬线体承载界面文字，衬线体传达机构权威感，等宽体精确展示数据与标注。字号遵循 8px 网格模数。
+        </p>
+
+        <!-- Font Families -->
+        <div class="cards-grid mb-8">
+          <div class="card">
+            <div class="card-body">
+              <p class="text-xs text-tertiary mb-2" style="letter-spacing:0.08em;">UI / 界面文字</p>
+              <p style="font-family:'Noto Sans SC',sans-serif; font-size:20px; font-weight:600; margin-bottom:8px;">
+                Noto Sans SC
+              </p>
+              <p style="font-family:'Noto Sans SC',sans-serif; font-size:14px; color:var(--text-secondary);">
+                笔画均匀清晰，适合按钮、标签、表单、导航等界面元素
+              </p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <p class="text-xs text-tertiary mb-2" style="letter-spacing:0.08em;">标题 / 数据展示</p>
+              <p style="font-family:'Noto Serif SC',serif; font-size:20px; font-weight:600; margin-bottom:8px;">
+                Noto Serif SC
+              </p>
+              <p style="font-family:'Noto Serif SC',serif; font-size:14px; color:var(--text-secondary);">
+                衬线体传达正式感，用于页面标题、数据大字展示、机构名称
+              </p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <p class="text-xs text-tertiary mb-2" style="letter-spacing:0.08em;">数据 / 代码 / 标注</p>
+              <p style="font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:500; margin-bottom:8px;">
+                JetBrains Mono
+              </p>
+              <p style="font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--text-secondary);">
+                等宽字体用于端口号、版本号、统计数据等精确标注
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Type Scale -->
+        <p class="text-sm font-500 text-secondary mb-4">字号阶序</p>
+        <div class="card mb-8">
+          <div class="type-specimen">
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-meta-label">36px / 2.25rem</div>
+                <div class="type-meta-name">页面主标题</div>
+              </div>
+              <div class="type-sample">
+                <span class="text-serif" style="font-size:36px; font-weight:700; letter-spacing:-0.03em; line-height:1.15;">地下空间所数字化平台</span>
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-meta-label">28px / 1.75rem</div>
+                <div class="type-meta-name">区域标题</div>
+              </div>
+              <div class="type-sample">
+                <span class="text-serif" style="font-size:28px; font-weight:700; letter-spacing:-0.02em; line-height:1.2;">CAD 协同会签系统</span>
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-meta-label">20px / 1.25rem</div>
+                <div class="type-meta-name">卡片标题</div>
+              </div>
+              <div class="type-sample">
+                <span style="font-size:20px; font-weight:600; letter-spacing:-0.01em;">项目配置与参数设置</span>
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-meta-label">15px</div>
+                <div class="type-meta-name">模块标题</div>
+              </div>
+              <div class="type-sample">
+                <span style="font-size:15px; font-weight:600;">图纸审核流程</span>
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-meta-label">14px / 0.875rem</div>
+                <div class="type-meta-name">正文</div>
+              </div>
+              <div class="type-sample">
+                <span style="font-size:14px; line-height:1.7; color:var(--text-secondary);">隧道衬砌结构设计采用荷载-结构模型，地层参数依据地质勘察报告取值。计算结果应满足规范规定的承载能力极限状态要求。</span>
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-meta-label">12px / 0.75rem</div>
+                <div class="type-meta-name">辅助文字</div>
+              </div>
+              <div class="type-sample">
+                <span style="font-size:12px; color:var(--text-tertiary);">最后更新于 2026/05/05 14:32 · 审核人：张工</span>
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-meta-label">11px</div>
+                <div class="type-meta-name">标注 / 标签</div>
+              </div>
+              <div class="type-sample">
+                <span class="text-mono" style="font-size:11px; color:var(--text-tertiary); letter-spacing:0.06em;">PORT:9201 · STATUS:RUNNING · VER:2.4.0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Letter spacing rules -->
+        <p class="text-sm font-500 text-secondary mb-4">字间距规则</p>
+        <div class="code-block">
+<span class="code-comment">/* 中文标题：微收紧 */</span>
+<span class="code-key">letter-spacing</span>: <span class="code-val">-0.02em</span>;
+
+<span class="code-comment">/* 中文正文：默认 */</span>
+<span class="code-key">letter-spacing</span>: <span class="code-val">0</span>;
+
+<span class="code-comment">/* 英文/数字标注：微加宽 */</span>
+<span class="code-key">letter-spacing</span>: <span class="code-val">0.04em</span>;
+
+<span class="code-comment">/* 大写英文标签：工程标注感 */</span>
+<span class="code-key">letter-spacing</span>: <span class="code-val">0.1em</span>;
+<span class="code-key">text-transform</span>: <span class="code-val">uppercase</span>;
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Layout ============ -->
+    <section class="page-section" id="layout">
+      <div class="page-wrap">
+        <p class="section-label">03 / Layout</p>
+        <h2 class="section-title">页面布局</h2>
+        <p class="section-desc">
+          8px 网格模数贯穿所有间距决策。页面最大宽度 1200px，内容居中。所有间距必须是 4 的倍数，首选 8 的倍数。
+        </p>
+
+        <!-- Grid modulus -->
+        <p class="text-sm font-500 text-secondary mb-4">间距模数</p>
+        <div class="card mb-8">
+          <div class="card-body">
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center gap-4">
+                <span class="text-mono text-xs text-tertiary" style="width:50px;">4px</span>
+                <div style="width:4px; height:16px; background:var(--accent-muted);"></div>
+                <span class="text-sm text-secondary">行内元素间距</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-mono text-xs text-tertiary" style="width:50px;">8px</span>
+                <div style="width:8px; height:16px; background:var(--accent-muted);"></div>
+                <span class="text-sm text-secondary">标签间距、列表项内间距</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-mono text-xs text-tertiary" style="width:50px;">16px</span>
+                <div style="width:16px; height:16px; background:var(--accent-muted);"></div>
+                <span class="text-sm text-secondary">卡片网格间距、中等间距</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-mono text-xs text-tertiary" style="width:50px;">24px</span>
+                <div style="width:24px; height:16px; background:var(--accent-muted);"></div>
+                <span class="text-sm text-secondary">标准间距、卡片内边距</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-mono text-xs text-tertiary" style="width:50px;">32px</span>
+                <div style="width:32px; height:16px; background:var(--accent-muted);"></div>
+                <span class="text-sm text-secondary">区域间分隔、大间距</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-mono text-xs text-tertiary" style="width:50px;">48px</span>
+                <div style="width:48px; height:16px; background:var(--accent-muted);"></div>
+                <span class="text-sm text-secondary">页面级分隔</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-mono text-xs text-tertiary" style="width:50px;">64px</span>
+                <div style="width:64px; height:16px; background:var(--accent-muted);"></div>
+                <span class="text-sm text-secondary">首屏区域分隔</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page structure demo -->
+        <p class="text-sm font-500 text-secondary mb-4">标准页面结构</p>
+        <div class="layout-demo mb-8">
+          <div class="layout-demo-header">
+            <div class="layout-demo-dot"></div>
+            <div class="layout-demo-dot"></div>
+            <div class="layout-demo-dot"></div>
+            <span class="text-xs text-tertiary" style="margin-left:8px;">56px 固定顶部导航</span>
+          </div>
+          <div class="layout-demo-body">
+            <div class="layout-demo-sidebar">
+              <div class="layout-demo-sidebar-item"></div>
+              <div class="layout-demo-sidebar-item"></div>
+              <div class="layout-demo-sidebar-item"></div>
+              <div class="layout-demo-sidebar-item"></div>
+              <div class="layout-demo-sidebar-item"></div>
+            </div>
+            <div class="layout-demo-main">
+              <div class="layout-demo-main-row">
+                <div class="layout-demo-block" style="flex:1;"></div>
+              </div>
+              <div class="layout-demo-main-row">
+                <div class="layout-demo-block" style="flex:1;"></div>
+                <div class="layout-demo-block" style="flex:1;"></div>
+                <div class="layout-demo-block" style="flex:1;"></div>
+              </div>
+              <div class="layout-demo-main-row">
+                <div class="layout-demo-block" style="flex:2;"></div>
+                <div class="layout-demo-block" style="flex:1;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Breakpoints -->
+        <p class="text-sm font-500 text-secondary mb-4">响应式断点</p>
+        <div class="card">
+          <div class="data-table-wrap" style="border:none;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>宽度</th>
+                  <th>列数</th>
+                  <th>间距</th>
+                  <th>内边距</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-500">sm</td>
+                  <td class="text-mono">≥640px</td>
+                  <td>4 列</td>
+                  <td>16px</td>
+                  <td>16px</td>
+                </tr>
+                <tr>
+                  <td class="font-500">md</td>
+                  <td class="text-mono">≥768px</td>
+                  <td>8 列</td>
+                  <td>16px</td>
+                  <td>16px</td>
+                </tr>
+                <tr>
+                  <td class="font-500">lg</td>
+                  <td class="text-mono">≥1024px</td>
+                  <td>8 列</td>
+                  <td>24px</td>
+                  <td>24px</td>
+                </tr>
+                <tr>
+                  <td class="font-500">xl</td>
+                  <td class="text-mono">≥1200px</td>
+                  <td>12 列</td>
+                  <td>24px</td>
+                  <td>24px</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Components ============ -->
+    <section class="page-section" id="components">
+      <div class="page-wrap">
+        <p class="section-label">04 / Components</p>
+        <h2 class="section-title">组件规范</h2>
+        <p class="section-desc">
+          组件以结构线为主要视觉边界，不使用阴影。圆角保持最小化（2-3px），直角矩形为默认。所有过渡不超过 200ms。
+        </p>
+
+        <!-- Buttons -->
+        <h3 class="text-serif text-lg font-600 mb-4">按钮 Buttons</h3>
+
+        <div class="btn-row">
+          <div>
+            <p class="btn-row-label">类型 Variants</p>
+            <div class="btn-group">
+              <button class="btn btn-primary">主按钮 Primary</button>
+              <button class="btn btn-secondary">次要按钮 Secondary</button>
+              <button class="btn btn-ghost">幽灵按钮 Ghost</button>
+              <button class="btn btn-danger">危险按钮 Danger</button>
+            </div>
+          </div>
+          <div>
+            <p class="btn-row-label">尺寸 Sizes</p>
+            <div class="btn-group">
+              <button class="btn btn-primary btn-sm">Small 32px</button>
+              <button class="btn btn-primary">Medium 40px</button>
+              <button class="btn btn-primary btn-lg">Large 48px</button>
+            </div>
+          </div>
+          <div>
+            <p class="btn-row-label">状态 States</p>
+            <div class="btn-group">
+              <button class="btn btn-primary">正常态</button>
+              <button class="btn btn-primary" disabled>禁用态</button>
+              <button class="btn btn-secondary">处理中...</button>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Form Inputs -->
+        <h3 class="text-serif text-lg font-600 mb-4">表单 Form Elements</h3>
+
+        <div style="max-width:520px;">
+          <div class="form-group">
+            <label class="form-label form-label-required">项目名称</label>
+            <input type="text" class="input" placeholder="输入项目名称，如：XX地铁5号线">
+            <span class="form-hint">2-50 个字符，支持中英文及数字</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">项目描述</label>
+            <textarea class="textarea" placeholder="描述项目概况、建设规模及设计范围..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">工程类别</label>
+            <div class="select-wrap">
+              <select class="select">
+                <option>请选择工程类别</option>
+                <option>地铁区间隧道</option>
+                <option>地下综合管廊</option>
+                <option>人防工程</option>
+                <option>深基坑支护</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">端口号</label>
+            <input type="text" class="input text-mono" value="9201" style="font-family:'JetBrains Mono',monospace;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">错误状态示例</label>
+            <input type="text" class="input is-error" value="无效输入">
+            <span class="form-error">端口范围应在 1024-65535 之间</span>
+          </div>
+
+          <div class="form-group">
+            <div class="flex gap-6">
+              <label class="checkbox-group">
+                <input type="checkbox" class="checkbox" checked>
+                <span>启用审核流程</span>
+              </label>
+              <label class="checkbox-group">
+                <input type="checkbox" class="checkbox">
+                <span>自动通知</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="flex gap-6">
+              <label class="radio-group">
+                <input type="radio" class="radio" name="method" checked>
+                <span>荷载结构法</span>
+              </label>
+              <label class="radio-group">
+                <input type="radio" class="radio" name="method">
+                <span>地层结构法</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Cards -->
+        <h3 class="text-serif text-lg font-600 mb-4">卡片 Cards</h3>
+
+        <p class="text-sm text-secondary mb-4">统计卡片</p>
+        <div class="cards-grid mb-6">
+          <div class="card stat-card">
+            <div class="stat-label">活跃项目</div>
+            <div class="stat-value">12</div>
+            <div class="stat-change stat-up">+2 本月新增</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">待审图纸</div>
+            <div class="stat-value">47</div>
+            <div class="stat-change stat-down">-5 较上周</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">知识库文档</div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-change stat-neutral">持平</div>
+          </div>
+        </div>
+
+        <p class="text-sm text-secondary mb-4">内容卡片</p>
+        <div class="cards-grid mb-6">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">XX地铁5号线区间</span>
+              <span class="badge badge-success"><span class="badge-dot badge-dot-success"></span>审核中</span>
+            </div>
+            <div class="card-body">
+              <p class="card-text">双线盾构区间，全长 2.8km，穿越复合地层。采用荷载-结构法进行衬砌计算，围岩级别 III-IV 级。</p>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-ghost btn-sm">查看详情</button>
+              <button class="btn btn-secondary btn-sm">导出报告</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">地下综合管廊工程</span>
+              <span class="badge badge-warning"><span class="badge-dot badge-dot-warning"></span>待审核</span>
+            </div>
+            <div class="card-body">
+              <p class="card-text">城市综合管廊标准段设计，采用明挖法施工。包含电力舱、综合舱、燃气舱三舱结构。</p>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-ghost btn-sm">查看详情</button>
+              <button class="btn btn-secondary btn-sm">导出报告</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">人防地下室改造</span>
+              <span class="badge badge-error"><span class="badge-dot badge-dot-error"></span>需修改</span>
+            </div>
+            <div class="card-body">
+              <p class="card-text">既有地下室人防改造设计，防护等级甲类核6级。结构验算需复核既有构件承载力。</p>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-ghost btn-sm">查看详情</button>
+              <button class="btn btn-secondary btn-sm">导出报告</button>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Data Table -->
+        <h3 class="text-serif text-lg font-600 mb-4">数据表格 Data Table</h3>
+
+        <div class="data-table-wrap mb-8">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>服务名称</th>
+                <th>端口</th>
+                <th>状态</th>
+                <th>负责人</th>
+                <th>最后心跳</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-500">招投标辅助工具</td>
+                <td class="table-mono">:9101 / :9201</td>
+                <td><span class="badge badge-success"><span class="badge-dot badge-dot-success"></span>运行中</span></td>
+                <td>经营投标组</td>
+                <td class="text-sm text-tertiary">2 分钟前</td>
+                <td><button class="btn btn-ghost btn-sm">管理</button></td>
+              </tr>
+              <tr>
+                <td class="font-500">RAG 知识库</td>
+                <td class="table-mono">:9102 / :9202</td>
+                <td><span class="badge badge-success"><span class="badge-dot badge-dot-success"></span>运行中</span></td>
+                <td>知识库管理员</td>
+                <td class="text-sm text-tertiary">刚刚</td>
+                <td><button class="btn btn-ghost btn-sm">管理</button></td>
+              </tr>
+              <tr>
+                <td class="font-500">CAD 协同会签</td>
+                <td class="table-mono">:9103 / :9203</td>
+                <td><span class="badge badge-warning"><span class="badge-dot badge-dot-warning"></span>需关注</span></td>
+                <td>设计协同组</td>
+                <td class="text-sm text-tertiary">15 分钟前</td>
+                <td><button class="btn btn-ghost btn-sm">管理</button></td>
+              </tr>
+              <tr>
+                <td class="font-500">FEM-2D 隧道分析</td>
+                <td class="table-mono">:9204</td>
+                <td><span class="badge badge-success"><span class="badge-dot badge-dot-success"></span>运行中</span></td>
+                <td>结构计算组</td>
+                <td class="text-sm text-tertiary">5 分钟前</td>
+                <td><button class="btn btn-ghost btn-sm">管理</button></td>
+              </tr>
+              <tr>
+                <td class="font-500">统一认证服务</td>
+                <td class="table-mono">:9300 / :9301</td>
+                <td><span class="badge badge-error"><span class="badge-dot badge-dot-error"></span>已离线</span></td>
+                <td>数字化运维</td>
+                <td class="text-sm text-tertiary">3 小时前</td>
+                <td><button class="btn btn-ghost btn-sm">管理</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Tabs -->
+        <h3 class="text-serif text-lg font-600 mb-4">标签页 Tabs</h3>
+
+        <div class="tabs-bar">
+          <button class="tab-item is-active" onclick="switchTab(this)">全部项目</button>
+          <button class="tab-item" onclick="switchTab(this)">运行中</button>
+          <button class="tab-item" onclick="switchTab(this)">待审核</button>
+          <button class="tab-item" onclick="switchTab(this)">已归档</button>
+        </div>
+        <p class="text-sm text-secondary mb-6">底部边框指示器标识活跃标签。活跃态：2px 底部边框 + 主强调色。非活跃态：hover 时出现淡色边框。</p>
+
+        <hr class="divider">
+
+        <!-- Badges & Tags -->
+        <h3 class="text-serif text-lg font-600 mb-4">徽章与标签 Badges & Tags</h3>
+
+        <p class="text-sm text-secondary mb-4">状态徽章</p>
+        <div class="flex gap-3 mb-6 flex-wrap items-center">
+          <span class="badge badge-default">默认</span>
+          <span class="badge badge-accent">铜绿</span>
+          <span class="badge badge-amber">琥珀</span>
+          <span class="badge badge-success"><span class="badge-dot badge-dot-success"></span>成功</span>
+          <span class="badge badge-warning"><span class="badge-dot badge-dot-warning"></span>警告</span>
+          <span class="badge badge-error"><span class="badge-dot badge-dot-error"></span>错误</span>
+        </div>
+
+        <p class="text-sm text-secondary mb-4">可删除标签</p>
+        <div class="flex gap-2 flex-wrap items-center">
+          <span class="tag">荷载结构法 <span class="tag-close">&times;</span></span>
+          <span class="tag">盾构区间 <span class="tag-close">&times;</span></span>
+          <span class="tag">GB55001-2021 <span class="tag-close">&times;</span></span>
+          <span class="tag">核6级 <span class="tag-close">&times;</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Patterns ============ -->
+    <section class="page-section" id="patterns">
+      <div class="page-wrap">
+        <p class="section-label">05 / Patterns</p>
+        <h2 class="section-title">交互模式</h2>
+        <p class="section-desc">
+          交互遵循克制原则：动效不超过 200ms，仅使用淡入淡出和边框色过渡。反馈即时，不打断用户心流。
+        </p>
+
+        <!-- Toast demos -->
+        <h3 class="text-serif text-lg font-600 mb-4">通知 Toast</h3>
+        <p class="text-sm text-secondary mb-4">位置：右上角固定，导航栏下方。触发后点击按钮查看效果。</p>
+        <div class="btn-group mb-8">
+          <button class="btn btn-primary btn-sm" onclick="showToast('success')">成功通知</button>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('warning')">警告通知</button>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('error')">错误通知</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('default')">默认通知</button>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Modal demo -->
+        <h3 class="text-serif text-lg font-600 mb-4">模态框 Modal</h3>
+        <p class="text-sm text-secondary mb-4">遮罩：焦墨色半透明。容器：白底 + 结构线边框。最大宽度 520px。</p>
+        <button class="btn btn-primary" onclick="openModal()">打开模态框</button>
+
+        <hr class="divider">
+
+        <!-- Loading states -->
+        <h3 class="text-serif text-lg font-600 mb-4">加载态 Loading States</h3>
+
+        <p class="text-sm text-secondary mb-4">顶部进度条</p>
+        <div class="progress-bar mb-8" style="max-width:400px;">
+          <div class="progress-fill"></div>
+        </div>
+
+        <p class="text-sm text-secondary mb-4">骨架屏 Skeleton</p>
+        <div class="cards-grid mb-8">
+          <div class="card">
+            <div class="card-body">
+              <div class="skeleton skeleton-heading"></div>
+              <div class="skeleton skeleton-text" style="width:100%"></div>
+              <div class="skeleton skeleton-text" style="width:85%"></div>
+              <div class="skeleton skeleton-text" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="flex gap-4 mb-4">
+                <div class="skeleton skeleton-avatar"></div>
+                <div style="flex:1">
+                  <div class="skeleton skeleton-text" style="width:40%"></div>
+                  <div class="skeleton skeleton-text" style="width:25%"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-image"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="skeleton skeleton-heading" style="width:70%"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text" style="width:90%"></div>
+              <div class="skeleton skeleton-text" style="width:45%"></div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Empty state -->
+        <h3 class="text-serif text-lg font-600 mb-4">空状态 Empty State</h3>
+
+        <div class="empty-state mb-8">
+          <div class="empty-state-icon">◇</div>
+          <div class="empty-state-title">暂无图纸记录</div>
+          <div class="empty-state-desc">上传 DXF/DWG 文件后，图纸会出现在这里。系统支持自动解析图框与标注。</div>
+          <button class="btn btn-primary" style="margin-top:8px;">上传图纸</button>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Inline confirmation -->
+        <h3 class="text-serif text-lg font-600 mb-4">行内确认 Inline Confirm</h3>
+        <p class="text-sm text-secondary mb-4">删除操作不使用弹窗，改用行内确认条。</p>
+
+        <div class="confirm-bar">
+          <span>确定要删除项目「XX地铁5号线」吗？此操作不可撤销。</span>
+          <div style="margin-left:auto; display:flex; gap:8px;">
+            <button class="btn btn-sm" style="background:var(--error); color:#fff; border-color:var(--error);">确认删除</button>
+            <button class="btn btn-secondary btn-sm">取消</button>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Interaction rules table -->
+        <h3 class="text-serif text-lg font-600 mb-4">动效规范</h3>
+        <div class="data-table-wrap" style="max-width:600px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:50%">允许</th>
+                <th style="width:50%">禁止</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-success" style="font-size:11px;">边框色过渡 ≤200ms</span></td>
+                <td><span class="badge badge-error" style="font-size:11px;">动效时长超过 300ms</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-success" style="font-size:11px;">透明度淡入淡出</span></td>
+                <td><span class="badge badge-error" style="font-size:11px;">弹跳/弹簧动画</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-success" style="font-size:11px;">高度展开/收起</span></td>
+                <td><span class="badge badge-error" style="font-size:11px;">旋转、缩放动画</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-success" style="font-size:11px;">卡片 hover 边框加深</span></td>
+                <td><span class="badge badge-error" style="font-size:11px;">hover 添加阴影</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-success" style="font-size:11px;">按钮 active 下移 1px</span></td>
+                <td><span class="badge badge-error" style="font-size:11px;">视差滚动</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Responsive ============ -->
+    <section class="page-section" id="responsive">
+      <div class="page-wrap">
+        <p class="section-label">06 / Responsive</p>
+        <h2 class="section-title">响应式设计</h2>
+        <p class="section-desc">
+          缩放浏览器窗口查看响应式行为。卡片网格在断点处自动切换列数，侧栏在小屏隐藏，表单元素始终全宽。
+        </p>
+
+        <p class="text-sm font-500 text-secondary mb-4">响应式网格 — 缩放窗口观察变化</p>
+        <div class="responsive-grid mb-8">
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary">≥1024px: 4列</span></div>
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary">768-1023px: 2列</span></div>
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary"><768px: 1列</span></div>
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary">间距: 16-24px</span></div>
+        </div>
+
+        <!-- Responsive rules table -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">组件响应式行为</span>
+            <span class="badge badge-default">参考</span>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <div class="data-table-wrap" style="border:none;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>组件</th>
+                    <th>&lt;768px</th>
+                    <th>768–1023px</th>
+                    <th>≥1024px</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-500">导航栏</td>
+                    <td>隐藏文字，仅图标</td>
+                    <td>完整显示</td>
+                    <td>完整显示</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">卡片网格</td>
+                    <td>1 列</td>
+                    <td>2 列</td>
+                    <td>3 列</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">双栏布局</td>
+                    <td>堆叠</td>
+                    <td>堆叠</td>
+                    <td>左右分栏</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">侧栏</td>
+                    <td>隐藏 / 抽屉</td>
+                    <td>隐藏 / 抽屉</td>
+                    <td>固定显示</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">表格</td>
+                    <td>横向滚动</td>
+                    <td>横向滚动</td>
+                    <td>完整展示</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">内边距</td>
+                    <td class="text-mono">16px</td>
+                    <td class="text-mono">16px</td>
+                    <td class="text-mono">24px</td>
+                  </tr>
+                  <tr>
+                    <td class="font-500">触摸目标</td>
+                    <td>最小 44×44px</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="site-footer">
+    <div class="page-wrap">
+      <p>岩筑 YánZhù Design System v2.0</p>
+      <p class="site-footer-mono">BUILT FOR 地下空间所数字化平台 · 2026</p>
+    </div>
+  </footer>
+
+  <!-- ============ Toast Container ============ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ============ Modal ============ -->
+  <div class="modal-overlay is-hidden" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">新建项目</span>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label form-label-required">项目名称</label>
+          <input type="text" class="input" placeholder="输入项目名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">工程类别</label>
+          <div class="select-wrap">
+            <select class="select">
+              <option>请选择</option>
+              <option>地铁区间隧道</option>
+              <option>地下综合管廊</option>
+              <option>人防工程</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">项目描述</label>
+          <textarea class="textarea" placeholder="简要描述项目概况..." style="min-height:72px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">负责人</label>
+          <input type="text" class="input" placeholder="输入负责人姓名">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="closeModal()">创建项目</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Scripts ============ -->
+  <script>
+    // Tab switching
+    function switchTab(el) {
+      el.parentElement.querySelectorAll('.tab-item').forEach(t => t.classList.remove('is-active'));
+      el.classList.add('is-active');
+    }
+
+    // Toast
+    const toastMessages = {
+      success: '图纸审核流程已启动，预计 3 个工作日完成。',
+      warning: '服务端口 :9203 心跳延迟超过 60 秒，请关注。',
+      error: '连接认证服务失败：Connection refused (:9301)。',
+      default: '系统将在今晚 22:00 进行维护升级。'
+    };
+
+    function showToast(type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <span>${toastMessages[type]}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => { if (toast.parentElement) toast.remove(); }, 4000);
+    }
+
+    // Modal
+    function openModal() {
+      document.getElementById('modalOverlay').classList.remove('is-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('modalOverlay').classList.add('is-hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ESC to close modal
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.getElementById('modalOverlay').classList.add('is-hidden');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('.header-nav a').forEach(a => {
+      a.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href.startsWith('#')) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          document.querySelectorAll('.header-nav a').forEach(n => n.classList.remove('is-active'));
+          this.classList.add('is-active');
+        }
+      });
+    });
+
+    // Update active nav on scroll
+    const sections = document.querySelectorAll('.page-section[id]');
+    const navLinks = document.querySelectorAll('.header-nav a');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(link => {
+            link.classList.toggle('is-active', link.getAttribute('href') === `#${id}`);
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>

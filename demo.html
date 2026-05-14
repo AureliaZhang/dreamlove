@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>温柔的雾霾蓝 · 组件库演示</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* =============================================
+       Design System v1.0
+       ============================================= */
+
+    :root {
+      /* ── 底色层级 · 雾霾蓝基调 ── */
+      --bg-primary: #eef1f5;
+      --bg-secondary: #e0e5eb;
+      --bg-tertiary: #f5f7fa;
+      --bg-card: #f8f9fc;
+      --bg-input: #eef1f5;
+      --bg-header: #f5f7fa;
+      --bg-code: #e4e8ee;
+
+      /* ── 结构线 · 蓝灰 ── */
+      --border: #c4ccd6;
+      --border-hover: #98a5b5;
+      --border-strong: #6b7a8d;
+      --rule: #d4dbe4;
+      --rule-light: #e4e9f0;
+
+      /* ── 文字阶序 · 冷灰 ── */
+      --text-primary: #1e2a3a;
+      --text-secondary: #5a6876;
+      --text-tertiary: #8a95a2;
+      --text-disabled: #b5bcc5;
+
+      /* ── 主强调 · 洋红 ── */
+      --accent: #e91e8c;
+      --accent-hover: #c41777;
+      --accent-light: #fdf2f9;
+      --accent-muted: #f5a0d0;
+
+      /* ── 辅助强调 · 雾霾蓝 ── */
+      --amber: #6b8ca4;
+      --amber-hover: #5a7a92;
+      --amber-light: #edf3f8;
+
+      /* ── 用地分类 · GB 50137 ── */
+      --zone-residential: #7ba7c2;  /* R 居住用地 */
+      --zone-commercial: #c4a46b;   /* B 商业服务业 */
+      --zone-industrial: #8a8a8a;   /* M 工业用地 */
+      --zone-green: #5a9a6a;        /* G 绿地广场 */
+      --zone-mixed: #a47bc4;        /* 混合用地 */
+      --zone-water: #6b9ac4;        /* E1 水域 */
+      --zone-road: #d4dbe4;         /* S 道路交通 */
+
+      /* ── 六线控制 ── */
+      --line-red: #c45a5a;          /* 道路红线 */
+      --line-green: #5a9a6a;        /* 城市绿线 */
+      --line-blue: #5a7ac4;         /* 城市蓝线 */
+      --line-purple: #8a5aaa;       /* 城市紫线 */
+      --line-yellow: #b4a44a;       /* 城市黄线 */
+      --line-eco: #c45a5a;          /* 生态红线 */
+
+      /* ── Spatial Data 空间数据 ── */
+      --heat-low: #eef1f5;
+      --heat-mid: #6b8ca4;
+      --heat-high: #e91e8c;
+
+      /* ── 状态色 · Sasaki 风格低饱和 ── */
+      --success: #6a8a6e;
+      --success-light: #f0f4f0;
+      --warning: #a68a5a;
+      --warning-light: #f4f0e8;
+      --error: #a86a6a;
+      --error-light: #f4eeee;
+
+      /* ── 标识 ── */
+      --logo-bg: #2a3a4e;
+      --logo-text: #d8e2ec;
+
+      /* ── Surface 灰阶 · 蓝调 ── */
+      --surface-50: #f5f7fa;
+      --surface-100: #eaeff5;
+      --surface-200: #dde4ec;
+      --surface-300: #c4cdd8;
+      --surface-400: #98a5b5;
+      --surface-500: #7a8898;
+      --surface-600: #5a6876;
+      --surface-700: #3a4858;
+      --surface-800: #2a3a4e;
+      --surface-900: #1e2a3a;
+
+      /* ── 阴影 ── */
+      --shadow-soft: 0 1px 2px rgba(30,42,58,0.06);
+      --shadow-float: 0 4px 6px rgba(30,42,58,0.08);
+
+      /* ── 圆角 ── */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+
+      /* ── 间距模数 ── */
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 20px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-10: 40px;
+      --sp-12: 48px;
+      --sp-16: 64px;
+
+      /* ── 字号 ── */
+      --text-xs: 11px;
+      --text-sm: 12px;
+      --text-base: 14px;
+      --text-md: 15px;
+      --text-lg: 18px;
+      --text-xl: 20px;
+      --text-2xl: 28px;
+      --text-3xl: 36px;
+
+      /* ── 动效 ── */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-fast: 120ms;
+      --duration-normal: 200ms;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    #particleCanvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1; pointer-events: none;
+    }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+      font-size: var(--text-base);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Apple 磨砂玻璃 · Frosted Glass ── */
+    .site-header {
+      background: rgba(245,247,250,0.72) !important;
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(196,204,214,0.4) !important;
+    }
+    .card, .persona-card, .project-card, .ab-card {
+      background: rgba(248,249,252,0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(196,204,214,0.35);
+    }
+    .modal {
+      background: rgba(248,249,252,0.80);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+    }
+    .modal-overlay {
+      background: rgba(30,42,58,0.18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .toast {
+      background: rgba(30,42,58,0.82) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .data-table-wrap, .spec-wrap {
+      background: rgba(248,249,252,0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .map-placeholder {
+      background: rgba(224,229,235,0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface-300); border-radius: 0; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--surface-400); }
+
+    :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+    ::selection { background: var(--amber-light); color: var(--surface-900); }
+
+    /* =============================================
+       Layout
+       ============================================= */
+
+    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--sp-6); }
+
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg-header); border-bottom: 1px solid var(--border);
+    }
+    .site-header .page-wrap { display: flex; align-items: center; height: 56px; gap: var(--sp-6); }
+    .header-logo { display: flex; align-items: center; gap: var(--sp-3); text-decoration: none; color: var(--text-primary); flex-shrink: 0; }
+    .header-logo-mark { width: 28px; height: 28px; background: var(--logo-bg); color: var(--logo-text); display: flex; align-items: center; justify-content: center; font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 14px; }
+    .header-logo-text { font-family: 'Noto Serif SC', serif; font-weight: 600; font-size: var(--text-md); letter-spacing: -0.01em; white-space: nowrap; }
+    .header-logo-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.06em; border-left: 1px solid var(--border); padding-left: var(--sp-3); white-space: nowrap; }
+    .header-nav { display: flex; align-items: center; gap: var(--sp-1); margin-left: auto; }
+    .header-nav a { font-size: var(--text-sm); color: var(--text-secondary); text-decoration: none; padding: var(--sp-2) var(--sp-3); border-bottom: 2px solid transparent; transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease; }
+    .header-nav a:hover { color: var(--text-primary); border-bottom-color: var(--border-hover); }
+    .header-nav a.is-active { color: var(--amber); border-bottom-color: var(--amber); font-weight: 500; }
+
+    .page-section { padding: var(--sp-16) 0; border-bottom: 1px solid var(--rule-light); }
+    .page-section:last-child { border-bottom: none; }
+    .section-label { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); font-weight: 500; color: var(--amber); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: var(--sp-2); }
+    .section-title { font-family: 'Noto Serif SC', serif; font-size: var(--text-2xl); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: var(--sp-2); }
+    .section-desc { font-size: var(--text-base); color: var(--text-secondary); max-width: 640px; line-height: 1.7; margin-bottom: var(--sp-10); }
+
+    /* =============================================
+       Hero
+       ============================================= */
+
+    .hero { padding: var(--sp-16) 0 var(--sp-12); position: relative; }
+    /* .hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--rule-light) 1px, transparent 1px), linear-gradient(90deg, var(--rule-light) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; opacity: 0.5; } */
+    .hero-badge { display: inline-flex; align-items: center; gap: var(--sp-2); font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--amber); letter-spacing: 0.08em; padding: var(--sp-1) var(--sp-3); border: 1px solid var(--amber-light); background: var(--amber-light); margin-bottom: var(--sp-6); position: relative; }
+    .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--amber); display: inline-block; }
+    .hero h1 { font-family: 'Noto Serif SC', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: var(--sp-4); position: relative; }
+    .hero h1 span { color: var(--amber); }
+    .hero-subtitle { font-size: var(--text-lg); color: var(--text-secondary); line-height: 1.7; max-width: 560px; position: relative; }
+    .hero-meta { display: flex; gap: var(--sp-8); margin-top: var(--sp-10); position: relative; }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .hero-meta-value { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xl); font-weight: 500; color: var(--text-primary); }
+    .hero-meta-label { font-size: var(--text-xs); color: var(--text-tertiary); letter-spacing: 0.06em; }
+
+    /* =============================================
+       Color Palette
+       ============================================= */
+
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-4); }
+    .color-swatch { border: 1px solid var(--border); overflow: hidden; transition: border-color var(--duration-fast) ease; }
+    .color-swatch:hover { border-color: var(--border-hover); }
+    .color-swatch-fill { height: 64px; position: relative; }
+    .color-swatch-fill::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: rgba(0,0,0,0.08); }
+    .color-swatch-info { padding: var(--sp-3); background: var(--bg-card); }
+    .color-swatch-name { font-size: var(--text-sm); font-weight: 500; margin-bottom: 2px; }
+    .color-swatch-hex { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--text-tertiary); letter-spacing: 0.04em; }
+
+    /* =============================================
+       Typography
+       ============================================= */
+
+    .type-specimen { margin-bottom: var(--sp-10); }
+    .type-row { display: flex; align-items: baseline; padding: var(--sp-3) 0; border-bottom: 1px solid var(--rule-light); gap: var(--sp-6); }
+    .type-row:last-child { border-bottom: none; }
+    .type-meta { width: 140px; flex-shrink: 0; }
+    .type-meta-label { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--text-tertiary); letter-spacing: 0.04em; }
+    .type-meta-name { font-size: var(--text-xs); color: var(--text-secondary); margin-top: 2px; }
+    .type-sample { flex: 1; min-width: 0; }
+
+    /* =============================================
+       Buttons
+       ============================================= */
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); font-family: 'Noto Sans SC', sans-serif; font-size: var(--text-base); font-weight: 500; line-height: 1; padding: 0 var(--sp-5); height: 40px; border: 1px solid transparent; cursor: pointer; transition: all var(--duration-fast) ease; text-decoration: none; white-space: nowrap; border-radius: var(--radius-md); }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-secondary { background: var(--bg-card); color: var(--text-primary); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--amber); color: var(--amber); }
+    .btn-ghost { background: transparent; color: var(--accent); border-color: transparent; }
+    .btn-ghost:hover { background: var(--amber-light); }
+    .btn-danger { background: var(--error); color: #fff; border-color: var(--error); }
+    .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+    .btn-sm { height: 32px; padding: 0 var(--sp-4); font-size: var(--text-sm); }
+    .btn-lg { height: 48px; padding: 0 var(--sp-8); font-size: var(--text-md); }
+    .btn[disabled] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+    .btn-group { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+    .btn-row { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-6); }
+    .btn-row-label { font-size: var(--text-xs); color: var(--text-tertiary); letter-spacing: 0.06em; margin-bottom: var(--sp-1); }
+
+    /* =============================================
+       Form Inputs
+       ============================================= */
+
+    .form-group { display: flex; flex-direction: column; gap: var(--sp-1); margin-bottom: var(--sp-5); }
+    .form-label { font-size: var(--text-sm); font-weight: 500; color: var(--text-secondary); }
+    .form-label-required::after { content: ' *'; color: var(--error); }
+    .form-hint { font-size: var(--text-xs); color: var(--text-tertiary); }
+    .form-error { font-size: var(--text-xs); color: var(--error); }
+    .input { height: 40px; padding: 0 var(--sp-3); background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); font-family: 'Noto Sans SC', sans-serif; font-size: var(--text-base); transition: border-color var(--duration-fast) ease; width: 100%; border-radius: var(--radius-md); }
+    .input:focus { outline: none; border-color: var(--amber); box-shadow: inset 0 0 0 1px var(--amber); }
+    .input::placeholder { color: var(--text-disabled); }
+    .input.is-error { border-color: var(--error); }
+    .input.is-error:focus { box-shadow: inset 0 0 0 1px var(--error); }
+    .textarea { min-height: 100px; padding: var(--sp-3); resize: vertical; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); font-family: 'Noto Sans SC', sans-serif; font-size: var(--text-base); line-height: 1.7; transition: border-color var(--duration-fast) ease; width: 100%; border-radius: var(--radius-md); }
+    .textarea:focus { outline: none; border-color: var(--amber); box-shadow: inset 0 0 0 1px var(--amber); }
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: '\25BE'; position: absolute; right: var(--sp-3); top: 50%; transform: translateY(-50%); font-size: var(--text-sm); color: var(--text-tertiary); pointer-events: none; }
+    .select { appearance: none; height: 40px; padding: 0 var(--sp-8) 0 var(--sp-3); background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); font-family: 'Noto Sans SC', sans-serif; font-size: var(--text-base); cursor: pointer; width: 100%; transition: border-color var(--duration-fast) ease; border-radius: var(--radius-md); }
+    .select:focus { outline: none; border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .checkbox-group { display: flex; align-items: center; gap: var(--sp-2); cursor: pointer; font-size: var(--text-base); }
+    .checkbox { width: 18px; height: 18px; appearance: none; border: 1px solid var(--border); background: var(--bg-input); cursor: pointer; position: relative; flex-shrink: 0; border-radius: var(--radius-sm); }
+    .checkbox:checked { background: var(--accent); border-color: var(--accent); }
+    .checkbox:checked::after { content: ''; position: absolute; left: 5px; top: 2px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+    .radio-group { display: flex; align-items: center; gap: var(--sp-2); cursor: pointer; font-size: var(--text-base); }
+    .radio { width: 18px; height: 18px; appearance: none; border: 1px solid var(--border); background: var(--bg-input); cursor: pointer; border-radius: 50%; flex-shrink: 0; }
+    .radio:checked { border-color: var(--accent); border-width: 5px; background: #fff; }
+
+    /* =============================================
+       Cards
+       ============================================= */
+
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); transition: border-color var(--duration-normal) var(--ease-out); }
+    .card:hover { border-color: var(--border-hover); }
+    .card-body { padding: var(--sp-6); }
+    .card-header { padding: var(--sp-5) var(--sp-6); border-bottom: 1px solid var(--rule-light); display: flex; align-items: center; justify-content: space-between; }
+    .card-footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--rule-light); display: flex; align-items: center; gap: var(--sp-3); }
+    .card-title { font-family: 'Noto Serif SC', serif; font-size: var(--text-md); font-weight: 600; }
+    .card-text { font-size: var(--text-base); color: var(--text-secondary); line-height: 1.7; }
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+    .stat-card { padding: var(--sp-5); }
+    .stat-label { font-size: var(--text-xs); color: var(--text-tertiary); letter-spacing: 0.06em; margin-bottom: var(--sp-2); }
+    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: var(--text-2xl); font-weight: 500; line-height: 1; margin-bottom: var(--sp-2); }
+    .stat-change { font-size: var(--text-xs); display: flex; align-items: center; gap: var(--sp-1); }
+    .stat-up { color: var(--success); }
+    .stat-down { color: var(--error); }
+    .stat-neutral { color: var(--text-tertiary); }
+
+    /* =============================================
+       Data Table
+       ============================================= */
+
+    .data-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); }
+    .data-table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
+    .data-table th { font-size: var(--text-xs); font-weight: 500; color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase; text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--bg-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--rule-light); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tbody tr { transition: background var(--duration-fast) ease; }
+    .data-table tbody tr:hover { background: var(--amber-light); }
+    .table-mono { font-family: 'JetBrains Mono', monospace; font-size: var(--text-sm); }
+
+    /* =============================================
+       Tabs
+       ============================================= */
+
+    .tabs-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: var(--sp-6); }
+    .tab-item { padding: var(--sp-3) var(--sp-5); font-size: var(--text-base); color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Noto Sans SC', sans-serif; }
+    .tab-item:hover { color: var(--text-primary); border-bottom-color: var(--border-hover); }
+    .tab-item.is-active { color: var(--amber); border-bottom-color: var(--amber); font-weight: 500; }
+
+    /* =============================================
+       Badges & Tags
+       ============================================= */
+
+    .badge { display: inline-flex; align-items: center; gap: var(--sp-1); font-size: var(--text-xs); font-weight: 500; padding: 2px var(--sp-2); letter-spacing: 0.02em; white-space: nowrap; border-radius: var(--radius-sm); }
+    .badge-default { background: var(--bg-secondary); color: var(--text-secondary); }
+    .badge-accent { background: var(--accent-light); color: var(--accent); }
+    .badge-amber { background: var(--amber-light); color: var(--amber); }
+    .badge-success { background: var(--success-light); color: var(--success); }
+    .badge-warning { background: var(--warning-light); color: var(--warning); }
+    .badge-error { background: var(--error-light); color: var(--error); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .badge-dot-success { background: var(--success); }
+    .badge-dot-warning { background: var(--warning); }
+    .badge-dot-error { background: var(--error); }
+    .badge-dot-neutral { background: var(--surface-400); }
+    .tag { display: inline-flex; align-items: center; gap: var(--sp-1); font-size: var(--text-xs); padding: var(--sp-1) var(--sp-3); border: 1px solid var(--border); color: var(--text-secondary); background: var(--bg-card); border-radius: var(--radius-sm); }
+    .tag-close { cursor: pointer; color: var(--text-disabled); font-size: 14px; line-height: 1; transition: color var(--duration-fast) ease; }
+    .tag-close:hover { color: var(--error); }
+
+    /* =============================================
+       Toast
+       ============================================= */
+
+    .toast-container { position: fixed; top: 68px; right: var(--sp-6); z-index: 200; display: flex; flex-direction: column; gap: var(--sp-3); pointer-events: none; }
+    .toast { display: flex; align-items: flex-start; gap: var(--sp-3); background: var(--surface-900); color: #fff; padding: var(--sp-3) var(--sp-5); min-width: 300px; max-width: 420px; border-left: 3px solid var(--surface-500); pointer-events: auto; animation: toast-in 300ms var(--ease-out); font-size: var(--text-base); border-radius: var(--radius-sm); }
+    .toast-success { border-left-color: var(--success); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-close { margin-left: auto; background: none; border: none; color: var(--surface-400); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; flex-shrink: 0; }
+    .toast-close:hover { color: #fff; }
+    @keyframes toast-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* =============================================
+       Modal
+       ============================================= */
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; display: flex; align-items: center; justify-content: center; padding: var(--sp-6); animation: modal-overlay-in 200ms ease; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; animation: modal-in 250ms var(--ease-out); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-5) var(--sp-6); border-bottom: 1px solid var(--rule-light); }
+    .modal-title { font-family: 'Noto Serif SC', serif; font-size: var(--text-lg); font-weight: 600; }
+    .modal-close { background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 20px; line-height: 1; padding: var(--sp-1); transition: color var(--duration-fast) ease; }
+    .modal-close:hover { color: var(--text-primary); }
+    .modal-body { padding: var(--sp-6); }
+    .modal-footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--rule-light); display: flex; justify-content: flex-end; gap: var(--sp-3); }
+    @keyframes modal-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modal-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* =============================================
+       Loading & Skeleton
+       ============================================= */
+
+    .skeleton { background: var(--bg-secondary); position: relative; overflow: hidden; border-radius: var(--radius-sm); }
+    .skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--surface-200), transparent); animation: skeleton-pulse 1.8s ease-in-out infinite; }
+    @keyframes skeleton-pulse { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .skeleton-text { height: 14px; margin-bottom: var(--sp-2); }
+    .skeleton-text:last-child { width: 60%; }
+    .skeleton-heading { height: 20px; width: 45%; margin-bottom: var(--sp-4); }
+    .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+    .skeleton-image { height: 140px; margin-bottom: var(--sp-4); }
+    .progress-bar { height: 2px; background: var(--bg-secondary); overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); animation: progress-indeterminate 1.4s ease infinite; }
+    @keyframes progress-indeterminate { 0% { transform: translateX(-100%); width: 40%; } 50% { width: 70%; } 100% { transform: translateX(200%); width: 40%; } }
+
+    /* =============================================
+       Empty State
+       ============================================= */
+
+    .empty-state { border: 1px dashed var(--border); padding: var(--sp-12) var(--sp-6); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); border-radius: var(--radius-md); }
+    .empty-state-icon { font-size: 32px; color: var(--text-disabled); line-height: 1; }
+    .empty-state-title { font-size: var(--text-md); font-weight: 500; color: var(--text-secondary); }
+    .empty-state-desc { font-size: var(--text-sm); color: var(--text-tertiary); max-width: 360px; }
+
+    /* =============================================
+       Inline Confirmation
+       ============================================= */
+
+    .confirm-bar { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); background: var(--error-light); border: 1px solid var(--error); font-size: var(--text-sm); color: var(--error); border-radius: var(--radius-md); }
+
+    /* =============================================
+       Code Block
+       ============================================= */
+
+    .code-block { background: var(--bg-code); border: 1px solid var(--border); padding: var(--sp-5); font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); line-height: 1.8; overflow-x: auto; color: var(--text-secondary); border-radius: var(--radius-md); }
+    .code-block .code-key { color: var(--accent); }
+    .code-block .code-val { color: var(--amber); }
+    .code-block .code-comment { color: var(--text-disabled); }
+
+    /* =============================================
+       Responsive Grid Demo
+       ============================================= */
+
+    .responsive-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+    .responsive-grid-item { padding: var(--sp-4); background: var(--bg-card); border: 1px solid var(--border); text-align: center; font-size: var(--text-sm); color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; border-radius: var(--radius-md); }
+
+    /* =============================================
+       Divider
+       ============================================= */
+
+    .divider { border: none; border-top: 1px solid var(--rule-light); margin: var(--sp-6) 0; }
+    .divider-text { display: flex; align-items: center; gap: var(--sp-4); color: var(--text-tertiary); font-size: var(--text-xs); margin: var(--sp-6) 0; }
+    .divider-text::before, .divider-text::after { content: ''; flex: 1; border-top: 1px solid var(--rule-light); }
+
+    /* =============================================
+       Footer
+       ============================================= */
+
+    .site-footer { padding: var(--sp-12) 0; text-align: center; }
+    .site-footer p { font-size: var(--text-sm); color: var(--text-tertiary); line-height: 1.8; }
+    .site-footer-mono { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--text-disabled); letter-spacing: 0.04em; }
+
+    /* =============================================
+       Utility
+       ============================================= */
+
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: var(--sp-2); }
+    .gap-3 { gap: var(--sp-3); }
+    .gap-4 { gap: var(--sp-4); }
+    .gap-6 { gap: var(--sp-6); }
+    .mb-2 { margin-bottom: var(--sp-2); }
+    .mb-4 { margin-bottom: var(--sp-4); }
+    .mb-6 { margin-bottom: var(--sp-6); }
+    .mb-8 { margin-bottom: var(--sp-8); }
+    .w-full { width: 100%; }
+    .text-mono { font-family: 'JetBrains Mono', monospace; }
+    .text-xs { font-size: var(--text-xs); }
+    .text-sm { font-size: var(--text-sm); }
+    .text-base { font-size: var(--text-base); }
+    .text-tertiary { color: var(--text-tertiary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-serif { font-family: 'Noto Serif SC', serif; }
+    .font-500 { font-weight: 500; }
+    .font-600 { font-weight: 600; }
+    .is-hidden { display: none !important; }
+
+    /* =============================================
+       Responsive
+       ============================================= */
+
+    @media (max-width: 1024px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .responsive-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-meta { flex-wrap: wrap; gap: var(--sp-5); }
+    }
+    @media (max-width: 768px) {
+      .page-wrap { padding: 0 var(--sp-4); }
+      .page-section { padding: var(--sp-10) 0; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .responsive-grid { grid-template-columns: 1fr; }
+      .type-row { flex-direction: column; gap: var(--sp-2); }
+      .type-meta { width: auto; }
+      .header-nav { display: none; }
+      .hero { padding: var(--sp-10) 0 var(--sp-8); }
+      .color-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 28px; }
+      .color-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── 城市规划 Components ── */
+    .zone-legend { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-bottom: var(--sp-6); }
+    .zone-item { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--text-sm); }
+    .zone-dot { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+    .timeline { position: relative; padding-left: 24px; margin-bottom: var(--sp-6); }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 2px; background: var(--border); }
+    .timeline-item { position: relative; padding-bottom: var(--sp-5); }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--amber); background: var(--bg-card); }
+    .timeline-item.active .timeline-dot { background: var(--accent); border-color: var(--accent); }
+    .timeline-label { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--text-tertiary); margin-bottom: 2px; }
+    .timeline-text { font-size: var(--text-sm); color: var(--text-primary); }
+    .map-placeholder { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: var(--sp-6); }
+    /* .map-placeholder::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--rule-light) 1px, transparent 1px), linear-gradient(90deg, var(--rule-light) 1px, transparent 1px); background-size: 32px 32px; opacity: 0.4; } */
+    .map-overlay { position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .map-overlay-btn { width: 32px; height: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); color: var(--text-secondary); cursor: pointer; }
+    .map-overlay-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .map-legend { position: absolute; bottom: 12px; left: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--sp-3); }
+    .map-legend-title { font-size: var(--text-xs); font-weight: 600; margin-bottom: var(--sp-2); }
+    .comparison-table { margin-bottom: var(--sp-6); }
+    .comparison-table .best { color: var(--success); font-weight: 600; }
+    .comparison-table .worst { color: var(--text-tertiary); }
+    .metric-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+    .metric-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-4); }
+    .metric-card-label { font-size: var(--text-xs); color: var(--text-tertiary); letter-spacing: 0.06em; margin-bottom: var(--sp-1); }
+    .metric-card-value { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xl); font-weight: 600; color: var(--text-primary); }
+    .metric-card-unit { font-size: var(--text-sm); color: var(--text-tertiary); margin-left: 2px; }
+    .metric-card-bar { height: 4px; background: var(--surface-200); border-radius: 2px; margin-top: var(--sp-2); overflow: hidden; }
+    .metric-card-bar-fill { height: 100%; border-radius: 2px; transition: width 600ms var(--ease-out); }
+    .project-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-5); margin-bottom: var(--sp-6); }
+    .project-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-4); }
+    .project-card-title { font-family: 'Noto Serif SC', serif; font-size: var(--text-lg); font-weight: 600; }
+    .project-card-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+    .project-card-stat { text-align: center; }
+    .project-card-stat-value { font-family: 'JetBrains Mono', monospace; font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); }
+    .project-card-stat-label { font-size: var(--text-xs); color: var(--text-tertiary); }
+
+    /* ── HCI Components ── */
+    .persona-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-bottom: var(--sp-6); }
+    .persona-card-header { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-5); background: var(--bg-secondary); }
+    .persona-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--amber-light); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--amber); flex-shrink: 0; }
+    .persona-info h4 { font-size: var(--text-md); font-weight: 600; margin-bottom: 2px; }
+    .persona-info p { font-size: var(--text-sm); color: var(--text-secondary); }
+    .persona-card-body { padding: var(--sp-5); }
+    .persona-section { margin-bottom: var(--sp-4); }
+    .persona-section:last-child { margin-bottom: 0; }
+    .persona-section-label { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--accent); letter-spacing: 0.06em; margin-bottom: var(--sp-2); }
+    .persona-list { list-style: none; padding: 0; }
+    .persona-list li { font-size: var(--text-sm); color: var(--text-secondary); padding: var(--sp-1) 0; padding-left: var(--sp-4); position: relative; }
+    .persona-list li::before { content: ''; position: absolute; left: 0; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+    .journey-map { margin-bottom: var(--sp-6); overflow-x: auto; }
+    .journey-stages { display: flex; min-width: 600px; }
+    .journey-stage { flex: 1; border: 1px solid var(--border); border-right: none; padding: var(--sp-4); background: var(--bg-card); }
+    .journey-stage:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+    .journey-stage:last-child { border-right: 1px solid var(--border); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+    .journey-stage-name { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--accent); letter-spacing: 0.06em; margin-bottom: var(--sp-2); }
+    .journey-stage-text { font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--sp-2); }
+    .journey-emotion { font-size: var(--text-lg); }
+    .usability-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+    .usability-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+    .usability-card-value { font-family: 'JetBrains Mono', monospace; font-size: var(--text-2xl); font-weight: 700; color: var(--text-primary); }
+    .usability-card-label { font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--sp-1); }
+    .usability-card-bar { height: 6px; background: var(--surface-200); border-radius: 3px; margin-top: var(--sp-3); overflow: hidden; }
+    .usability-card-bar-fill { height: 100%; border-radius: 3px; }
+    .heuristic-list { list-style: none; padding: 0; margin-bottom: var(--sp-6); }
+    .heuristic-item { display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: var(--sp-2); background: var(--bg-card); }
+    .heuristic-item.passed { border-left: 3px solid var(--success); }
+    .heuristic-item.warning { border-left: 3px solid var(--warning); }
+    .heuristic-item.failed { border-left: 3px solid var(--error); }
+    .heuristic-num { font-family: 'JetBrains Mono', monospace; font-size: var(--text-sm); font-weight: 600; color: var(--text-tertiary); width: 24px; flex-shrink: 0; }
+    .heuristic-text { font-size: var(--text-sm); color: var(--text-primary); flex: 1; }
+    .heuristic-status { font-size: var(--text-xs); font-weight: 500; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; }
+    .heuristic-status.pass { background: var(--success-light); color: var(--success); }
+    .heuristic-status.warn { background: var(--warning-light); color: var(--warning); }
+    .heuristic-status.fail { background: var(--error-light); color: var(--error); }
+    .ab-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-5); margin-bottom: var(--sp-6); }
+    .ab-card-header { font-size: var(--text-md); font-weight: 600; margin-bottom: var(--sp-4); }
+    .ab-variants { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+    .ab-variant { border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+    .ab-variant.winner { border-color: var(--success); background: var(--success-light); }
+    .ab-variant-name { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--text-tertiary); letter-spacing: 0.06em; margin-bottom: var(--sp-2); }
+    .ab-variant-value { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xl); font-weight: 600; }
+    .ab-variant-detail { font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--sp-1); }
+    .wcag-badges { display: flex; gap: var(--sp-3); margin-bottom: var(--sp-6); }
+    .wcag-badge { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-4); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: var(--text-sm); }
+    .wcag-badge.level-a { border-color: var(--error); color: var(--error); }
+    .wcag-badge.level-aa { border-color: var(--success); color: var(--success); }
+    .wcag-badge.level-aaa { border-color: var(--amber); color: var(--amber); }
+    .wcag-badge-icon { font-weight: 700; font-size: var(--text-md); }
+  </style>
+</head>
+<body>
+
+  <!-- ============ 粒子背景 ============ -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- ============ Header ============ -->
+  <header class="site-header">
+    <div class="page-wrap">
+      <a class="header-logo" href="#">
+        <div class="header-logo-mark">L</div>
+        <span class="header-logo-text">Lia · 城市规划 &times; HCI</span>
+        <span class="header-logo-tag">HAZE BLUE v1.0</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#colors" class="is-active">色彩</a>
+        <a href="#typography">排版</a>
+        <a href="#components">组件</a>
+        <a href="#urban">规划</a>
+        <a href="#hci">交互</a>
+        <a href="#patterns">模式</a>
+        <a href="#responsive">响应式</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============ Hero ============ -->
+  <section class="hero">
+    <div class="page-wrap">
+      <div class="hero-badge">HAZE BLUE v1.0</div>
+      <h1>Lia<br><span>Design System</span></h1>
+      <p class="hero-subtitle">
+        以黑白灰为主色基调，洋红点亮交互焦点，雾霾蓝铺陈温柔底色。面向城市规划 (Urban Planning) 与人机交互 (HCI) 领域，克制、冷静、不失温度。
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">--</span>
+          <span class="hero-meta-label">设计令牌</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">--</span>
+          <span class="hero-meta-label">组件类型</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">--</span>
+          <span class="hero-meta-label">响应断点</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-value text-mono">--</span>
+          <span class="hero-meta-label">网格模数</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+
+    <!-- ============ Color System ============ -->
+    <section class="page-section" id="colors">
+      <div class="page-wrap">
+        <p class="section-label">01 / Color System</p>
+        <h2 class="section-title">色彩系统</h2>
+        <p class="section-desc">
+          在此描述色彩的使用原则。色彩承担信息编码职责，不用于装饰。
+        </p>
+
+        <p class="text-sm font-500 text-secondary mb-4">底色层级</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#eef1f5"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">雾霾白 · Primary</div>
+              <div class="color-swatch-hex">--bg-primary · #eef1f5</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#e0e5eb"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">雾灰 · Secondary</div>
+              <div class="color-swatch-hex">--bg-secondary · #e0e5eb</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#f8f9fc"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">净白 · Card</div>
+              <div class="color-swatch-hex">--bg-card · #f8f9fc</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#eef1f5"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">雾底 · Input</div>
+              <div class="color-swatch-hex">--bg-input · #eef1f5</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-sm font-500 text-secondary mb-4">文字阶序</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#1e2a3a"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">墨蓝 · 主文字</div>
+              <div class="color-swatch-hex">--text-primary · #1e2a3a</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#5a6876"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">灰蓝 · 次要</div>
+              <div class="color-swatch-hex">--text-secondary · #5a6876</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#8a95a2"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">雾灰 · 辅助</div>
+              <div class="color-swatch-hex">--text-tertiary · #8a95a2</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#b5bcc5"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">淡雾 · 禁用</div>
+              <div class="color-swatch-hex">--text-disabled · #b5bcc5</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-sm font-500 text-secondary mb-4">强调色</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#e91e8c"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">洋红 · 主强调</div>
+              <div class="color-swatch-hex">--accent · #e91e8c</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#c41777"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">深洋红 · Hover</div>
+              <div class="color-swatch-hex">--accent-hover · #c41777</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#fdf2f9"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">浅洋红 · 选中底色</div>
+              <div class="color-swatch-hex">--accent-light · #fdf2f9</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#6b8ca4"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">雾霾蓝 · 辅助强调</div>
+              <div class="color-swatch-hex">--amber · #6b8ca4</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-sm font-500 text-secondary mb-4">状态色 · Sasaki 风格</p>
+        <div class="color-grid mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#6a8a6e"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">鼠尾草 · 成功</div>
+              <div class="color-swatch-hex">--success · #6a8a6e</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#a68a5a"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">赭石 · 警告</div>
+              <div class="color-swatch-hex">--warning · #a68a5a</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-fill" style="background:#a86a6a"></div>
+            <div class="color-swatch-info">
+              <div class="color-swatch-name">赤陶 · 错误</div>
+              <div class="color-swatch-hex">--error · #a86a6a</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Typography ============ -->
+    <section class="page-section" id="typography">
+      <div class="page-wrap">
+        <p class="section-label">02 / Typography</p>
+        <h2 class="section-title">排版规范</h2>
+        <p class="section-desc">
+          在此描述字体使用原则。三组字体各司其职：无衬线体承载界面文字，衬线体传达机构权威感，等宽体精确展示数据。
+        </p>
+
+        <div class="cards-grid mb-8">
+          <div class="card"><div class="card-body">
+            <p class="text-xs text-tertiary mb-2" style="letter-spacing:0.08em;">UI / 界面文字</p>
+            <p style="font-family:'Noto Sans SC',sans-serif; font-size:20px; font-weight:600; margin-bottom:8px;">Noto Sans SC</p>
+            <p style="font-family:'Noto Sans SC',sans-serif; font-size:14px; color:var(--text-secondary);">按钮、标签、表单、导航等界面元素</p>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <p class="text-xs text-tertiary mb-2" style="letter-spacing:0.08em;">标题 / 数据展示</p>
+            <p style="font-family:'Noto Serif SC',serif; font-size:20px; font-weight:600; margin-bottom:8px;">Noto Serif SC</p>
+            <p style="font-family:'Noto Serif SC',serif; font-size:14px; color:var(--text-secondary);">页面标题、数据大字展示、机构名称</p>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <p class="text-xs text-tertiary mb-2" style="letter-spacing:0.08em;">数据 / 代码 / 标注</p>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:500; margin-bottom:8px;">JetBrains Mono</p>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--text-secondary);">端口号、版本号、统计数据等精确标注</p>
+          </div></div>
+        </div>
+
+        <p class="text-sm font-500 text-secondary mb-4">字号阶序</p>
+        <div class="card mb-8">
+          <div class="type-specimen">
+            <div class="type-row">
+              <div class="type-meta"><div class="type-meta-label">36px</div><div class="type-meta-name">页面主标题</div></div>
+              <div class="type-sample"><span class="text-serif" style="font-size:36px; font-weight:700; letter-spacing:-0.03em; line-height:1.15;">页面主标题示例</span></div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta"><div class="type-meta-label">28px</div><div class="type-meta-name">区域标题</div></div>
+              <div class="type-sample"><span class="text-serif" style="font-size:28px; font-weight:700; letter-spacing:-0.02em; line-height:1.2;">区域标题示例</span></div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta"><div class="type-meta-label">20px</div><div class="type-meta-name">卡片标题</div></div>
+              <div class="type-sample"><span style="font-size:20px; font-weight:600; letter-spacing:-0.01em;">卡片标题示例</span></div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta"><div class="type-meta-label">15px</div><div class="type-meta-name">模块标题</div></div>
+              <div class="type-sample"><span style="font-size:15px; font-weight:600;">模块标题示例</span></div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta"><div class="type-meta-label">14px</div><div class="type-meta-name">正文</div></div>
+              <div class="type-sample"><span style="font-size:14px; line-height:1.7; color:var(--text-secondary);">正文内容示例。在此填入你的正文文字样本，展示行高和字间距效果。</span></div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta"><div class="type-meta-label">12px</div><div class="type-meta-name">辅助文字</div></div>
+              <div class="type-sample"><span style="font-size:12px; color:var(--text-tertiary);">最后更新于 2026/05/12 · 操作人：--</span></div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta"><div class="type-meta-label">11px</div><div class="type-meta-name">标注 / 标签</div></div>
+              <div class="type-sample"><span class="text-mono" style="font-size:11px; color:var(--text-tertiary); letter-spacing:0.06em;">PORT:8080 · STATUS:RUNNING · VER:1.0.0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Components ============ -->
+    <section class="page-section" id="components">
+      <div class="page-wrap">
+        <p class="section-label">03 / Components</p>
+        <h2 class="section-title">组件规范</h2>
+        <p class="section-desc">
+          在此描述组件的设计原则。所有过渡不超过 200ms。
+        </p>
+
+        <h3 class="text-serif text-lg font-600 mb-4">按钮 Buttons</h3>
+        <div class="btn-row">
+          <div>
+            <p class="btn-row-label">类型 Variants</p>
+            <div class="btn-group">
+              <button class="btn btn-primary">主按钮</button>
+              <button class="btn btn-secondary">次要按钮</button>
+              <button class="btn btn-ghost">幽灵按钮</button>
+              <button class="btn btn-danger">危险按钮</button>
+            </div>
+          </div>
+          <div>
+            <p class="btn-row-label">尺寸 Sizes</p>
+            <div class="btn-group">
+              <button class="btn btn-primary btn-sm">Small 32px</button>
+              <button class="btn btn-primary">Medium 40px</button>
+              <button class="btn btn-primary btn-lg">Large 48px</button>
+            </div>
+          </div>
+          <div>
+            <p class="btn-row-label">状态 States</p>
+            <div class="btn-group">
+              <button class="btn btn-primary">正常态</button>
+              <button class="btn btn-primary" disabled>禁用态</button>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">表单 Form Elements</h3>
+        <div style="max-width:520px;">
+          <div class="form-group">
+            <label class="form-label form-label-required">项目名称</label>
+            <input type="text" class="input" placeholder="输入项目名称">
+            <span class="form-hint">2-50 个字符</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">项目描述</label>
+            <textarea class="textarea" placeholder="描述项目概况..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">类别</label>
+            <div class="select-wrap">
+              <select class="select">
+                <option>请选择类别</option>
+                <option>类别 A</option>
+                <option>类别 B</option>
+                <option>类别 C</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">错误状态示例</label>
+            <input type="text" class="input is-error" value="无效输入">
+            <span class="form-error">请输入有效的值</span>
+          </div>
+          <div class="form-group">
+            <div class="flex gap-6">
+              <label class="checkbox-group"><input type="checkbox" class="checkbox" checked><span>选项 A</span></label>
+              <label class="checkbox-group"><input type="checkbox" class="checkbox"><span>选项 B</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="flex gap-6">
+              <label class="radio-group"><input type="radio" class="radio" name="demo" checked><span>方案一</span></label>
+              <label class="radio-group"><input type="radio" class="radio" name="demo"><span>方案二</span></label>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">卡片 Cards</h3>
+        <p class="text-sm text-secondary mb-4">统计卡片</p>
+        <div class="cards-grid mb-6">
+          <div class="card stat-card"><div class="stat-label">指标 A</div><div class="stat-value">128</div><div class="stat-change stat-up">+12%</div></div>
+          <div class="card stat-card"><div class="stat-label">指标 B</div><div class="stat-value">47</div><div class="stat-change stat-down">-5%</div></div>
+          <div class="card stat-card"><div class="stat-label">指标 C</div><div class="stat-value">1,024</div><div class="stat-change stat-neutral">持平</div></div>
+        </div>
+        <p class="text-sm text-secondary mb-4">内容卡片</p>
+        <div class="cards-grid mb-6">
+          <div class="card">
+            <div class="card-header"><span class="card-title">卡片标题 A</span><span class="badge badge-success">正常</span></div>
+            <div class="card-body"><p class="card-text">卡片内容描述。在此填入你的卡片正文。</p></div>
+            <div class="card-footer"><button class="btn btn-ghost btn-sm">查看详情</button></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">卡片标题 B</span><span class="badge badge-warning">待处理</span></div>
+            <div class="card-body"><p class="card-text">卡片内容描述。在此填入你的卡片正文。</p></div>
+            <div class="card-footer"><button class="btn btn-ghost btn-sm">查看详情</button></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">卡片标题 C</span><span class="badge badge-error">异常</span></div>
+            <div class="card-body"><p class="card-text">卡片内容描述。在此填入你的卡片正文。</p></div>
+            <div class="card-footer"><button class="btn btn-ghost btn-sm">查看详情</button></div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">数据表格 Data Table</h3>
+        <div class="data-table-wrap mb-8">
+          <table class="data-table">
+            <thead><tr><th>名称</th><th>端口</th><th>状态</th><th>负责人</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td class="font-500">服务 A</td><td class="table-mono">:8001</td><td><span class="badge badge-success"><span class="badge-dot badge-dot-success"></span>运行中</span></td><td>张三</td><td><button class="btn btn-ghost btn-sm">管理</button></td></tr>
+              <tr><td class="font-500">服务 B</td><td class="table-mono">:8002</td><td><span class="badge badge-warning"><span class="badge-dot badge-dot-warning"></span>需关注</span></td><td>李四</td><td><button class="btn btn-ghost btn-sm">管理</button></td></tr>
+              <tr><td class="font-500">服务 C</td><td class="table-mono">:8003</td><td><span class="badge badge-error"><span class="badge-dot badge-dot-error"></span>已离线</span></td><td>王五</td><td><button class="btn btn-ghost btn-sm">管理</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">标签页 Tabs</h3>
+        <div class="tabs-bar">
+          <button class="tab-item is-active" onclick="switchTab(this)">全部</button>
+          <button class="tab-item" onclick="switchTab(this)">进行中</button>
+          <button class="tab-item" onclick="switchTab(this)">已完成</button>
+          <button class="tab-item" onclick="switchTab(this)">已归档</button>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">徽章与标签 Badges & Tags</h3>
+        <p class="text-sm text-secondary mb-4">状态徽章</p>
+        <div class="flex gap-3 mb-6 flex-wrap items-center">
+          <span class="badge badge-default">默认</span>
+          <span class="badge badge-accent">强调</span>
+          <span class="badge badge-amber">琥珀</span>
+          <span class="badge badge-success"><span class="badge-dot badge-dot-success"></span>成功</span>
+          <span class="badge badge-warning"><span class="badge-dot badge-dot-warning"></span>警告</span>
+          <span class="badge badge-error"><span class="badge-dot badge-dot-error"></span>错误</span>
+        </div>
+        <p class="text-sm text-secondary mb-4">可删除标签</p>
+        <div class="flex gap-2 flex-wrap items-center">
+          <span class="tag">标签 A <span class="tag-close">&times;</span></span>
+          <span class="tag">标签 B <span class="tag-close">&times;</span></span>
+          <span class="tag">标签 C <span class="tag-close">&times;</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 城市规划 Urban Planning ============ -->
+    <section class="page-section" id="urban">
+      <div class="page-wrap">
+        <p class="section-label">04 / Urban Planning</p>
+        <h2 class="section-title">城市规划</h2>
+        <p class="section-desc">
+          面向城市规划与城市设计领域的专业组件。涵盖用地分类 (GB 50137)、控制性详细规划指标、六线控制、交通体系、生态要素等城市规划工作流核心场景。
+        </p>
+
+        <h3 class="text-serif text-lg font-600 mb-4">项目概况 Project Overview</h3>
+        <div class="project-card">
+          <div class="project-card-header">
+            <span class="project-card-title">滨水片区城市更新</span>
+            <span class="badge badge-accent">概念方案</span>
+          </div>
+          <div class="project-card-meta">
+            <div class="project-card-stat">
+              <div class="project-card-stat-value">12.8</div>
+              <div class="project-card-stat-label">用地面积 / ha</div>
+            </div>
+            <div class="project-card-stat">
+              <div class="project-card-stat-value">2.4</div>
+              <div class="project-card-stat-label">容积率 FAR</div>
+            </div>
+            <div class="project-card-stat">
+              <div class="project-card-stat-value">35%</div>
+              <div class="project-card-stat-label">绿地率</div>
+            </div>
+            <div class="project-card-stat">
+              <div class="project-card-stat-value">80m</div>
+              <div class="project-card-stat-label">限高</div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">用地分类 Zoning Legend</h3>
+        <div class="zone-legend">
+          <div class="zone-item"><div class="zone-dot" style="background:var(--zone-residential)"></div>居住用地 R</div>
+          <div class="zone-item"><div class="zone-dot" style="background:var(--zone-commercial)"></div>商业用地 B</div>
+          <div class="zone-item"><div class="zone-dot" style="background:var(--zone-industrial)"></div>工业用地 M</div>
+          <div class="zone-item"><div class="zone-dot" style="background:var(--zone-green)"></div>绿地 G</div>
+          <div class="zone-item"><div class="zone-dot" style="background:var(--zone-mixed)"></div>混合用地 A+B</div>
+          <div class="zone-item"><div class="zone-dot" style="background:var(--zone-water)"></div>水域 E1</div>
+          <div class="zone-item"><div class="zone-dot" style="background:var(--zone-road)"></div>道路 S</div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">设计时间轴 Timeline</h3>
+        <div class="timeline">
+          <div class="timeline-item active">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Phase 01 · 2026.03</div>
+            <div class="timeline-text">场地调研与基底分析 Site Analysis</div>
+          </div>
+          <div class="timeline-item active">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Phase 02 · 2026.04</div>
+            <div class="timeline-text">概念方案设计 Concept Design</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Phase 03 · 2026.06</div>
+            <div class="timeline-text">深化方案与城市设计导则</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Phase 04 · 2026.09</div>
+            <div class="timeline-text">公众参与与方案评审 Public Review</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-label">Phase 05 · 2026.12</div>
+            <div class="timeline-text">实施导则与交付 Implementation</div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">指标仪表盘 Metrics Dashboard</h3>
+        <div class="metric-card-grid">
+          <div class="metric-card">
+            <div class="metric-card-label">人口密度</div>
+            <div class="metric-card-value">12,400<span class="metric-card-unit">人/km²</span></div>
+            <div class="metric-card-bar"><div class="metric-card-bar-fill" style="width:62%;background:var(--amber)"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">绿地覆盖率</div>
+            <div class="metric-card-value">35.2<span class="metric-card-unit">%</span></div>
+            <div class="metric-card-bar"><div class="metric-card-bar-fill" style="width:35%;background:var(--zone-green)"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">步行可达性</div>
+            <div class="metric-card-value">78<span class="metric-card-unit">分</span></div>
+            <div class="metric-card-bar"><div class="metric-card-bar-fill" style="width:78%;background:var(--accent)"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">公交覆盖率</div>
+            <div class="metric-card-value">89<span class="metric-card-unit">%</span></div>
+            <div class="metric-card-bar"><div class="metric-card-bar-fill" style="width:89%;background:var(--success)"></div></div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">地图集成 Map Integration</h3>
+        <div class="map-placeholder">
+          <div style="position:relative;z-index:1;text-align:center;">
+            <div style="font-size:var(--text-lg);font-weight:600;color:var(--text-secondary);margin-bottom:4px;">Map View</div>
+            <div style="font-size:var(--text-xs);color:var(--text-tertiary);">集成 Mapbox / Leaflet / Google Maps</div>
+          </div>
+          <div class="map-overlay">
+            <div class="map-overlay-btn">+</div>
+            <div class="map-overlay-btn">&minus;</div>
+            <div class="map-overlay-btn">&#9673;</div>
+          </div>
+          <div class="map-legend">
+            <div class="map-legend-title">图层控制</div>
+            <div class="zone-legend" style="margin-bottom:0;">
+              <div class="zone-item"><div class="zone-dot" style="background:var(--zone-residential)"></div><span style="font-size:11px">居住</span></div>
+              <div class="zone-item"><div class="zone-dot" style="background:var(--zone-commercial)"></div><span style="font-size:11px">商业</span></div>
+              <div class="zone-item"><div class="zone-dot" style="background:var(--zone-green)"></div><span style="font-size:11px">绿地</span></div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">方案比选 Comparison Table</h3>
+        <div class="data-table-wrap comparison-table">
+          <table class="data-table">
+            <thead><tr><th>指标</th><th>方案 A · 高密度</th><th>方案 B · 均衡</th><th>方案 C · 低密度</th></tr></thead>
+            <tbody>
+              <tr><td class="font-500">容积率 FAR</td><td class="text-mono">3.2</td><td class="text-mono best">2.4</td><td class="text-mono worst">1.6</td></tr>
+              <tr><td class="font-500">建筑密度</td><td class="text-mono worst">45%</td><td class="text-mono">35%</td><td class="text-mono best">25%</td></tr>
+              <tr><td class="font-500">绿地率</td><td class="text-mono worst">20%</td><td class="text-mono">35%</td><td class="text-mono best">45%</td></tr>
+              <tr><td class="font-500">限高</td><td class="text-mono">100m</td><td class="text-mono">80m</td><td class="text-mono">60m</td></tr>
+              <tr><td class="font-500">日照达标率</td><td class="text-mono worst">72%</td><td class="text-mono best">95%</td><td class="text-mono">98%</td></tr>
+              <tr><td class="font-500">预估造价</td><td class="text-mono">¥8.2亿</td><td class="text-mono">¥6.5亿</td><td class="text-mono best">¥4.8亿</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HCI Patterns ============ -->
+    <section class="page-section" id="hci">
+      <div class="page-wrap">
+        <p class="section-label">05 / HCI Patterns</p>
+        <h2 class="section-title">人机交互</h2>
+        <p class="section-desc">
+          面向 HCI (Human-Computer Interaction) 领域的专业组件。涵盖用户画像、旅程地图、可用性指标、启发式评估、A/B 测试、无障碍合规等用户研究与交互设计核心场景。
+        </p>
+
+        <h3 class="text-serif text-lg font-600 mb-4">用户画像 Persona</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-6);">
+          <div class="persona-card">
+            <div class="persona-card-header">
+              <div class="persona-avatar">张</div>
+              <div class="persona-info">
+                <h4>张明 · 城市规划师</h4>
+                <p>32岁 · 市规划院 · 8年经验</p>
+              </div>
+            </div>
+            <div class="persona-card-body">
+              <div class="persona-section">
+                <div class="persona-section-label">GOALS</div>
+                <ul class="persona-list">
+                  <li>高效完成控规编制与城市设计导则</li>
+                  <li>在方案汇报中清晰呈现空间数据</li>
+                  <li>跨专业协同（交通、市政、景观）</li>
+                </ul>
+              </div>
+              <div class="persona-section">
+                <div class="persona-section-label">PAIN POINTS</div>
+                <ul class="persona-list">
+                  <li>GIS 数据与设计工具之间切换繁琐</li>
+                  <li>方案比选缺少直观的量化对比</li>
+                  <li>公众参与环节反馈收集效率低</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="persona-card">
+            <div class="persona-card-header">
+              <div class="persona-avatar">李</div>
+              <div class="persona-info">
+                <h4>李薇 · UX 研究员</h4>
+                <p>28岁 · 互联网公司 · 4年经验</p>
+              </div>
+            </div>
+            <div class="persona-card-body">
+              <div class="persona-section">
+                <div class="persona-section-label">GOALS</div>
+                <ul class="persona-list">
+                  <li>快速搭建可用性测试方案</li>
+                  <li>用数据驱动设计决策</li>
+                  <li>建立标准化的用户研究流程</li>
+                </ul>
+              </div>
+              <div class="persona-section">
+                <div class="persona-section-label">PAIN POINTS</div>
+                <ul class="persona-list">
+                  <li>测试结果难以量化呈现给利益相关者</li>
+                  <li>跨平台一致性检查耗时</li>
+                  <li>无障碍审计缺少系统化工具</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">用户旅程地图 Journey Map</h3>
+        <div class="journey-map">
+          <div class="journey-stages">
+            <div class="journey-stage">
+              <div class="journey-stage-name">发现</div>
+              <div class="journey-stage-text">用户首次接触产品/服务</div>
+              <div class="journey-emotion">😐</div>
+            </div>
+            <div class="journey-stage">
+              <div class="journey-stage-name">探索</div>
+              <div class="journey-stage-text">浏览功能、了解核心价值</div>
+              <div class="journey-emotion">🙂</div>
+            </div>
+            <div class="journey-stage">
+              <div class="journey-stage-name">使用</div>
+              <div class="journey-stage-text">完成核心任务、遇到摩擦点</div>
+              <div class="journey-emotion">😤</div>
+            </div>
+            <div class="journey-stage">
+              <div class="journey-stage-name">完成</div>
+              <div class="journey-stage-text">达成目标、获得成就感</div>
+              <div class="journey-emotion">😊</div>
+            </div>
+            <div class="journey-stage">
+              <div class="journey-stage-name">回顾</div>
+              <div class="journey-stage-text">评估体验、决定是否复用</div>
+              <div class="journey-emotion">🤔</div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">可用性指标 Usability Metrics</h3>
+        <div class="usability-grid">
+          <div class="usability-card">
+            <div class="usability-card-value">72.5</div>
+            <div class="usability-card-label">SUS 评分</div>
+            <div class="usability-card-bar"><div class="usability-card-bar-fill" style="width:72.5%;background:var(--amber)"></div></div>
+          </div>
+          <div class="usability-card">
+            <div class="usability-card-value">89%</div>
+            <div class="usability-card-label">任务完成率</div>
+            <div class="usability-card-bar"><div class="usability-card-bar-fill" style="width:89%;background:var(--success)"></div></div>
+          </div>
+          <div class="usability-card">
+            <div class="usability-card-value">4.2s</div>
+            <div class="usability-card-label">平均任务时长</div>
+            <div class="usability-card-bar"><div class="usability-card-bar-fill" style="width:42%;background:var(--accent)"></div></div>
+          </div>
+          <div class="usability-card">
+            <div class="usability-card-value">3.8%</div>
+            <div class="usability-card-label">错误率</div>
+            <div class="usability-card-bar"><div class="usability-card-bar-fill" style="width:3.8%;background:var(--error)"></div></div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">A/B 测试结果</h3>
+        <div class="ab-card">
+          <div class="ab-card-header">导航栏布局优化 · 转化率对比</div>
+          <div class="ab-variants">
+            <div class="ab-variant">
+              <div class="ab-variant-name">VARIANT A · 对照组</div>
+              <div class="ab-variant-value" style="color:var(--text-secondary)">12.4%</div>
+              <div class="ab-variant-detail">n=2,847 · 95% CI [11.2%, 13.6%]</div>
+            </div>
+            <div class="ab-variant winner">
+              <div class="ab-variant-name">VARIANT B · 实验组 ✓</div>
+              <div class="ab-variant-value" style="color:var(--success)">15.7%</div>
+              <div class="ab-variant-detail">n=2,812 · 95% CI [14.4%, 17.0%] · p&lt;0.01</div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">启发式评估 Heuristic Evaluation</h3>
+        <ul class="heuristic-list">
+          <li class="heuristic-item passed"><span class="heuristic-num">01</span><span class="heuristic-text">系统状态可见性 Visibility of System Status</span><span class="heuristic-status pass">通过</span></li>
+          <li class="heuristic-item passed"><span class="heuristic-num">02</span><span class="heuristic-text">系统与现实匹配 Match Between System and Real World</span><span class="heuristic-status pass">通过</span></li>
+          <li class="heuristic-item warning"><span class="heuristic-num">03</span><span class="heuristic-text">用户控制与自由 User Control and Freedom</span><span class="heuristic-status warn">待改进</span></li>
+          <li class="heuristic-item passed"><span class="heuristic-num">04</span><span class="heuristic-text">一致性与标准 Consistency and Standards</span><span class="heuristic-status pass">通过</span></li>
+          <li class="heuristic-item failed"><span class="heuristic-num">05</span><span class="heuristic-text">错误预防 Error Prevention</span><span class="heuristic-status fail">未通过</span></li>
+          <li class="heuristic-item passed"><span class="heuristic-num">06</span><span class="heuristic-text">识别而非回忆 Recognition Rather Than Recall</span><span class="heuristic-status pass">通过</span></li>
+          <li class="heuristic-item warning"><span class="heuristic-num">07</span><span class="heuristic-text">灵活性与效率 Flexibility and Efficiency of Use</span><span class="heuristic-status warn">待改进</span></li>
+          <li class="heuristic-item passed"><span class="heuristic-num">08</span><span class="heuristic-text">美学与极简设计 Aesthetic and Minimalist Design</span><span class="heuristic-status pass">通过</span></li>
+          <li class="heuristic-item passed"><span class="heuristic-num">09</span><span class="heuristic-text">帮助用户识别、诊断和恢复错误</span><span class="heuristic-status pass">通过</span></li>
+          <li class="heuristic-item warning"><span class="heuristic-num">10</span><span class="heuristic-text">帮助与文档 Help and Documentation</span><span class="heuristic-status warn">待改进</span></li>
+        </ul>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">无障碍合规 WCAG Compliance</h3>
+        <div class="wcag-badges">
+          <div class="wcag-badge level-a"><span class="wcag-badge-icon">A</span> 基础合规</div>
+          <div class="wcag-badge level-aa"><span class="wcag-badge-icon">AA</span> 推荐标准</div>
+          <div class="wcag-badge level-aaa"><span class="wcag-badge-icon">AAA</span> 最高标准</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Patterns ============ -->
+    <section class="page-section" id="patterns">
+      <div class="page-wrap">
+        <p class="section-label">06 / Patterns</p>
+        <h2 class="section-title">交互模式</h2>
+        <p class="section-desc">
+          在此描述交互设计原则。动效不超过 200ms，反馈即时，不打断用户心流。
+        </p>
+
+        <h3 class="text-serif text-lg font-600 mb-4">通知 Toast</h3>
+        <div class="btn-group mb-8">
+          <button class="btn btn-primary btn-sm" onclick="showToast('success')">成功通知</button>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('warning')">警告通知</button>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('error')">错误通知</button>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">模态框 Modal</h3>
+        <button class="btn btn-primary" onclick="openModal()">打开模态框</button>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">加载态 Loading States</h3>
+        <p class="text-sm text-secondary mb-4">进度条</p>
+        <div class="progress-bar mb-8" style="max-width:400px;"><div class="progress-fill"></div></div>
+        <p class="text-sm text-secondary mb-4">骨架屏</p>
+        <div class="cards-grid mb-8">
+          <div class="card"><div class="card-body"><div class="skeleton skeleton-heading"></div><div class="skeleton skeleton-text" style="width:100%"></div><div class="skeleton skeleton-text" style="width:85%"></div><div class="skeleton skeleton-text" style="width:60%"></div></div></div>
+          <div class="card"><div class="card-body"><div class="flex gap-4 mb-4"><div class="skeleton skeleton-avatar"></div><div style="flex:1"><div class="skeleton skeleton-text" style="width:40%"></div><div class="skeleton skeleton-text" style="width:25%"></div></div></div><div class="skeleton skeleton-image"></div></div></div>
+          <div class="card"><div class="card-body"><div class="skeleton skeleton-heading" style="width:70%"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text" style="width:90%"></div><div class="skeleton skeleton-text" style="width:45%"></div></div></div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">空状态 Empty State</h3>
+        <div class="empty-state mb-8">
+          <div class="empty-state-icon">&#9671;</div>
+          <div class="empty-state-title">暂无数据</div>
+          <div class="empty-state-desc">在此描述空状态的引导文案。</div>
+          <button class="btn btn-primary" style="margin-top:8px;">执行操作</button>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="text-serif text-lg font-600 mb-4">行内确认 Inline Confirm</h3>
+        <div class="confirm-bar">
+          <span>确定要删除此项吗？此操作不可撤销。</span>
+          <div style="margin-left:auto; display:flex; gap:8px;">
+            <button class="btn btn-sm" style="background:var(--error); color:#fff; border-color:var(--error);">确认删除</button>
+            <button class="btn btn-secondary btn-sm">取消</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Responsive ============ -->
+    <section class="page-section" id="responsive">
+      <div class="page-wrap">
+        <p class="section-label">07 / Responsive</p>
+        <h2 class="section-title">响应式设计</h2>
+        <p class="section-desc">
+          缩放浏览器窗口查看响应式行为。
+        </p>
+        <div class="responsive-grid mb-8">
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary">&ge;1024px: 4列</span></div>
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary">768-1023px: 2列</span></div>
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary">&lt;768px: 1列</span></div>
+          <div class="responsive-grid-item">1fr<br><span class="text-xs text-tertiary">间距: 16-24px</span></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="site-footer">
+    <div class="page-wrap">
+      <p>Lia Design System v1.0 · 雾霾蓝 · 城市规划 &times; HCI</p>
+      <p class="site-footer-mono">HAZE BLUE · BLACK · WHITE · GRAY · 2026</p>
+    </div>
+  </footer>
+
+  <!-- ============ Toast Container ============ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ============ Modal ============ -->
+  <div class="modal-overlay is-hidden" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">新建项目</span>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label form-label-required">名称</label>
+          <input type="text" class="input" placeholder="输入名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">描述</label>
+          <textarea class="textarea" placeholder="简要描述..." style="min-height:72px;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="closeModal()">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Scripts ============ -->
+  <script>
+    function switchTab(el) {
+      el.parentElement.querySelectorAll('.tab-item').forEach(t => t.classList.remove('is-active'));
+      el.classList.add('is-active');
+    }
+
+    const toastMessages = {
+      success: '操作成功完成。',
+      warning: '请注意，存在需要关注的事项。',
+      error: '操作失败，请重试。'
+    };
+
+    function showToast(type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span>${toastMessages[type]}</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
+      container.appendChild(toast);
+      setTimeout(() => { if (toast.parentElement) toast.remove(); }, 4000);
+    }
+
+    function openModal() {
+      document.getElementById('modalOverlay').classList.remove('is-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('modalOverlay').classList.add('is-hidden');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.getElementById('modalOverlay').classList.add('is-hidden');
+        document.body.style.overflow = '';
+      }
+    });
+
+    document.querySelectorAll('.header-nav a').forEach(a => {
+      a.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href.startsWith('#')) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          document.querySelectorAll('.header-nav a').forEach(n => n.classList.remove('is-active'));
+          this.classList.add('is-active');
+        }
+      });
+    });
+
+    const sections = document.querySelectorAll('.page-section[id]');
+    const navLinks = document.querySelectorAll('.header-nav a');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(link => link.classList.toggle('is-active', link.getAttribute('href') === `#${id}`));
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(s => observer.observe(s));
+
+    /* ── 柔和磁吸 ── */
+    (function() {
+      const SNAP_THRESHOLD = 80;
+      const SNAP_DURATION = 400;
+      let scrollTimer = null;
+      let isSnapping = false;
+      function getSections() {
+        return Array.from(document.querySelectorAll('.hero, .page-section[id]'));
+      }
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+      function smoothSnapTo(targetY) {
+        if (isSnapping) return;
+        isSnapping = true;
+        const startY = window.scrollY;
+        const dist = targetY - startY;
+        const start = performance.now();
+        function step(now) {
+          const t = Math.min((now - start) / SNAP_DURATION, 1);
+          window.scrollTo(0, startY + dist * easeOut(t));
+          if (t < 1) requestAnimationFrame(step);
+          else isSnapping = false;
+        }
+        requestAnimationFrame(step);
+      }
+      window.addEventListener('scroll', function() {
+        if (isSnapping) return;
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(function() {
+          const scrollY = window.scrollY;
+          const secs = getSections();
+          let closest = null, minDist = Infinity;
+          secs.forEach(function(s) {
+            const top = s.offsetTop;
+            const d = Math.abs(scrollY - top);
+            if (d < minDist) { minDist = d; closest = top; }
+          });
+          if (closest !== null && minDist > 2 && minDist < SNAP_THRESHOLD) {
+            smoothSnapTo(closest);
+          }
+        }, 150);
+      }, { passive: true });
+    })();
+
+    /* ── 粒子背景 ── */
+    (function() {
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      let w, h, particles = [];
+      const PARTICLE_COUNT = 60;
+      const CONNECT_DIST = 120;
+      const COLORS = ['rgba(107,140,164,', 'rgba(139,163,183,', 'rgba(90,122,146,', 'rgba(168,184,200,'];
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+
+      function createParticle() {
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: Math.random() * 1.5 + 0.8,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          alpha: Math.random() * 0.3 + 0.15
+        };
+      }
+
+      function init() {
+        resize();
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(createParticle());
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > w) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + p.alpha + ')';
+          ctx.fill();
+          for (let j = i + 1; j < particles.length; j++) {
+            const q = particles[j];
+            const dx = p.x - q.x, dy = p.y - q.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < CONNECT_DIST) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = 'rgba(107,140,164,' + (1 - dist / CONNECT_DIST) * 0.12 + ')';
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', resize);
+      init();
+      draw();
+    })();
+  </script>
+
+</body>
+</html>

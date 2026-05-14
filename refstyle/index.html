@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图标库 · 岩筑设计系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #f2f0eb;
+  --bg-secondary: #e9e6e0;
+  --bg-card: #faf9f6;
+  --border: #ccc8c0;
+  --border-hover: #9e9a91;
+  --rule-light: #e0ddd7;
+  --text-primary: #1c1b18;
+  --text-secondary: #5c5850;
+  --text-tertiary: #8e8a80;
+  --text-disabled: #b8b4aa;
+  --accent: #3a7a6c;
+  --accent-hover: #2c5f54;
+  --accent-light: #e4edeb;
+  --accent-muted: #a8c5be;
+  --amber: #b87328;
+  --success: #4a7a56;
+  --warning: #8a6a1a;
+  --error: #8a3232;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 18px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--sp-6); }
+
+/* Header */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+.site-header .page-wrap {
+  display: flex; align-items: center; height: 56px; gap: var(--sp-6);
+}
+.header-logo {
+  display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary);
+}
+.header-logo-mark {
+  width: 28px; height: 28px; background: var(--accent-hover); color: #d4e4df;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 14px;
+}
+.header-logo-text {
+  font-family: 'Noto Serif SC', serif; font-weight: 600; font-size: 15px;
+}
+.header-logo-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-tertiary);
+  letter-spacing: 0.06em; border-left: 1px solid var(--border); padding-left: 12px;
+}
+
+/* Hero */
+.hero { padding: var(--sp-12) 0 var(--sp-8); }
+.hero-title {
+  font-family: 'Noto Serif SC', serif; font-size: 28px; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px;
+}
+.hero-desc {
+  color: var(--text-secondary); max-width: 640px; line-height: 1.7;
+}
+.hero-meta {
+  display: flex; gap: 32px; margin-top: 24px;
+}
+.hero-meta-item {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.hero-meta-value {
+  font-family: 'JetBrains Mono', monospace; font-size: 20px;
+  font-weight: 500; color: var(--text-primary);
+}
+.hero-meta-label {
+  font-size: var(--text-xs); color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+}
+
+/* Section */
+.section { padding: var(--sp-10) 0; border-bottom: 1px solid var(--rule-light); }
+.section:last-child { border-bottom: none; }
+.section-header { margin-bottom: var(--sp-6); }
+.section-eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs);
+  font-weight: 500; color: var(--accent); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.section-title {
+  font-family: 'Noto Serif SC', serif; font-size: var(--text-lg);
+  font-weight: 600; color: var(--text-primary);
+}
+.section-desc { font-size: var(--text-sm); color: var(--text-tertiary); margin-top: 4px; }
+
+/* Icon Grid */
+.icon-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+.icon-grid.large { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+.icon-cell {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; padding: 20px 12px 16px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  cursor: pointer; transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.icon-cell:hover {
+  border-color: var(--accent); box-shadow: 0 1px 0 var(--accent-muted);
+}
+.icon-cell svg {
+  width: 28px; height: 28px; color: var(--text-primary);
+  display: block; flex-shrink: 0;
+}
+.icon-cell.geology svg { color: var(--accent); }
+.icon-cell.status-check svg { color: var(--success); }
+.icon-cell.status-warn svg { color: var(--warning); }
+.icon-cell.status-error svg { color: var(--error); }
+.icon-cell-large svg { width: 36px; height: 36px; }
+.icon-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text-tertiary); line-height: 1.3;
+  text-align: center; letter-spacing: 0.02em;
+  word-break: break-all;
+}
+.icon-filename {
+  font-size: 9px; color: var(--text-disabled); line-height: 1;
+  text-align: center; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+/* Spec Table */
+.spec-wrap { overflow-x: auto; border: 1px solid var(--border); }
+.spec-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.spec-table th {
+  font-size: var(--text-xs); font-weight: 500; color: var(--text-secondary);
+  letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+  padding: 10px 16px; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.spec-table td {
+  padding: 10px 16px; border-bottom: 1px solid var(--rule-light);
+  vertical-align: middle;
+}
+.spec-table tr:last-child td { border-bottom: none; }
+.spec-table tbody tr:hover { background: var(--accent-light); }
+.spec-table td:first-child {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs);
+  color: var(--accent); font-weight: 500;
+}
+.spec-table .preview-svg {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.spec-table .preview-svg svg { width: 20px; height: 20px; color: var(--text-secondary); }
+
+/* Color row indicators */
+.spec-table .row-accent td:first-child { color: var(--accent); }
+.spec-table .row-accent svg { color: var(--accent) !important; }
+
+/* Specs section */
+.specs-list { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+.spec-item { margin-bottom: 16px; }
+.spec-key {
+  font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs);
+  color: var(--accent); font-weight: 500; letter-spacing: 0.04em;
+  display: block; margin-bottom: 2px;
+}
+.spec-value { font-size: var(--text-sm); color: var(--text-secondary); }
+
+/* Footer */
+.site-footer {
+  padding: var(--sp-8) 0; text-align: center;
+}
+.site-footer p { font-size: var(--text-sm); color: var(--text-tertiary); line-height: 1.8; }
+.site-footer-mono {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text-disabled); letter-spacing: 0.04em;
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #1c1b18; color: #fff; padding: 10px 20px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  opacity: 0; transition: opacity 200ms ease; pointer-events: none; z-index: 200;
+}
+.toast.show { opacity: 1; }
+
+/* SVG inline demo */
+.demo-row {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border);
+}
+.demo-row svg { width: 16px; height: 16px; color: var(--text-secondary); }
+.demo-row svg.accent { color: var(--accent); }
+.demo-row svg.success { color: var(--success); }
+.demo-row svg.warning { color: var(--warning); }
+.demo-row svg.error { color: var(--error); }
+.demo-row svg.s20 { width: 20px; height: 20px; }
+.demo-row svg.s24 { width: 24px; height: 24px; }
+
+@media (max-width: 768px) {
+  .icon-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .specs-list { grid-template-columns: 1fr; }
+  .hero-meta { flex-wrap: wrap; gap: 20px; }
+  .page-wrap { padding: 0 var(--sp-4); }
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="page-wrap">
+    <a class="header-logo" href="#">
+      <span class="header-logo-mark">图标库</span>
+      <span class="header-logo-text">地下空间所 · 设计系统</span>
+      <span class="header-logo-tag">ICON v1.0</span>
+    </a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="page-wrap">
+    <h1 class="hero-title">图标库</h1>
+    <p class="hero-desc">
+      为岩筑设计系统构建的图标集合。以精密建造为设计哲学——每枚图标都遵循统一的视觉语言，拒绝千篇一律的 AI 生成式图标。
+      所有图标均为手工绘制的描边式 SVG，统一 24×24 视口、1.8px 描宽、圆头端点。
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-value">6</span>
+        <span class="hero-meta-label">分类 / 类</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-value">50+</span>
+        <span class="hero-meta-label">图标 / 枚</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-value">24×24</span>
+        <span class="hero-meta-label">视口 / px</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-value">1.8</span>
+        <span class="hero-meta-label">描边宽 / px</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 设计规格 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">Design Specs</div>
+      <h2 class="section-title">图标设计规格</h2>
+      <p class="section-desc">所有图标遵循统一的描边风格规范，确保视觉一致性</p>
+    </div>
+    <div class="specs-list">
+      <div>
+        <div class="spec-item">
+          <span class="spec-key">viewBox</span>
+          <span class="spec-value"><code>0 0 24 24</code> — 统一视口坐标系</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-key">fill</span>
+          <span class="spec-value"><code>none</code> — 纯描边风格，仅状态指示点使用填充</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-key">stroke</span>
+          <span class="spec-value"><code>currentColor</code> — 跟随父元素文字颜色</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-key">stroke-width</span>
+          <span class="spec-value"><code>1.8</code> — 统一描边粗细</span>
+        </div>
+      </div>
+      <div>
+        <div class="spec-item">
+          <span class="spec-key">stroke-linecap</span>
+          <span class="spec-value"><code>round</code> — 圆头端点，避免机械感</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-key">stroke-linejoin</span>
+          <span class="spec-value"><code>round</code> — 圆角连接</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-key">命名规范</span>
+          <span class="spec-value">英文短横线命名（kebab-case），按分类存放子目录</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-key">使用方式</span>
+          <span class="spec-value">SVG inline / SVG sprite / 直接引用文件</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 尺寸展示 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">Scale Demo</div>
+      <h2 class="section-title">尺寸应用示例</h2>
+      <p class="section-desc">同一图标在不同 UI 上下文中的尺寸表现</p>
+    </div>
+    <div class="demo-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <svg class="s20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <svg class="s24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span style="color:var(--text-disabled);font-family:'JetBrains Mono',monospace;font-size:10px;">14px · 20px · 24px</span>
+    </div>
+    <div class="demo-row" style="margin-top:8px;">
+      <svg class="accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+      <svg class="success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/></svg>
+      <svg class="warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+      <svg class="error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+      <span style="color:var(--text-disabled);font-family:'JetBrains Mono',monospace;font-size:10px;">状态色应用 · accent / success / warning / error</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 导航类 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">navigation/</div>
+      <h2 class="section-title">导航 · Navigation</h2>
+      <p class="section-desc">方向指示、菜单、页面切换、折叠展开等界面导航元素</p>
+    </div>
+    <div class="icon-grid">
+      <div class="icon-cell" data-name="arrow-right" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <span class="icon-name">arrow-right</span>
+        <span class="icon-filename">arrow-right.svg</span>
+      </div>
+      <div class="icon-cell" data-name="arrow-left" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span class="icon-name">arrow-left</span>
+        <span class="icon-filename">arrow-left.svg</span>
+      </div>
+      <div class="icon-cell" data-name="arrow-up" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <span class="icon-name">arrow-up</span>
+        <span class="icon-filename">arrow-up.svg</span>
+      </div>
+      <div class="icon-cell" data-name="arrow-down" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span class="icon-name">arrow-down</span>
+        <span class="icon-filename">arrow-down.svg</span>
+      </div>
+      <div class="icon-cell" data-name="chevron-right" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        <span class="icon-name">chevron-right</span>
+        <span class="icon-filename">chevron-right.svg</span>
+      </div>
+      <div class="icon-cell" data-name="chevron-left" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        <span class="icon-name">chevron-left</span>
+        <span class="icon-filename">chevron-left.svg</span>
+      </div>
+      <div class="icon-cell" data-name="chevron-down" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="icon-name">chevron-down</span>
+        <span class="icon-filename">chevron-down.svg</span>
+      </div>
+      <div class="icon-cell" data-name="chevron-up" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+        <span class="icon-name">chevron-up</span>
+        <span class="icon-filename">chevron-up.svg</span>
+      </div>
+      <div class="icon-cell" data-name="expand" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="icon-name">expand</span>
+        <span class="icon-filename">expand.svg</span>
+      </div>
+      <div class="icon-cell" data-name="collapse" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+        <span class="icon-name">collapse</span>
+        <span class="icon-filename">collapse.svg</span>
+      </div>
+      <div class="icon-cell" data-name="menu" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <span class="icon-name">menu</span>
+        <span class="icon-filename">menu.svg</span>
+      </div>
+      <div class="icon-cell" data-name="close" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <span class="icon-name">close</span>
+        <span class="icon-filename">close.svg</span>
+      </div>
+      <div class="icon-cell" data-name="back" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span class="icon-name">back</span>
+        <span class="icon-filename">back.svg</span>
+      </div>
+      <div class="icon-cell" data-name="home" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+        <span class="icon-name">home</span>
+        <span class="icon-filename">home.svg</span>
+      </div>
+      <div class="icon-cell" data-name="external" data-category="navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+        <span class="icon-name">external</span>
+        <span class="icon-filename">external.svg</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 操作类 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">action/</div>
+      <h2 class="section-title">操作 · Actions</h2>
+      <p class="section-desc">搜索、编辑、删除、上传下载、设置等交互操作</p>
+    </div>
+    <div class="icon-grid">
+      <div class="icon-cell" data-name="search" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <span class="icon-name">search</span>
+        <span class="icon-filename">search.svg</span>
+      </div>
+      <div class="icon-cell" data-name="add" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        <span class="icon-name">add</span>
+        <span class="icon-filename">add.svg</span>
+      </div>
+      <div class="icon-cell" data-name="edit" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        <span class="icon-name">edit</span>
+        <span class="icon-filename">edit.svg</span>
+      </div>
+      <div class="icon-cell" data-name="delete" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v12a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12zM10 11v4M14 11v4"/></svg>
+        <span class="icon-name">delete</span>
+        <span class="icon-filename">delete.svg</span>
+      </div>
+      <div class="icon-cell" data-name="copy" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        <span class="icon-name">copy</span>
+        <span class="icon-filename">copy.svg</span>
+      </div>
+      <div class="icon-cell" data-name="settings" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="icon-name">settings</span>
+        <span class="icon-filename">settings.svg</span>
+      </div>
+      <div class="icon-cell" data-name="refresh" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+        <span class="icon-name">refresh</span>
+        <span class="icon-filename">refresh.svg</span>
+      </div>
+      <div class="icon-cell" data-name="download" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <span class="icon-name">download</span>
+        <span class="icon-filename">download.svg</span>
+      </div>
+      <div class="icon-cell" data-name="upload" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        <span class="icon-name">upload</span>
+        <span class="icon-filename">upload.svg</span>
+      </div>
+      <div class="icon-cell" data-name="filter" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+        <span class="icon-name">filter</span>
+        <span class="icon-filename">filter.svg</span>
+      </div>
+      <div class="icon-cell" data-name="star" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span class="icon-name">star</span>
+        <span class="icon-filename">star.svg</span>
+      </div>
+      <div class="icon-cell" data-name="share" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+        <span class="icon-name">share</span>
+        <span class="icon-filename">share.svg</span>
+      </div>
+      <div class="icon-cell" data-name="link" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        <span class="icon-name">link</span>
+        <span class="icon-filename">link.svg</span>
+      </div>
+      <div class="icon-cell" data-name="more" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+        <span class="icon-name">more</span>
+        <span class="icon-filename">more.svg</span>
+      </div>
+      <div class="icon-cell" data-name="eye-open" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="icon-name">eye-open</span>
+        <span class="icon-filename">eye-open.svg</span>
+      </div>
+      <div class="icon-cell" data-name="eye-closed" data-category="action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+        <span class="icon-name">eye-closed</span>
+        <span class="icon-filename">eye-closed.svg</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 状态类 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">status/</div>
+      <h2 class="section-title">状态 · Status</h2>
+      <p class="section-desc">成功、警告、错误、信息等状态反馈图标</p>
+    </div>
+    <div class="icon-grid">
+      <div class="icon-cell icon-cell-large status-check" data-name="check-circle" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/></svg>
+        <span class="icon-name">check-circle</span>
+        <span class="icon-filename">check-circle.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large status-check" data-name="check" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+        <span class="icon-name">check</span>
+        <span class="icon-filename">check.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large status-warn" data-name="warning" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+        <span class="icon-name">warning</span>
+        <span class="icon-filename">warning.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large status-error" data-name="error" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+        <span class="icon-name">error</span>
+        <span class="icon-filename">error.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large" data-name="info" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span class="icon-name">info</span>
+        <span class="icon-filename">info.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large" data-name="question" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        <span class="icon-name">question</span>
+        <span class="icon-filename">question.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large" data-name="alert" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3" fill="currentColor"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+        <span class="icon-name">alert</span>
+        <span class="icon-filename">alert.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large" data-name="thumbs-up" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+        <span class="icon-name">thumbs-up</span>
+        <span class="icon-filename">thumbs-up.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large" data-name="spinner" data-category="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <span class="icon-name">spinner</span>
+        <span class="icon-filename">spinner.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large" data-name="dot" data-category="status">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+        <span class="icon-name">dot</span>
+        <span class="icon-filename">dot.svg</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 数据类 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">data/</div>
+      <h2 class="section-title">数据 · Data</h2>
+      <p class="section-desc">文件、文件夹、列表、表格、图表等数据内容图标</p>
+    </div>
+    <div class="icon-grid">
+      <div class="icon-cell" data-name="file" data-category="data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="icon-name">file</span>
+        <span class="icon-filename">file.svg</span>
+      </div>
+      <div class="icon-cell" data-name="folder" data-category="data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        <span class="icon-name">folder</span>
+        <span class="icon-filename">folder.svg</span>
+      </div>
+      <div class="icon-cell" data-name="list" data-category="data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        <span class="icon-name">list</span>
+        <span class="icon-filename">list.svg</span>
+      </div>
+      <div class="icon-cell" data-name="table" data-category="data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+        <span class="icon-name">table</span>
+        <span class="icon-filename">table.svg</span>
+      </div>
+      <div class="icon-cell" data-name="grid" data-category="data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span class="icon-name">grid</span>
+        <span class="icon-filename">grid.svg</span>
+      </div>
+      <div class="icon-cell" data-name="chart" data-category="data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        <span class="icon-name">chart</span>
+        <span class="icon-filename">chart.svg</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 通信类 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">communication/</div>
+      <h2 class="section-title">通信 · Communication</h2>
+      <p class="section-desc">消息、用户、通知、邮件等沟通交互图标</p>
+    </div>
+    <div class="icon-grid">
+      <div class="icon-cell" data-name="user" data-category="communication">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="icon-name">user</span>
+        <span class="icon-filename">user.svg</span>
+      </div>
+      <div class="icon-cell" data-name="users" data-category="communication">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <span class="icon-name">users</span>
+        <span class="icon-filename">users.svg</span>
+      </div>
+      <div class="icon-cell" data-name="message" data-category="communication">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span class="icon-name">message</span>
+        <span class="icon-filename">message.svg</span>
+      </div>
+      <div class="icon-cell" data-name="send" data-category="communication">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        <span class="icon-name">send</span>
+        <span class="icon-filename">send.svg</span>
+      </div>
+      <div class="icon-cell" data-name="mail" data-category="communication">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span class="icon-name">mail</span>
+        <span class="icon-filename">mail.svg</span>
+      </div>
+      <div class="icon-cell" data-name="bell" data-category="communication">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="icon-name">bell</span>
+        <span class="icon-filename">bell.svg</span>
+      </div>
+      <div class="icon-cell" data-name="quote" data-category="communication">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zM15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
+        <span class="icon-name">quote</span>
+        <span class="icon-filename">quote.svg</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 地质主题 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">geology/</div>
+      <h2 class="section-title">地质 · Geology</h2>
+      <p class="section-desc">主题特色图标，灵感源自地质学——岩层、钻探、矿物、测绘等符号</p>
+    </div>
+    <div class="icon-grid large">
+      <div class="icon-cell icon-cell-large geology" data-name="layers" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="icon-name">layers</span>
+        <span class="icon-filename">layers.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="strata" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h20M2 8h20M2 12h20M2 16h20M2 20h20M2 4v16M22 4v16"/><path d="M8 4v16M16 4v16"/></svg>
+        <span class="icon-name">strata</span>
+        <span class="icon-filename">strata.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="core" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L12 4l8 16H4zM7.5 12h9M12 4v16"/><path d="M6.5 8.5l3 3.5M17.5 8.5l-3 3.5"/></svg>
+        <span class="icon-name">core</span>
+        <span class="icon-filename">core.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="drill" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v16M6 6l6-4 6 4M6 18h12M4 22h16"/><path d="M10 14h4"/></svg>
+        <span class="icon-name">drill</span>
+        <span class="icon-filename">drill.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="crystal" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l5 5 5-3 5 3 5-5-10-5zM7 12l5 10 5-10"/><path d="M2 7l5 5M22 7l-5 5"/></svg>
+        <span class="icon-name">crystal</span>
+        <span class="icon-filename">crystal.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="compass" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+        <span class="icon-name">compass</span>
+        <span class="icon-filename">compass.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="pin" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="icon-name">pin</span>
+        <span class="icon-filename">pin.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="coordinate" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><path d="M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <span class="icon-name">coordinate</span>
+        <span class="icon-filename">coordinate.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="map" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z"/><path d="M9 4v13M15 7v13"/></svg>
+        <span class="icon-name">map</span>
+        <span class="icon-filename">map.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="flag" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+        <span class="icon-name">flag</span>
+        <span class="icon-filename">flag.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="time" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="icon-name">time</span>
+        <span class="icon-filename">time.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="clock" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 8 14"/></svg>
+        <span class="icon-name">clock</span>
+        <span class="icon-filename">clock.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="scan" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M3 17v2a2 2 0 002 2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2"/><path d="M7 12h10"/></svg>
+        <span class="icon-name">scan</span>
+        <span class="icon-filename">scan.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="image" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span class="icon-name">image</span>
+        <span class="icon-filename">image.svg</span>
+      </div>
+      <div class="icon-cell icon-cell-large geology" data-name="play" data-category="geology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        <span class="icon-name">play</span>
+        <span class="icon-filename">play.svg</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 图标文件清单 ============ -->
+<div class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">manifest</div>
+      <h2 class="section-title">图标清单 · Icon Manifest</h2>
+      <p class="section-desc">全部图标的文件名称、分类与说明</p>
+    </div>
+    <div class="spec-wrap">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>文件名</th>
+            <th>分类</th>
+            <th>预览</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>arrow-right.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></td><td>右箭头</td></tr>
+          <tr><td>arrow-left.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></td><td>左箭头</td></tr>
+          <tr><td>arrow-up.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></td><td>上箭头</td></tr>
+          <tr><td>arrow-down.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></td><td>下箭头</td></tr>
+          <tr><td>chevron-right.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></td><td>右V形</td></tr>
+          <tr><td>chevron-left.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></td><td>左V形</td></tr>
+          <tr><td>chevron-down.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></td><td>下V形（展开）</td></tr>
+          <tr><td>chevron-up.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg></td><td>上V形（收起）</td></tr>
+          <tr><td>expand.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></td><td>展开（加号）</td></tr>
+          <tr><td>collapse.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></td><td>折叠（减号）</td></tr>
+          <tr><td>menu.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></td><td>菜单（三横线）</td></tr>
+          <tr><td>close.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></td><td>关闭/删除</td></tr>
+          <tr><td>back.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></td><td>返回（箭头+线）</td></tr>
+          <tr><td>home.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg></td><td>首页</td></tr>
+          <tr><td>external.svg</td><td>navigation</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg></td><td>外部链接</td></tr>
+        </tbody>
+      </table>
+      <table class="spec-table">
+        <thead>
+          <tr><th>文件名</th><th>分类</th><th>预览</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>search.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></td><td>搜索</td></tr>
+          <tr><td>add.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></td><td>添加</td></tr>
+          <tr><td>edit.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></td><td>编辑</td></tr>
+          <tr><td>delete.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v12a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12zM10 11v4M14 11v4"/></svg></td><td>删除</td></tr>
+          <tr><td>copy.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></td><td>复制</td></tr>
+          <tr><td>settings.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></td><td>设置</td></tr>
+          <tr><td>refresh.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg></td><td>刷新</td></tr>
+          <tr><td>download.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></td><td>下载</td></tr>
+          <tr><td>upload.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></td><td>上传</td></tr>
+          <tr><td>filter.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg></td><td>筛选</td></tr>
+          <tr><td>star.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></td><td>收藏/评分</td></tr>
+          <tr><td>share.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></td><td>分享</td></tr>
+          <tr><td>link.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></td><td>链接</td></tr>
+          <tr><td>more.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></td><td>更多操作</td></tr>
+          <tr><td>eye-open.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></td><td>显示/可见</td></tr>
+          <tr><td>eye-closed.svg</td><td>action</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24"/><path d="M1 1l22 22"/></svg></td><td>隐藏</td></tr>
+        </tbody>
+      </table>
+      <table class="spec-table">
+        <thead><tr><th>文件名</th><th>分类</th><th>预览</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>check-circle.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/></svg></td><td>成功（圆形）</td></tr>
+          <tr><td>check.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></td><td>勾选/完成</td></tr>
+          <tr><td>warning.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg></td><td>警告（三角惊叹号）</td></tr>
+          <tr><td>error.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></td><td>错误（圆X）</td></tr>
+          <tr><td>info.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></td><td>信息</td></tr>
+          <tr><td>question.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></td><td>帮助/疑问</td></tr>
+          <tr><td>alert.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3" fill="currentColor"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg></td><td>提醒（带红点）</td></tr>
+          <tr><td>thumbs-up.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg></td><td>点赞</td></tr>
+          <tr><td>spinner.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></td><td>加载中</td></tr>
+          <tr><td>dot.svg</td><td>status</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg></td><td>状态指示点</td></tr>
+          <tr><td>file.svg</td><td>data</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></td><td>文件</td></tr>
+          <tr><td>folder.svg</td><td>data</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></td><td>文件夹</td></tr>
+          <tr><td>list.svg</td><td>data</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></td><td>列表</td></tr>
+          <tr><td>table.svg</td><td>data</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></td><td>表格</td></tr>
+          <tr><td>grid.svg</td><td>data</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></td><td>网格</td></tr>
+          <tr><td>chart.svg</td><td>data</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></td><td>图表</td></tr>
+          <tr><td>user.svg</td><td>communication</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></td><td>用户</td></tr>
+          <tr><td>users.svg</td><td>communication</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></td><td>多用户</td></tr>
+          <tr><td>message.svg</td><td>communication</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></td><td>消息</td></tr>
+          <tr><td>send.svg</td><td>communication</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></td><td>发送</td></tr>
+          <tr><td>mail.svg</td><td>communication</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></td><td>邮件</td></tr>
+          <tr><td>bell.svg</td><td>communication</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></td><td>通知</td></tr>
+          <tr><td>quote.svg</td><td>communication</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zM15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg></td><td>引用</td></tr>
+          <tr><td>layers.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></td><td>岩层</td></tr>
+          <tr><td>strata.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h20M2 8h20M2 12h20M2 16h20M2 20h20M2 4v16M22 4v16"/><path d="M8 4v16M16 4v16"/></svg></td><td>层理/剖面</td></tr>
+          <tr><td>core.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L12 4l8 16H4zM7.5 12h9M12 4v16"/><path d="M6.5 8.5l3 3.5M17.5 8.5l-3 3.5"/></svg></td><td>岩芯样本</td></tr>
+          <tr><td>drill.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v16M6 6l6-4 6 4M6 18h12M4 22h16"/><path d="M10 14h4"/></svg></td><td>钻探</td></tr>
+          <tr><td>crystal.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l5 5 5-3 5 3 5-5-10-5zM7 12l5 10 5-10"/><path d="M2 7l5 5M22 7l-5 5"/></svg></td><td>矿物晶体</td></tr>
+          <tr><td>compass.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg></td><td>罗盘/定向</td></tr>
+          <tr><td>pin.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></td><td>定位标记</td></tr>
+          <tr><td>coordinate.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><path d="M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></td><td>坐标</td></tr>
+          <tr><td>map.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z"/><path d="M9 4v13M15 7v13"/></svg></td><td>地图</td></tr>
+          <tr><td>flag.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg></td><td>标记旗</td></tr>
+          <tr><td>time.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></td><td>时间/历史</td></tr>
+          <tr><td>clock.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 8 14"/></svg></td><td>时钟</td></tr>
+          <tr><td>scan.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2M3 17v2a2 2 0 002 2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2"/><path d="M7 12h10"/></svg></td><td>扫描/探测</td></tr>
+          <tr><td>image.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></td><td>图像</td></tr>
+          <tr><td>play.svg</td><td>geology</td><td class="preview-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></td><td>播放</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="site-footer">
+  <div class="page-wrap">
+    <p>图标库 v1.0 · 地下空间所数字化平台<br>
+    为 <span class="site-footer-mono">岩筑 · YanZhu Design System</span> 与 <span class="site-footer-mono">岩层 · Lith Design System</span> 共用</p>
+    <p class="site-footer-mono" style="margin-top:8px;">SVG · 24×24 · stroke-width:1.8 · stroke-linecap:round · fill:none</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+document.querySelectorAll('.icon-cell').forEach(cell => {
+  cell.addEventListener('click', function() {
+    const name = this.dataset.name;
+    const cat = this.dataset.category;
+    const svg = this.querySelector('svg').outerHTML;
+    const toast = document.getElementById('toast');
+
+    const code = '&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                 'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"&gt;' +
+                 svg.match(/<path[^>]*\/>|<circle[^>]*\/>|<rect[^>]*\/>|<polygon[^>]*\/>|<polyline[^>]*\/>/g).join('') +
+                 '&lt;/svg&gt;';
+
+    navigator.clipboard.writeText(svg.replace(/<svg[^>]*>/, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">')).then(() => {
+      toast.textContent = '已复制: ' + cat + '/' + name + '.svg';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@zbits/ui 组件库演示 · 岩筑 YánZhù</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+  @import url('https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css');
+  :root {
+    --bg-primary:#f2f0eb;--bg-secondary:#e9e6e0;--bg-tertiary:#faf9f6;--bg-card:#faf9f6;
+    --bg-input:#f2f0eb;--bg-header:#faf9f6;--bg-code:#e9e6e0;
+    --border:#ccc8c0;--border-hover:#9e9a91;--border-strong:#6b675e;
+    --rule:#d5d1ca;--rule-light:#e0ddd7;
+    --text-primary:#1c1b18;--text-secondary:#5c5850;--text-tertiary:#8e8a80;
+    --text-disabled:#b8b4aa;--text-inverse:#f4f2ec;
+    --accent:#3a7a6c;--accent-hover:#2c5f54;--accent-light:#e4edeb;--accent-muted:#a8c5be;
+    --amber:#b87328;--amber-hover:#9a5f1e;--amber-light:#fdf3e6;
+    --success:#4a7a56;--success-light:#eaf2ec;--warning:#8a6a1a;--warning-light:#f5efe2;
+    --error:#8a3232;--error-light:#f5e8e8;
+    --logo-bg:#2c5f54;--logo-text:#d4e4df;
+    --surface-50:#f2f0eb;--surface-100:#e9e6e0;--surface-200:#ddd9d1;--surface-300:#ccc8c0;
+    --surface-400:#9e9a91;--surface-500:#8e8a80;--surface-600:#5c5850;--surface-700:#3a3832;--surface-800:#28271f;--surface-900:#1c1b18;
+    --shadow-soft:0 1px 0 var(--surface-200);--shadow-float:0 2px 0 var(--surface-300);
+    --radius-sm:2px;--radius-md:2px;--radius-lg:3px;
+    --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;
+    --sp-8:32px;--sp-10:40px;--sp-12:48px;--sp-16:64px;
+    --text-xs:11px;--text-sm:12px;--text-base:14px;--text-md:15px;
+    --text-lg:18px;--text-xl:20px;--text-2xl:28px;--text-3xl:36px;
+    --ease-out:cubic-bezier(0.16,1,0.3,1);--duration-fast:120ms;--duration-normal:200ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;scrollbar-gutter:stable;overflow-y:scroll}
+  body{margin:0;padding:0;background:var(--bg-primary);color:var(--text-primary);font-family:'Noto Sans SC',system-ui,-apple-system,sans-serif;font-size:var(--text-base);line-height:1.7;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--surface-300)}
+  ::webkit-scrollbar-thumb:hover{background:var(--surface-400)}
+  ::selection{background:var(--accent-muted);color:var(--surface-900)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  input,textarea,select{background:var(--bg-input)!important;color:var(--text-primary)!important;border:1px solid var(--border)!important;font-family:inherit!important;transition:border-color 120ms ease!important}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;outline:none!important;box-shadow:inset 0 0 0 1px var(--accent)!important}
+  input::placeholder{color:var(--text-disabled)!important;font-style:italic}
+  .bg-grid{background-color:var(--bg-primary);background-image:linear-gradient(var(--rule-light) 1px,transparent 1px),linear-gradient(90deg,var(--rule-light) 1px,transparent 1px);background-size:48px 48px}
+</style>
+</head>
+<body>
+<script type="text/x-template" id="demo-app-template">
+<div class="bg-grid" style="min-height:100vh">
+  <!-- Top Nav -->
+  <nav class="demo-nav"><div class="demo-nav-inner">
+    <a v-for="item in [
+        {key:'buttons',label:'ZButton'},{key:'badge',label:'ZBadge'},{key:'card',label:'ZCard'},{key:'modal',label:'ZModal'},
+        {key:'form',label:'表单'},{key:'table',label:'ZTable'},{key:'feedback',label:'反馈'},{key:'nav',label:'导航'},
+        {key:'hero',label:'ZHero'},{key:'llm-config',label:'ZLLMConfig'},{key:'embedding-config',label:'ZEmbeddingConfig'},{key:'chat',label:'ZChatWindow'},{key:'streaming',label:'ZStreamingText'},{key:'markdown',label:'ZMarkdown'},{key:'composer',label:'ZChatComposer'},{key:'chatfeedback',label:'ZChatFeedback'},{key:'sources',label:'ZSourceList'},{key:'data',label:'数据'},{key:'metrics',label:'指标'},{key:'layout',label:'布局'}
+      ]" :key="item.key" :href="'#'+item.key">{{ item.label }}</a>
+  </div></nav>
+
+  <div class="demo-wrapper">
+    <!-- Hero -->
+    <div class="demo-hero">
+      <p class="demo-eyebrow">YánZhù Design System / @zbits/ui</p>
+      <h1 class="demo-title">组件库演示</h1>
+      <p class="demo-desc">岩筑设计系统 — 面向地下空间所数字化平台的全线产品。氧化铜绿（Patina）作为主强调色，体现精密建造的设计语言。共 29 个可交互组件。</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="demo-meta">
+      <div class="demo-meta-item"><span class="demo-meta-val">29</span><span class="demo-meta-lbl">组件</span></div>
+      <div class="demo-meta-item"><span class="demo-meta-val">1</span><span class="demo-meta-lbl">Composable</span></div>
+      <div class="demo-meta-item"><span class="demo-meta-val">Vue 3</span><span class="demo-meta-lbl">框架</span></div>
+      <div class="demo-meta-item"><span class="demo-meta-val">PC</span><span class="demo-meta-lbl">设计语言</span></div>
+    </div>
+
+    <!-- ZButton -->
+    <section id="buttons" class="demo-section">
+      <p class="demo-section-eyebrow">01</p>
+      <h2 class="demo-section-title">ZButton 按钮</h2>
+      <p class="demo-section-desc">4 种变体 × 3 种尺寸，支持 loading 态、icon 插槽。</p>
+      <div class="demo-grid-2">
+        <div class="demo-item">
+          <p class="demo-item-title">Variant 变体</p>
+          <div class="demo-item-body">
+            <ZButton variant="primary">主要按钮</ZButton>
+            <ZButton variant="secondary">次要按钮</ZButton>
+            <ZButton variant="ghost">幽灵按钮</ZButton>
+            <ZButton variant="danger">危险按钮</ZButton>
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">Size 尺寸 × State 状态</p>
+          <div class="demo-item-body">
+            <ZButton size="sm">小号</ZButton>
+            <ZButton size="md">中号</ZButton>
+            <ZButton size="lg">大号</ZButton>
+            <ZButton disabled>禁用</ZButton>
+            <ZButton loading>加载中</ZButton>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZBadge + ZTag -->
+    <section id="badge" class="demo-section">
+      <p class="demo-section-eyebrow">02</p>
+      <h2 class="demo-section-title">ZBadge 徽标 / ZTag 标签</h2>
+      <p class="demo-section-desc">6 种颜色变体，支持圆点模式；标签可关闭。</p>
+      <div class="demo-grid-2">
+        <div class="demo-item">
+          <p class="demo-item-title">ZBadge 变体</p>
+          <div class="demo-item-body">
+            <ZBadge variant="default">默认</ZBadge>
+            <ZBadge variant="accent">强调</ZBadge>
+            <ZBadge variant="amber">琥珀</ZBadge>
+            <ZBadge variant="success">成功</ZBadge>
+            <ZBadge variant="warning">警告</ZBadge>
+            <ZBadge variant="error">错误</ZBadge>
+            <ZBadge variant="success" dot>圆点</ZBadge>
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">ZTag 标签</p>
+          <div class="demo-item-body">
+            <ZTag>默认标签</ZTag>
+            <ZTag>资料包</ZTag>
+            <ZTag closable @close="addToast('标签已关闭','info')">可关闭</ZTag>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZCard -->
+    <section id="card" class="demo-section">
+      <p class="demo-section-eyebrow">03</p>
+      <h2 class="demo-section-title">ZCard 卡片</h2>
+      <p class="demo-section-desc">header / body / footer 三段式，支持 hover 变色、muted 变体、动态 padding。</p>
+      <div class="demo-grid-3">
+        <ZCard>
+          <template #header><strong>基础卡片</strong><ZBadge variant="accent">default</ZBadge></template>
+          这是卡片内容区域，可放置任意内容。
+          <template #footer><small style="color:var(--text-tertiary)">卡片底部</small></template>
+        </ZCard>
+        <ZCard hover>
+          <template #header><strong>Hover 卡片</strong><ZBadge variant="success">hover</ZBadge></template>
+          鼠标悬停时边框变色，适合可点击的卡片。
+          <template #footer><small style="color:var(--text-tertiary)">hover: border-accent</small></template>
+        </ZCard>
+        <ZCard muted>
+          <template #header><strong>Muted 卡片</strong><ZBadge variant="amber">muted</ZBadge></template>
+          使用次要底色，用于层级较低的辅助面板。
+        </ZCard>
+      </div>
+    </section>
+
+    <!-- ZModal -->
+    <section id="modal" class="demo-section">
+      <p class="demo-section-eyebrow">04</p>
+      <h2 class="demo-section-title">ZModal 模态框 / ZConfirm 确认弹窗</h2>
+      <p class="demo-section-desc">Teleport + 过渡动画。确认弹窗支持 danger 和 loading 态。</p>
+      <div class="demo-item-body" style="gap:var(--sp-3);padding:0">
+        <ZButton @click="modalVis=true">打开模态框</ZButton>
+        <ZButton variant="secondary" @click="confirmVis=true">打开确认弹窗</ZButton>
+      </div>
+      <ZModal :visible="modalVis" title="模态框示例" @close="modalVis=false">
+        <p>这是一个 ZModal 组件的演示。内容区域使用 body 插槽。</p>
+        <p style="margin-top:var(--sp-3);color:var(--text-secondary)">支持最大宽度自定义、自定义 footer。</p>
+        <template #footer>
+          <ZButton variant="secondary" @click="modalVis=false">取消</ZButton>
+          <ZButton @click="modalVis=false;addToast('操作已确认','success')">确认</ZButton>
+        </template>
+      </ZModal>
+      <ZConfirm :visible="confirmVis" title="确认操作" message="确定要执行此操作吗？" @cancel="confirmVis=false" @confirm="confirmVis=false;addToast('已确认','success')" />
+    </section>
+
+    <!-- ZTable -->
+    <section id="table" class="demo-section">
+      <p class="demo-section-eyebrow">05</p>
+      <h2 class="demo-section-title">ZTable 数据表格</h2>
+      <p class="demo-section-desc">列配置、行 hover 高亮、空数据占位、自定义列插槽。</p>
+      <ZTable :columns="tableCols" :data="tableData" />
+    </section>
+
+    <!-- ZFormField + ZSelect + ZSearch -->
+     <section id="form" class="demo-section">
+       <p class="demo-section-eyebrow">06</p>
+       <h2 class="demo-section-title">表单组件</h2>
+       <p class="demo-section-desc">ZFormField 统一表单行、ZSelect 下拉选择、ZSearch 搜索栏。</p>
+       <div class="demo-grid-3">
+        <div class="demo-item">
+          <p class="demo-item-title">ZFormField 表单行</p>
+          <div class="demo-item-body-col">
+            <ZFormField label="项目名称" hint="请输入项目名称" />
+            <ZFormField label="项目名称" required>…</ZFormField>
+            <ZFormField label="项目名称" error="名称不能为空" required>…</ZFormField>
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">ZSelect 下拉</p>
+          <div class="demo-item-body-col">
+            <ZSelect :options="selectOpts" placeholder="请选择角色" v-model="selExample" />
+            <span class="fss" style="font-size:var(--text-xs);color:var(--text-tertiary)">当前选中：{{ selExample || '未选择' }}</span>
+          </div>
+        </div>
+        <div class="demo-item">
+           <p class="demo-item-title">ZSearch 搜索栏</p>
+           <div class="demo-item-body-col">
+             <ZSearch v-model="searchQ" @search="addToast('搜索: '+$event,'info')" placeholder="搜索项目..." />
+           </div>
+         </div>
+       </div>
+     </section>
+
+    <!-- ZAlert + ZToast + ZProgress -->
+    <section id="feedback" class="demo-section">
+      <p class="demo-section-eyebrow">07</p>
+      <h2 class="demo-section-title">反馈组件</h2>
+      <p class="demo-section-desc">ZAlert 消息条、ZToast 通知、ZProgress 进度条、ZSpinner 加载动画。</p>
+      <div class="demo-item" style="margin-bottom:var(--sp-4)">
+        <p class="demo-item-title">ZAlert 消息条</p>
+        <div class="demo-item-body-col">
+          <ZAlert v-if="showAlert" type="info" closable @close="showAlert=false">这是一条提示消息</ZAlert>
+          <ZAlert type="success">操作成功！已保存。</ZAlert>
+          <ZAlert type="warning">部分字段未填写。</ZAlert>
+          <ZAlert type="error">网络异常，请重试。</ZAlert>
+          <ZButton size="sm" @click="showAlert=true" v-if="!showAlert">恢复 info 提示</ZButton>
+        </div>
+      </div>
+      <div class="demo-grid-3">
+        <div class="demo-item">
+          <p class="demo-item-title">ZToast 通知</p>
+          <div class="demo-item-body-col">
+            <ZButton size="sm" @click="addToast('这是一条信息','info')">Info</ZButton>
+            <ZButton size="sm" variant="secondary" @click="addToast('操作成功!','success')">Success</ZButton>
+            <ZButton size="sm" variant="secondary" @click="addToast('警告提示','warning')">Warning</ZButton>
+            <ZButton size="sm" variant="danger" @click="addToast('出错了!','error')">Error</ZButton>
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">ZProgress 进度条</p>
+          <div class="demo-item-body-col">
+            <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin-bottom:var(--sp-2)">确定进度 60%</p>
+            <ZProgress :percent="60" />
+            <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin:var(--sp-2) 0 0">不确定进度（动画）</p>
+            <ZProgress />
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">ZSpinner 加载圈</p>
+          <div class="demo-item-body">
+            <ZSpinner size="sm" />
+            <ZSpinner size="md" />
+            <ZSpinner size="lg" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZStepper + ZPagination -->
+    <section id="nav" class="demo-section">
+      <p class="demo-section-eyebrow">08</p>
+      <h2 class="demo-section-title">导航 / 分页组件</h2>
+      <p class="demo-section-desc">ZStepper 步骤条（圆+线+标签）、ZPagination 分页（折叠省略号）。</p>
+      <div class="demo-item" style="margin-bottom:var(--sp-4)">
+        <p class="demo-item-title">ZStepper 步骤条 — 当前第 {{ stepCur }} 步</p>
+        <div class="demo-item-body-col">
+          <ZStepper :steps="steps" :current="stepCur" />
+          <div class="demo-item-body">
+            <ZButton size="sm" @click="stepCur = Math.max(0,stepCur-1)" :disabled="stepCur===0">上一步</ZButton>
+            <ZButton size="sm" variant="secondary" @click="stepCur = Math.min(steps.length,stepCur+1)" :disabled="stepCur>=steps.length">下一步</ZButton>
+            <span style="font-size:var(--text-xs);color:var(--text-tertiary)" v-if="stepCur===steps.length">全部完成!</span>
+          </div>
+        </div>
+      </div>
+      <div class="demo-item">
+        <p class="demo-item-title">ZPagination 分页</p>
+        <ZPagination :current="pagCur" :total="pagTotal" @update:current="pagCur=$event" />
+      </div>
+    </section>
+
+    <!-- ZHero -->
+    <section id="hero" class="demo-section">
+      <p class="demo-section-eyebrow">09</p>
+      <h2 class="demo-section-title">ZHero 通用 Hero 区 / ZSparkline 走势线 / ZMetricBar 指标行</h2>
+      <p class="demo-section-desc">源自 RAG 知识库性能指标组件。ZHero 含 eyebrow + title + description + meta chip + 操作区；ZSparkline 展示迷你趋势；ZMetricBar 展示指标行。</p>
+      <div class="demo-item" style="margin-bottom:var(--sp-4)">
+        <p class="demo-item-title">ZHero 完整示例</p>
+        <ZHero eyebrow="RAG 知识库" title="系统性能总览" description="近 7 天知识库检索与 LLM 调用性能指标概览，监控系统运行状态。" :meta="['近7天', 'GPT-4o', '正常']">
+          <ZButton size="sm" variant="secondary">刷新</ZButton>
+          <ZButton size="sm">查看详情</ZButton>
+        </ZHero>
+      </div>
+      <div class="demo-grid-3">
+        <div class="demo-item">
+          <p class="demo-item-title">ZSparkline</p>
+          <div class="demo-item-body-col">
+            <div class="demo-item-body" style="justify-content:center">
+              <ZSparkline value="300" max="350" color="var(--accent)" />
+              <ZSparkline value="18000" max="25000" color="var(--warning)" />
+            </div>
+            <p style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--sp-2)">SVG 迷你走势线，可配置 value/max/color</p>
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">ZMetricBar 指标行</p>
+          <div class="demo-item-body-col">
+            <ZMetricBar label="平均 RPM" value="1.234">
+              <template #icon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="13" r="7"/><path d="M9 3h6"/></svg></template>
+              <template #spark><ZSparkline value="300" max="350" color="var(--accent)" /></template>
+            </ZMetricBar>
+            <ZMetricBar label="平均 TPM" value="60.000" period="近7天">
+              <template #icon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/><path d="M8 4v16"/></svg></template>
+              <template #spark><ZSparkline value="18000" max="25000" color="var(--warning)" /></template>
+            </ZMetricBar>
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">ZMetricBar 简约模式</p>
+          <div class="demo-item-body-col">
+            <ZMetricBar label="调用次数" value="1,234 次">
+              <template #icon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12a8 8 0 1116 0"/><path d="M12 12l4-4"/></svg></template>
+            </ZMetricBar>
+            <ZMetricBar label="延迟" value="320ms" period="P99">
+              <template #icon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></template>
+            </ZMetricBar>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZLLMConfig -->
+    <section id="llm-config" class="demo-section">
+      <p class="demo-section-eyebrow">10</p>
+      <h2 class="demo-section-title">ZLLMConfig 大语言模型配置</h2>
+      <p class="demo-section-desc">LLM 专用配置面板。API Key 显隐、Base URL、模型选择（含刷新按钮）、Temperature / Max Tokens 滑块，测试/保存按钮。</p>
+      <div class="demo-item">
+        <ZLLMConfig
+          title="LLM 配置演示"
+          description="配置大语言模型的连接参数与推理设置。"
+          :models="[{id:'qwen-plus',name:'通义千问 Plus'},{id:'gpt-4o',name:'GPT-4o'},{id:'deepseek-v3',name:'DeepSeek V3'}]"
+          model="qwen-plus"
+          base-url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+          api-key="sk-demo-key-xxxx"
+          :temperature="0.7"
+          :max-tokens="4096"
+          @test="addToast('LLM 连接测试演示','info')"
+          @save="addToast('LLM 配置已保存','success')"
+          @fetch="addToast('请求 LLM 模型列表','info')"
+        />
+      </div>
+    </section>
+
+    <!-- ZEmbeddingConfig -->
+    <section id="embedding-config" class="demo-section">
+      <p class="demo-section-eyebrow">10a</p>
+      <h2 class="demo-section-title">ZEmbeddingConfig 向量模型配置</h2>
+      <p class="demo-section-desc">向量模型专用配置面板。API Key 显隐、Base URL、模型选择（含刷新按钮）、向量维度选择，测试/保存按钮。</p>
+      <div class="demo-item">
+        <ZEmbeddingConfig
+          title="向量模型配置演示"
+          description="配置文本嵌入模型的连接参数与向量维度。"
+          :models="[{id:'text-embedding-v3',name:'通义千问 Embedding V3'},{id:'text-embedding-v2',name:'通义千问 Embedding V2'},{id:'text-embedding-ada-002',name:'OpenAI Ada-002'}]"
+          model="text-embedding-v3"
+          base-url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+          api-key="sk-embedding-key-xxxx"
+          :dimensions="1024"
+          @test="addToast('Embedding 连接测试演示','info')"
+          @save="addToast('Embedding 配置已保存','success')"
+          @fetch="addToast('请求向量模型列表','info')"
+        />
+      </div>
+    </section>
+
+    <!-- ZChatWindow -->
+    <section id="chat" class="demo-section">
+      <p class="demo-section-eyebrow">11</p>
+      <h2 class="demo-section-title">ZChatWindow 对话窗口</h2>
+      <p class="demo-section-desc">AI 对话消息列表窗口，支持用户/助手/系统角色，自动滚动到底部，配合流式输出展示打字机效果。</p>
+      <div class="demo-item">
+        <div style="height: 320px;">
+          <ZChatWindow :messages="chatMessages" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ZStreamingText -->
+    <section id="streaming" class="demo-section">
+      <p class="demo-section-eyebrow">12</p>
+      <h2 class="demo-section-title">ZStreamingText 流式文本</h2>
+      <p class="demo-section-desc">打字机效果文本输出，支持自定义速度、标点停顿、暂停/恢复控制。</p>
+      <div class="demo-grid-2">
+        <div class="demo-item">
+          <p class="demo-item-title">流式输出演示</p>
+          <div class="demo-item-body-col">
+            <div style="padding: var(--sp-4); background: var(--bg-secondary); border: 1px solid var(--border); min-height: 100px;">
+              <ZStreamingText :text="streamText" :complete="streamComplete" />
+            </div>
+            <div style="margin-top: var(--sp-3); display: flex; gap: var(--sp-2);">
+              <ZButton size="sm" @click="startStream">开始演示</ZButton>
+              <ZButton size="sm" variant="secondary" @click="resetStream">重置</ZButton>
+            </div>
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">使用场景</p>
+          <div class="demo-item-body-col">
+            <ul style="margin: 0; padding-left: var(--sp-4); font-size: var(--text-sm); color: var(--text-secondary);">
+              <li>LLM 回答流式展示</li>
+              <li>代码逐行输出</li>
+              <li>消息打字机效果</li>
+              <li>通知动态更新</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZMarkdown -->
+    <section id="markdown" class="demo-section">
+      <p class="demo-section-eyebrow">13</p>
+      <h2 class="demo-section-title">ZMarkdown Markdown渲染</h2>
+      <p class="demo-section-desc">支持标准Markdown语法、数学公式(KaTeX)、代码高亮等完整渲染功能。</p>
+      <div class="demo-item">
+        <p class="demo-item-title">Markdown渲染示例</p>
+        <div class="demo-item-body-col">
+          <div style="padding: var(--sp-4); background: var(--bg-secondary); border: 1px solid var(--border);">
+            <ZMarkdown :text="markdownDemo" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZChatComposer -->
+    <section id="composer" class="demo-section">
+      <p class="demo-section-eyebrow">13a</p>
+      <h2 class="demo-section-title">ZChatComposer 提问输入框</h2>
+      <p class="demo-section-desc">AI 对话提问组件，支持自动增高、Enter 发送 / Shift+Enter 换行、发送与停止按钮状态联动。</p>
+      <div class="demo-item">
+        <p class="demo-item-title">独立模式</p>
+        <div class="demo-item-body-col">
+          <ZChatComposer
+            v-model="composerText"
+            placeholder="输入问题，按 Enter 发送，Shift+Enter 换行"
+            @submit="onComposerSubmit"
+          />
+          <p style="font-size:var(--text-xs);color:var(--text-tertiary)">当前值：{{ composerText || '(空)' }}</p>
+        </div>
+      </div>
+      <div class="demo-item" style="margin-top:var(--sp-4)">
+        <p class="demo-item-title">对话模式（带 loading 和 footer）</p>
+        <div class="demo-item-body-col">
+          <ZChatComposer
+            v-model="composerText2"
+            placeholder="输入问题，按 Enter 发送"
+            :loading="composerLoading"
+            @submit="onComposerSubmit2"
+            @stop="composerLoading = false"
+          >
+            <template #hints>
+              <span class="composer-hint">Enter 发送 · Shift+Enter 换行 · 回答基于知识库检索</span>
+            </template>
+            <template #footer>
+              回答基于检索结果生成，重要结论请核对证据来源。
+            </template>
+          </ZChatComposer>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZChatFeedback -->
+    <section id="chatfeedback" class="demo-section">
+      <p class="demo-section-eyebrow">13b</p>
+      <h2 class="demo-section-title">ZChatFeedback 问答质量评价</h2>
+      <p class="demo-section-desc">AI 回答质量评价按钮组，支持有用/不准确/找不到依据/引用错误四种评价。</p>
+      <div class="demo-item">
+        <p class="demo-item-title">正常状态（有 conversationId）</p>
+        <div class="demo-item-body-col">
+          <ZChatFeedback
+            conversation-id="conv-001"
+            v-model:status="feedbackStatus1"
+            @submit="onFeedbackSubmit"
+          />
+          <p style="font-size:var(--text-xs);color:var(--text-tertiary)">当前状态：{{ feedbackStatus1 || '(未评价)' }}</p>
+        </div>
+      </div>
+      <div class="demo-item" style="margin-top:var(--sp-4)">
+        <p class="demo-item-title">禁用状态（无 conversationId）</p>
+        <div class="demo-item-body-col">
+          <ZChatFeedback
+            conversation-id=""
+            v-model:status="feedbackStatus2"
+            @submit="onFeedbackSubmit"
+          />
+        </div>
+      </div>
+      <div class="demo-item" style="margin-top:var(--sp-4)">
+        <p class="demo-item-title">失败重试状态</p>
+        <div class="demo-item-body-col">
+          <ZChatFeedback
+            conversation-id="conv-002"
+            v-model:status="feedbackStatus3"
+            @submit="onFeedbackSubmit"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ZSourceList -->
+    <section id="sources" class="demo-section">
+      <p class="demo-section-eyebrow">13c</p>
+      <h2 class="demo-section-title">ZSourceList 证据来源列表</h2>
+      <p class="demo-section-desc">RAG 检索结果来源列表，支持置信度标签、点击展开原文片段。</p>
+      <div class="demo-item">
+        <p class="demo-item-title">证据来源（点击卡片展开）</p>
+        <div class="demo-item-body-col">
+          <ZSourceList :sources="demoSources" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ZStatCard + ZEmpty + ZSkeleton -->
+    <section id="data" class="demo-section">
+      <p class="demo-section-eyebrow">14</p>
+      <h2 class="demo-section-title">数据展示组件</h2>
+      <p class="demo-section-desc">ZStatCard 统计卡片、ZEmpty 空状态、ZSkeleton 骨架屏。</p>
+      <div class="demo-grid-3">
+        <ZStatCard value="128" description="项目总数">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7v13a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          </template>
+        </ZStatCard>
+        <ZStatCard value="47" description="待审签" value-class="text-error">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>
+          </template>
+        </ZStatCard>
+        <ZStatCard value="89%" description="完成率">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </template>
+        </ZStatCard>
+      </div>
+      <div class="demo-grid-2" style="margin-top:var(--sp-4)">
+        <ZEmpty title="暂无数据" description="当前没有可展示的内容，请先创建项目。">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M12 9v6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </template>
+        </ZEmpty>
+        <div class="demo-item">
+          <p class="demo-item-title">ZSkeleton 骨架屏</p>
+          <div class="demo-item-body-col">
+            <ZSkeleton type="heading" />
+            <ZSkeleton type="text" />
+            <ZSkeleton type="text" />
+            <ZSkeleton type="text" style="width:60%" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZAvatar + ZDragDrop -->
+    <section id="layout" class="demo-section">
+      <p class="demo-section-eyebrow">15</p>
+      <h2 class="demo-section-title">其他组件</h2>
+      <p class="demo-section-desc">ZAvatar 头像、ZDragDrop 拖拽上传。</p>
+      <div class="demo-grid-2">
+        <div class="demo-item">
+          <p class="demo-item-title">ZAvatar 头像</p>
+          <div class="demo-item-body">
+            <ZAvatar name="张工" size="sm" />
+            <ZAvatar name="李总工" size="md" />
+            <ZAvatar name="王所" size="lg" />
+          </div>
+        </div>
+        <div class="demo-item">
+          <p class="demo-item-title">ZDragDrop 拖拽上传</p>
+          <ZDragDrop title="上传文件" hint="支持 PDF / Word / Excel / 图片 / 图纸 / MD / TXT 等格式" accept=".pdf,.doc,.docx,.xls,.xlsx,.md,.txt,.jpg,.jpeg,.png,.gif,.svg,.dwg,.dxf" multiple @file="addToast('已收到文件: '+$event,'success')" />
+        </div>
+      </div>
+    </section>
+
+    <footer class="demo-footer">
+      <p>@zbits/ui · 岩筑 YánZhù Design System · 地下空间所数字化平台</p>
+    </footer>
+  </div>
+
+  <ZToast :toasts="toasts" @remove="toasts = toasts.filter(t=>t.id!==$event)" />
+</div>
+</script>
+
+<div id="app"></div>
+<script type="importmap">
+{
+  "imports": {
+    "vue": "https://unpkg.com/vue@3.4/dist/vue.esm-browser.js"
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.2.0/marked.min.js"></script>
+<script type="module">
+import { createApp, ref, reactive, computed, defineComponent, h, onMounted, nextTick } from 'vue'
+
+const { createApp: VueCreateApp, ref: VueRef, reactive: VueReactive, computed: VueComputed, defineComponent: VueDefine, h: VueH } = { createApp, ref, reactive, computed, defineComponent, h }
+
+const ZButton = {
+  name: 'ZButton',
+  props: { variant: { type: String, default: 'primary' }, size: { type: String, default: 'md' }, disabled: Boolean, loading: Boolean },
+  emits: ['click'],
+  template: `
+    <button :class="['btn', 'btn-'+variant, { 'btn-sm': size==='sm', 'btn-lg': size==='lg' }]" :disabled="disabled||loading" @click="$emit('click')">
+      <span v-if="loading" class="btn-spinner"></span>
+      <slot name="icon" v-else />
+      <slot />
+    </button>`
+}
+
+const ZCard = {
+  name: 'ZCard',
+  props: { padding: { type: String, default: 'md' }, hover: Boolean, muted: Boolean },
+  template: `
+    <div class="card" :class="{ 'card-hover': hover, 'card-muted': muted }">
+      <div v-if="$slots.header" class="card-header"><slot name="header" /></div>
+      <div v-if="$slots.default" class="card-body" :style="{ padding: varP }"><slot /></div>
+      <div v-if="$slots.footer" class="card-footer"><slot name="footer" /></div>
+    </div>`,
+  computed: { varP() { const m={none:'0',sm:'var(--sp-4)',md:'var(--sp-6)',lg:'var(--sp-8)'}; return m[this.padding]||m.md } }
+}
+
+const ZBadge = {
+  name: 'ZBadge',
+  props: { variant: { type: String, default: 'default' }, dot: Boolean },
+  template: '<span class="badge" :class="`badge-${variant}`"><span v-if="dot" class="badge-dot" :class="`b-dot-${variant}`"></span><slot /></span>'
+}
+
+const ZModal = {
+  name: 'ZModal',
+  props: { visible: Boolean, title: String, maxWidth: { type: String, default: '520px' } },
+  emits: ['close'],
+  template: `
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
+          <div class="modal" :style="{ maxWidth }">
+            <div class="modal-header"><h3 class="modal-title">{{ title }}</h3><button class="modal-close" @click="$emit('close')">&times;</button></div>
+            <div class="modal-body"><slot /></div>
+            <div v-if="$slots.footer" class="modal-footer"><slot name="footer" /></div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>`
+}
+
+const ZTable = {
+  name: 'ZTable',
+  props: { columns: Array, data: Array, rowKey: { type: String, default: 'id' } },
+  template: `
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th v-for="c in columns" :key="c.key">{{ c.label }}</th></tr></thead>
+      <tbody>
+        <tr v-for="(row,i) in data" :key="row[rowKey]||i">
+          <td v-for="c in columns" :key="c.key"><slot :name="'cell-'+c.key" :row="row" :value="row[c.key]">{{ row[c.key] }}</slot></td>
+        </tr>
+        <tr v-if="!data.length"><td :colspan="columns.length" class="table-empty">暂无数据</td></tr>
+      </tbody>
+    </table></div>`
+}
+
+const ZSearch = {
+  name: 'ZSearch',
+  props: { modelValue: String, placeholder: { type: String, default: '搜索...' } },
+  emits: ['update:modelValue', 'search'],
+  template: `
+    <div class="search-bar"><div class="search-input-wrap">
+      <svg class="search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input :value="modelValue" @input="$emit('update:modelValue',$event.target.value)" @keyup.enter="$emit('search',modelValue)" type="search" class="search-input" :placeholder="placeholder" />
+      <button v-if="modelValue" class="search-clear" @click="$emit('update:modelValue','');$emit('search','')">&times;</button>
+    </div></div>`
+}
+
+const ZSpinner = {
+  name: 'ZSpinner',
+  props: { size: { type: String, default: 'md' }, variant: { type: String, default: 'accent' } },
+  template: '<div class="spinner" :class="[\'spinner-\'+size, \'spinner-var-\'+variant]"></div>'
+}
+
+const ZPagination = {
+  name: 'ZPagination',
+  props: { current: Number, total: Number, pageSize: { type: Number, default: 20 } },
+  emits: ['update:current', 'update:pageSize'],
+  template: `
+    <div class="pagination">
+      <span class="page-info">共 <strong>{{ total }}</strong> 条</span>
+      <div class="page-ctrls">
+        <button :disabled="current<=1" class="page-btn" @click="go(current-1)">‹</button>
+        <template v-for="p in pages" :key="p">
+          <span v-if="p==='...'" class="page-ell">...</span>
+          <button v-else :class="['page-btn',{active:p===current}]" @click="go(p)">{{ p }}</button>
+        </template>
+        <button :disabled="current>=last" class="page-btn" @click="go(current+1)">›</button>
+      </div>
+    </div>`,
+  computed: {
+    last() { return Math.max(1, Math.ceil(this.total/this.pageSize)) },
+    pages() {
+      const lp = this.last, c = this.current
+      if (lp <= 7) return Array.from({length: lp}, (_,i) => i+1)
+      const r = [1]
+      if (c > 3) r.push('...')
+      for (let i = Math.max(2,c-1); i <= Math.min(lp-1,c+1); i++) r.push(i)
+      if (c < lp-2) r.push('...')
+      r.push(lp)
+      return r
+    }
+  },
+  methods: { go(p) { if (p>=1 && p<=this.last) this.$emit('update:current', p) } }
+}
+
+const ZAlert = {
+  name: 'ZAlert',
+  props: { type: { type: String, default: 'info' }, closable: Boolean, visible: { type: Boolean, default: true } },
+  emits: ['close'],
+  template: '<div v-if="visible" :class="[\'alert\',\'alert-\'+type]"><span class="alert-t"><slot /></span><button v-if="closable" class="alert-x" @click="$emit(\'close\')">&times;</button></div>'
+}
+
+const ZProgress = {
+  name: 'ZProgress',
+  props: { percent: Number },
+  template: '<div class="prog-wrap"><div class="prog"><div v-if="percent!==undefined" class="prog-fill" :style="{width:percent+\'%\'}"></div><div v-else class="prog-indi"></div></div></div>'
+}
+
+const ZStepper = {
+  name: 'ZStepper',
+  props: { steps: Array, current: Number },
+  template: `
+    <div class="stepper-demo">
+      <div v-for="(s,i) in steps" :key="i" :class="[\'step-item\',{done:i<current,active:i===current,pending:i>current,last:i===steps.length-1}]">
+        <div class="step-dot"><span v-if="i<current" class="step-chk">&#10003;</span><span v-else class="step-num">{{ i+1 }}</span></div>
+        <span class="step-label">{{ s.label }}</span>
+        <div v-if="i<steps.length-1" class="step-line" :class="{done:i<current}"></div>
+      </div>
+    </div>`
+}
+
+const ZSelect = {
+  name: 'ZSelect',
+  props: { modelValue: [String, Number], options: Array, placeholder: String },
+  emits: ['update:modelValue'],
+  template: `
+    <div class="sel-wrap"><select :value="modelValue" @change="$emit(\'update:modelValue\',$event.target.value)" class="sel">
+      <option v-if="placeholder" value="" disabled>{{ placeholder }}</option>
+      <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+    </select></div>`
+}
+
+const ZConfirm = {
+  name: 'ZConfirm',
+  props: { visible: Boolean, title: String, message: String, confirmText: {type:String,default:'确认'}, cancelText: {type:String,default:'取消'}, danger: Boolean, loading: Boolean },
+  emits: ['confirm', 'cancel'],
+  template: `
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="visible" class="modal-overlay" @click.self="$emit('cancel')">
+          <div class="confirm-dlg"><div class="modal-header"><h3 class="modal-title">{{ title }}</h3></div>
+          <div class="modal-body">{{ message }}<slot /></div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary btn-sm" @click="$emit('cancel')">{{ cancelText }}</button>
+            <button :class="['btn', danger?'btn-danger':'btn-primary', 'btn-sm']" :disabled="loading" @click="$emit('confirm')">{{ loading?'处理中...':confirmText }}</button>
+          </div></div>
+        </div>
+      </Transition>
+    </Teleport>`
+}
+
+const ZAvatar = {
+  name: 'ZAvatar',
+  props: { name: String, size: {type:String,default:'md'} },
+  template: '<span class="avatar-demo" :class="\'avatar-\'+size" :title="name">{{\u0069\u006e\u0069\u0074\u0069\u0061\u006c\u0073}}</span>',
+  computed: { initials() { if (!this.name) return '?'; const p=this.name.trim().split(/\s+/); return p.length>=2 ? (p[0][0]+p[1][0]).toUpperCase() : this.name.slice(0,2).toUpperCase() } }
+}
+
+const ZTag = {
+  name: 'ZTag',
+  props: { closable: Boolean },
+  emits: ['close'],
+  template: '<span class="tag"><slot /><button v-if="closable" class="tag-x" @click="$emit(\'close\')">&times;</button></span>'
+}
+
+const ZFormField = {
+  name: 'ZFormField',
+  props: { label: String, hint: String, error: String, required: Boolean },
+  template: '<div class="ff" :class="{\'ff-err\':!!error}"><label class="ff-label" :class="{\'ff-req\':required}">{{ label }}</label><slot /><span v-if="hint&&!error" class="ff-hint">{{ hint }}</span><span v-if="error" class="ff-err-msg">{{ error }}</span></div>'
+}
+
+const ZStatCard = {
+  name: 'ZStatCard',
+  props: { value: [String,Number], description: String, icon: String, valueClass: String },
+  template: `<div class="stat-c">
+    <div class="stat-ico">
+      <slot name="icon"><span v-if="icon" v-html="icon"></span></slot>
+    </div>
+    <div class="stat-inf">
+      <span class="stat-val" :class="valueClass"><slot name="value">{{ value }}</slot></span>
+      <span class="stat-desc"><slot name="desc">{{ description }}</slot></span>
+    </div>
+  </div>`
+}
+
+const ZEmpty = {
+  name: 'ZEmpty',
+  props: { title: String, description: String, icon: String },
+  template: `<div class="empty">
+    <div class="empty-ico">
+      <slot name="icon"><span v-if="icon" v-html="icon"></span></slot>
+    </div>
+    <h3 class="empty-title">{{ title }}</h3>
+    <p class="empty-desc">{{ description }}</p>
+    <div v-if="$slots.action" class="empty-action"><slot name="action" /></div>
+  </div>`
+}
+
+const ZSkeleton = {
+  name: 'ZSkeleton',
+  props: { type: {type:String,default:'text'} },
+  template: '<div class="skeleton-demo" :class="\'sk-\'+type" :style="type===\'heading\'?{height:\'20px\',marginBottom:\'var(--sp-2)\'}:type===\'avatar\'?{width:\'40px\',height:\'40px\',borderRadius:\'50%\'}:{}"></div>'
+}
+
+const ZToast = {
+  name: 'ZToast',
+  props: { toasts: Array },
+  emits: ['remove'],
+  template: `
+    <Teleport to="body">
+      <div class="toast-ctn">
+        <div v-for="t in toasts" :key="t.id" :class="['toast-demo','t-'+t.type]">
+          <span>{{ t.message }}</span><button class="alert-x" @click="$emit('remove',t.id)">&times;</button>
+        </div>
+      </div>
+    </Teleport>`
+}
+
+const ZDragDrop = {
+  name: 'ZDragDrop',
+  props: { title: String, hint: String, accept: String, multiple: Boolean, loading: Boolean, icon: String },
+  emits: ['file', 'files'],
+  template: `
+    <div class="drop-zone-demo" @dragover.prevent="dragging=true" @dragleave="dragging=false" @drop.prevent="onDrop" @click="triggerFile">
+      <input ref="fi" type="file" :accept="accept" :multiple="multiple" @change="onFile" class="hidden-input" />
+      <div v-if="loading"><p>上传中...</p></div>
+      <template v-else><div class="drop-zone-demo-icon" v-html="icon||'📄'"></div><p class="drop-zone-demo-title">{{ title||'点击上传或拖拽文件' }}</p><p class="fss" style="color:var(--text-tertiary);font-size:var(--text-xs)">{{ hint }}</p></template>
+    </div>`,
+  data: () => ({ dragging: false }),
+  methods: {
+    triggerFile() { this.$refs.fi?.click() },
+    onFile(e) { const f=e.target?.files; if(f?.length) { for(const x of f) this.$emit('file',x.name); if(this.multiple) this.$emit('files',Array.from(f)) } if(this.$refs.fi) this.$refs.fi.value='' },
+    onDrop(e) { this.dragging=false; const f=e.dataTransfer?.files; if(f?.length) { for(const x of f) this.$emit('file',x.name); if(this.multiple) this.$emit('files',Array.from(f)) } }
+  }
+}
+
+const ZHero = {
+  name: 'ZHero',
+  props: { eyebrow: String, title: { type: String, required: true }, description: String, meta: Array },
+  template: `
+    <section class="hero-demo">
+      <div class="hero-t"><p v-if="eyebrow" class="hero-eb">{{ eyebrow }}</p><h1 class="hero-tt">{{ title }}</h1><p v-if="description" class="hero-desc-demo">{{ description }}</p><div v-if="meta?.length" class="hero-mt"><span v-for="m in meta" :key="m" class="hero-chip-demo">{{ m }}</span></div></div>
+      <div v-if="$slots.default" class="hero-act"><slot /></div>
+    </section>`
+}
+
+const ZSparkline = {
+  name: 'ZSparkline',
+  props: { value: [Number,String], max: { type: [Number,String], default: 1.2 }, color: { type: String, default: 'var(--accent)' }, width: { type: Number, default: 84 }, height: { type: Number, default: 36 } },
+  computed: {
+    pts() {
+      const v=Number(this.value), m=Number(this.max)
+      const r=Number.isFinite(v)&&m>0?Math.max(.15,Math.min(.92,v/m)):.2
+      return `8,28 42,${(27-r*18).toFixed(1)} 76,29`
+    }
+  },
+  template: '<svg :width="width" :height="height" viewBox="0 0 84 36" fill="none"><polyline :points="pts" :stroke="color" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+}
+
+const ZMetricBar = {
+  name: 'ZMetricBar',
+  props: { label: String, value: String, period: String },
+  template: `
+    <div class="mb-demo"><div v-if="$slots.icon" class="mb-ico"><slot name="icon" /></div>
+    <div class="mb-info"><p class="mb-lbl">{{ label }}</p><p class="mb-val">{{ value }}</p></div>
+    <div v-if="$slots.spark" class="mb-spark"><slot name="spark" /></div>
+    <span v-if="period" class="mb-period">{{ period }}</span></div>`
+}
+
+const ZLLMConfig = {
+  name: 'ZLLMConfig',
+  props: {
+    title: { type: String, default: '大语言模型配置' },
+    description: String,
+    apiKey: String, baseUrl: String, model: String, models: Array,
+    temperature: { type: Number, default: 0.7 },
+    maxTokens: { type: Number, default: 2048 },
+    loading: Boolean, testing: Boolean, saving: Boolean,
+    testStatus: Object
+  },
+  emits: ['update:apiKey', 'update:baseUrl', 'update:model', 'update:temperature', 'update:maxTokens', 'fetch', 'test', 'save'],
+  template: `
+    <div class="mc-demo"><div class="mc-demo-labels"><span class="mc-demo-eb">LLM 模型连接</span><h3 class="mc-demo-title">{{ title }}</h3><p v-if="description" class="mc-demo-desc">{{ description }}</p></div>
+    <div class="mc-demo-grid">
+      <div class="mc-demo-main">
+        <div class="mc-fld"><label class="mc-lbl">LLM API Key</label><div class="mc-iw"><input :value="apiKey" @input="$emit('update:apiKey',$event.target.value)" :type="sk?'text':'password'" class="mc-i" placeholder="sk-..." /><button type="button" class="mc-e" @click="sk=!sk"><span v-if="sk">\u25CF</span><span v-else>\u25CB</span></button></div></div>
+        <div class="mc-fld"><label class="mc-lbl">Base URL</label><input :value="baseUrl" @input="$emit('update:baseUrl',$event.target.value)" type="text" class="mc-i" placeholder="https://..." /></div>
+        <div class="mc-fld"><label class="mc-lbl">模型名称</label><div class="mc-mr"><select :value="model" @change="$emit('update:model',$event.target.value)" class="mc-s"><option value="">请选择模型</option><option v-for="m in (models||[])" :key="m.id" :value="m.id">{{ m.name }}</option></select><button type="button" class="mc-r" :disabled="loading" @click="$emit('fetch')"><span :class="{spin:loading}">\u21BB</span></button></div><span class="mc-h">从服务器拉取可用模型列表</span></div>
+        <div class="mc-pg"><div class="mc-fld"><div class="mc-sh"><label class="mc-lbl">Temperature</label><span class="mc-sv">{{ temperature }}</span></div><input :value="temperature" @input="$emit('update:temperature',parseFloat($event.target.value))" type="range" min="0" max="1" step="0.1" class="mc-rg" /><div class="mc-rl"><span>精确(0.0)</span><span>平衡(0.7)</span><span>创意(1.0)</span></div></div><div class="mc-fld"><div class="mc-sh"><label class="mc-lbl">Max Tokens</label><span class="mc-sv">{{ maxTokens }}</span></div><input :value="maxTokens" @input="$emit('update:maxTokens',parseInt($event.target.value))" type="range" min="256" max="8192" step="256" class="mc-rg" /><div class="mc-rl"><span>256</span><span>4096</span><span>8192</span></div></div></div>
+      </div>
+      <div class="mc-demo-side"><div class="mc-sb"><p class="mc-se">推理参数</p><p class="mc-st">温度与输出</p><p class="mc-sd">调整回答风格与最大输出长度</p></div><div class="mc-sb"><p class="mc-se">当前模型</p><p class="mc-st">{{ model||'未选择' }}</p><p class="mc-sd">{{ baseUrl||'未配置 URL' }}</p></div></div>
+    </div>
+    <div class="mc-as"><button type="button" class="mc-b mc-b2" :disabled="testing" @click="$emit('test')">{{ testing?'测试中...':'测试连接' }}</button><button type="button" class="mc-b mc-b1" :disabled="saving" @click="$emit('save')">{{ saving?'保存中...':'保存配置' }}</button></div></div>`,
+  data: () => ({ sk: false })
+}
+
+const ZEmbeddingConfig = {
+  name: 'ZEmbeddingConfig',
+  props: {
+    title: { type: String, default: '向量模型配置' },
+    description: String,
+    apiKey: String, baseUrl: String, model: String, models: Array,
+    dimensions: { type: Number, default: 0 },
+    loading: Boolean, testing: Boolean, saving: Boolean,
+    testStatus: Object
+  },
+  emits: ['update:apiKey', 'update:baseUrl', 'update:model', 'update:dimensions', 'fetch', 'test', 'save'],
+  template: `
+    <div class="mc-demo"><div class="mc-demo-labels"><span class="mc-demo-eb">向量模型连接</span><h3 class="mc-demo-title">{{ title }}</h3><p v-if="description" class="mc-demo-desc">{{ description }}</p></div>
+    <div class="mc-demo-grid">
+      <div class="mc-demo-main">
+        <div class="mc-fld"><label class="mc-lbl">Embedding API Key</label><div class="mc-iw"><input :value="apiKey" @input="$emit('update:apiKey',$event.target.value)" :type="sk?'text':'password'" class="mc-i" placeholder="sk-..." /><button type="button" class="mc-e" @click="sk=!sk"><span v-if="sk">\u25CF</span><span v-else>\u25CB</span></button></div></div>
+        <div class="mc-fld"><label class="mc-lbl">Base URL</label><input :value="baseUrl" @input="$emit('update:baseUrl',$event.target.value)" type="text" class="mc-i" placeholder="https://..." /></div>
+        <div class="mc-fld"><label class="mc-lbl">向量模型名称</label><div class="mc-mr"><select :value="model" @change="$emit('update:model',$event.target.value)" class="mc-s"><option value="">请选择模型</option><option v-for="m in (models||[])" :key="m.id" :value="m.id">{{ m.name }}</option></select><button type="button" class="mc-r" :disabled="loading" @click="$emit('fetch')"><span :class="{spin:loading}">\u21BB</span></button></div><span class="mc-h">从服务器拉取可用向量模型列表</span></div>
+        <div class="mc-fld"><label class="mc-lbl">向量维度</label><div class="mc-mr"><select :value="dimensions" @change="$emit('update:dimensions',parseInt($event.target.value))" class="mc-s"><option :value="0">默认（跟随模型）</option><option :value="1024">1024 维</option><option :value="768">768 维</option><option :value="512">512 维</option><option :value="256">256 维</option></select></div><span class="mc-h">选择合适的向量维度以平衡精度与性能</span></div>
+      </div>
+      <div class="mc-demo-side"><div class="mc-sb"><p class="mc-se">向量配置</p><p class="mc-st">Embedding 参数</p><p class="mc-sd">用于文档切分后的向量化存储，影响检索召回精度</p></div><div class="mc-sb"><p class="mc-se">当前模型</p><p class="mc-st">{{ model||'未选择' }}</p><p class="mc-sd">{{ baseUrl||'未配置 URL' }}</p></div><div v-if="dimensions" class="mc-sb"><p class="mc-se">向量维度</p><p class="mc-st">{{ dimensions }} 维</p><p class="mc-sd">{{ dimensions>=1024?'高精度':dimensions>=768?'标准精度':'快速检索' }}</p></div></div>
+    </div>
+    <div class="mc-as"><button type="button" class="mc-b mc-b2" :disabled="testing" @click="$emit('test')">{{ testing?'测试中...':'测试连接' }}</button><button type="button" class="mc-b mc-b1" :disabled="saving" @click="$emit('save')">{{ saving?'保存中...':'保存配置' }}</button></div></div>`,
+  data: () => ({ sk: false })
+}
+
+let chatMarkedRenderer = null
+let chatMathRenderer = null
+let chatRichTextReady = false
+
+function ensureChatRichTextRuntime() {
+  if (chatRichTextReady) return
+  if (typeof marked !== 'undefined' && typeof renderMathInElement !== 'undefined') {
+    marked.setOptions({ breaks: true, gfm: true })
+    chatMarkedRenderer = marked
+    chatMathRenderer = renderMathInElement
+    chatRichTextReady = true
+  }
+}
+
+function chatPreprocessAnswer(text) {
+  if (!text) return ''
+  let processed = text.replace(/\[\n([\s\S]*?)\n\]/g, (_, formula) => '$$\n' + formula.trim() + '\n$$')
+  processed = processed.replace(/\[([^\n\[\]]+)\]/g, (_, formula) => {
+    if (/\\|\^|_|\{|\}|\(|\)/.test(formula)) return '$$' + formula.trim() + '$$'
+    return '[' + formula + ']'
+  })
+  return processed
+}
+
+function chatRenderMarkdown(text) {
+  const processed = chatPreprocessAnswer(text)
+  if (!chatMarkedRenderer) return escapeHtml(processed).replace(/\n/g, '<br>')
+  return chatMarkedRenderer.parse(processed)
+}
+
+function chatRenderMath(container) {
+  if (!container || !chatMathRenderer) return
+  chatMathRenderer(container, {
+    delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '$', right: '$', display: false },
+    ],
+    throwOnError: false,
+  })
+}
+
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+const ZChatWindow = {
+  name: 'ZChatWindow',
+  props: {
+    messages: { type: Array, default: () => [] },
+    emptyDesc: { type: String, default: '输入问题开始与 AI 助手对话' }
+  },
+  data() {
+    return {
+      processedMessages: []
+    }
+  },
+  watch: {
+    messages: {
+      deep: true,
+      async handler() {
+        await this.processMessages()
+      }
+    }
+  },
+  async mounted() {
+    await ensureChatRichTextRuntime()
+    await this.processMessages()
+  },
+  methods: {
+    processMessages() {
+      this.processedMessages = this.messages.map(msg => ({
+        ...msg,
+        html: msg.role === 'assistant' ? chatRenderMarkdown(msg.content) : ''
+      }))
+      this.$nextTick(() => {
+        const container = this.$refs && this.$refs.messagesContainer
+        if (container) chatRenderMath(container)
+      })
+    }
+  },
+  template: `
+    <div class="chat-win">
+      <div ref="messagesContainer" class="chat-msgs">
+        <div v-for="(msg, idx) in processedMessages" :key="idx" class="chat-msg" :class="'chat-msg-'+msg.role">
+          <div class="chat-cnt">
+            <div class="chat-meta">
+              <span class="chat-role">{{ msg.role === 'user' ? '用户' : msg.role === 'assistant' ? '助手' : msg.role }}</span>
+              <span v-if="msg.timestamp" class="chat-time">{{ new Date(msg.timestamp).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}) }}</span>
+            </div>
+            <div class="chat-text" v-html="msg.role === 'assistant' ? msg.html : msg.content"></div>
+            <div v-if="msg.sources?.length" class="chat-srcs">
+              <p class="chat-srcs-tit">证据来源</p>
+              <div class="chat-srcs-lst">
+                <span v-for="s in msg.sources" :key="s.filename" class="chat-src">{{ s.filename }} {{ s.page_label }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-if="processedMessages.length === 0" class="chat-empty">
+          <div class="chat-empty-ico">💬</div>
+          <p class="chat-empty-tit">开始对话</p>
+          <p class="chat-empty-desc">{{ emptyDesc }}</p>
+        </div>
+      </div>
+    </div>`
+}
+
+const ZMarkdown = {
+  name: 'ZMarkdown',
+  props: { text: { type: String, default: '' }, complete: { type: Boolean, default: true } },
+  data() {
+    return { renderedHtml: '' }
+  },
+  watch: {
+    text: { handler: 'doRender', immediate: true }
+  },
+  methods: {
+    doRender() {
+      ensureChatRichTextRuntime()
+      this.renderedHtml = chatRenderMarkdown(this.text || '')
+      this.$nextTick(() => {
+        if (this.$refs.container) chatRenderMath(this.$refs.container)
+      })
+    }
+  },
+  template: `<div ref="container" class="md-content" :class="{streaming: !complete}" v-html="renderedHtml"></div>`
+}
+
+const ZStreamingText = {
+  name: 'ZStreamingText',
+  props: {
+    text: { type: String, default: '' },
+    complete: { type: Boolean, default: false },
+    speed: { type: Number, default: 18 },
+    pauseOnPunctuation: { type: Boolean, default: true },
+    punctuationDelay: { type: Number, default: 80 },
+  },
+  emits: ['complete'],
+  data() {
+    return {
+      renderedHtml: '',
+      currentIndex: 0,
+      intervalId: null,
+      isPaused: false,
+    }
+  },
+  computed: {
+    displayedRaw() { return this.text || '' }
+  },
+  watch: {
+    text: { handler: 'startStream', immediate: true },
+    complete(val) {
+      if (val) {
+        if (this.intervalId) { clearTimeout(this.intervalId); this.intervalId = null }
+        ensureChatRichTextRuntime()
+        this.renderedHtml = chatRenderMarkdown(this.text || '')
+        this.$nextTick(() => {
+          if (this.$refs.content) chatRenderMath(this.$refs.content)
+        })
+        this.currentIndex = this.text.length
+      }
+    }
+  },
+  methods: {
+    startStream() {
+      if (this.intervalId) { clearTimeout(this.intervalId); this.intervalId = null }
+      this.currentIndex = 0
+      this.isPaused = false
+      ensureChatRichTextRuntime()
+      const run = () => {
+        if (this.currentIndex >= this.text.length) {
+          this.$emit('complete')
+          return
+        }
+        if (this.isPaused) {
+          this.intervalId = setTimeout(run, 50)
+          return
+        }
+        this.currentIndex++
+        const partial = this.text.slice(0, this.currentIndex)
+        this.renderedHtml = chatRenderMarkdown(partial)
+        const ch = this.text[this.currentIndex - 1]
+        const punc = /[。，！？；：、,.!?;:]/
+        const delay = (this.pauseOnPunctuation && punc.test(ch)) ? this.punctuationDelay : this.speed
+        this.intervalId = setTimeout(run, delay)
+      }
+      run()
+    },
+    togglePause() {
+      this.isPaused = !this.isPaused
+    }
+  },
+  beforeUnmount() {
+    if (this.intervalId) { clearTimeout(this.intervalId); this.intervalId = null }
+  },
+  template: `<span class="stx-wrap">
+    <span ref="content" class="stx" v-html="renderedHtml"></span>
+    <span v-if="!complete && !isPaused" class="stx-cur">|</span>
+  </span>`
+}
+
+const ZChatComposer = {
+  name: 'ZChatComposer',
+  props: {
+    modelValue: { type: String, default: '' },
+    placeholder: { type: String, default: '输入问题，按 Enter 发送，Shift+Enter 换行' },
+    disabled: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
+    minRows: { type: Number, default: 1 },
+    maxRows: { type: Number, default: 8 },
+  },
+  emits: ['update:modelValue', 'submit', 'stop'],
+  data() {
+    return { inputValue: this.modelValue }
+  },
+  computed: {
+    canSend() {
+      return this.inputValue.trim().length > 0 && !this.disabled && !this.loading
+    }
+  },
+  watch: {
+    modelValue(val) {
+      if (val !== this.inputValue) this.inputValue = val
+    },
+    inputValue(val) {
+      this.$emit('update:modelValue', val)
+      this.$nextTick(() => this.autoResize())
+    }
+  },
+  methods: {
+    autoResize() {
+      const el = this.$refs.textarea
+      if (!el) return
+      el.style.height = 'auto'
+      const lineHeight = 24
+      const minH = lineHeight * this.minRows
+      const maxH = lineHeight * this.maxRows
+      el.style.height = Math.min(Math.max(el.scrollHeight, minH), maxH) + 'px'
+    },
+    handleEnter(e) {
+      if (this.canSend) this.handleSubmit()
+    },
+    handleSubmit() {
+      const text = this.inputValue.trim()
+      if (!text || this.disabled || this.loading) return
+      this.$emit('submit', text)
+      this.inputValue = ''
+      this.$nextTick(() => {
+        if (this.$refs.textarea) this.$refs.textarea.style.height = 'auto'
+      })
+    }
+  },
+  template: `
+    <div class="composer">
+      <div v-if="$slots.header" class="composer-header">
+        <slot name="header" />
+      </div>
+      <form class="composer-form" @submit.prevent="handleSubmit">
+        <div class="composer-input-wrap">
+          <textarea
+            ref="textarea"
+            v-model="inputValue"
+            class="composer-textarea"
+            :placeholder="placeholder"
+            :disabled="disabled || loading"
+            :rows="minRows"
+            @keydown.enter.exact.prevent="handleEnter"
+            @input="autoResize"
+          ></textarea>
+        </div>
+        <div class="composer-footer">
+          <div class="composer-hints">
+            <slot name="hints">
+              <span class="composer-hint">Enter 发送 · Shift+Enter 换行</span>
+            </slot>
+          </div>
+          <div class="composer-actions">
+            <button
+              v-if="loading"
+              type="button"
+              class="composer-btn composer-btn-stop"
+              @click="$emit('stop')"
+            >停止</button>
+            <button
+              type="submit"
+              class="composer-btn composer-btn-send"
+              :disabled="!canSend"
+            >
+              <svg v-if="loading" class="composer-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+              <span v-else>发送</span>
+            </button>
+          </div>
+        </div>
+      </form>
+      <div v-if="$slots.footer" class="composer-footer-note">
+        <slot name="footer" />
+      </div>
+    </div>`
+}
+
+const ZChatFeedback = {
+  name: 'ZChatFeedback',
+  props: {
+    conversationId: { type: String, default: '' },
+    status: { type: String, default: '' },
+    disabled: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
+  },
+  emits: ['update:status', 'submit', 'click-feedback'],
+  computed: {
+    feedbackTypes() {
+      return [
+        { type: 'useful', label: '有用', rating: 5, is_positive: true, comment: '有用', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>' },
+        { type: 'inaccurate', label: '不准确', rating: 2, is_positive: false, comment: '不准确', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>' },
+        { type: 'unsupported', label: '找不到依据', rating: 1, is_positive: false, comment: '找不到依据', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v4M11 16h.01"/></svg>' },
+        { type: 'citation', label: '引用错误', rating: 2, is_positive: false, comment: '引用错误', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 17c-2.76 0-5-2.24-5-5s2.24-5 5-5c1.12 0 2.15.38 2.99 1.01L10 9l2 2-1.01 1.01C10.15 12.62 10 13.3 10 14a3 3 0 003-1c1.1 0 2-.9 2-2a2 2 0 00-2-2H6z"/></svg>' },
+      ]
+    }
+  },
+  methods: {
+    handleClick(item) {
+      this.$emit('update:status', item.type)
+      this.$emit('click-feedback', item.type)
+      this.$emit('submit', { rating: item.rating, is_positive: item.is_positive, comment: item.comment })
+    }
+  },
+  template: `
+    <div class="feedback">
+      <div v-if="status === '' && !conversationId" class="feedback-hint">回答保存后可评价</div>
+      <div v-else-if="status === ''" class="feedback-actions">
+        <button
+          v-for="item in feedbackTypes"
+          :key="item.type"
+          class="feedback-btn"
+          :disabled="disabled || loading"
+          @click="handleClick(item)"
+        >
+          <span class="feedback-btn-icon" v-html="item.icon"></span>
+          <span>{{ item.label }}</span>
+        </button>
+      </div>
+      <div v-else-if="status === 'failed'" class="feedback-status feedback-status-error">反馈失败，可重试</div>
+      <div v-else class="feedback-status feedback-status-done">反馈已记录</div>
+    </div>`
+}
+
+const ZSourceList = {
+  name: 'ZSourceList',
+  props: {
+    sources: { type: Array, default: () => [] },
+    title: { type: String, default: '证据来源' },
+  },
+  data() {
+    return { localSources: [] }
+  },
+  watch: {
+    sources: {
+      handler(val) {
+        this.localSources = (val || []).map(s => ({ ...s, expanded: false }))
+      },
+      immediate: true,
+      deep: true,
+    }
+  },
+  methods: {
+    getConfidence(score) {
+      const s = Number(score || 0)
+      if (s >= 0.72) return { label: '高匹配', variant: 'success' }
+      if (s >= 0.42) return { label: '可参考', variant: 'warning' }
+      return { label: '待核对', variant: 'error' }
+    },
+    formatScore(score) { return Number(score || 0).toFixed(2) },
+    sourceTypeLabel(type) { return type === 'product_catalog' ? '产品目录' : '知识库文档' },
+    toggleExpand(idx) {
+      if (!this.localSources[idx].snippet && !this.localSources[idx].section_title) return
+      this.localSources[idx].expanded = !this.localSources[idx].expanded
+    }
+  },
+  template: `
+    <div v-if="localSources.length" class="source-list">
+      <div class="source-list-header">
+        <p class="source-list-title">{{ title }}</p>
+        <span class="source-list-count">{{ localSources.length }} 条</span>
+      </div>
+      <div class="source-list-items">
+        <div
+          v-for="(source, idx) in localSources"
+          :key="source.source_id || idx"
+          class="source-item"
+          :class="{'source-item-expanded': source.expanded}"
+          @click="toggleExpand(idx)"
+        >
+          <div class="source-item-meta">
+            <span class="source-badge" :class="'source-badge-'+getConfidence(source.score).variant">
+              <span class="source-badge-dot" :class="'source-badge-dot-'+getConfidence(source.score).variant"></span>
+              {{ getConfidence(source.score).label }}
+            </span>
+            <span class="source-filename">{{ source.filename }}</span>
+            <span v-if="source.page_label" class="source-page">{{ source.page_label }}</span>
+            <span class="source-type">{{ sourceTypeLabel(source.source_type) }}</span>
+            <span v-if="source.score" class="source-score">相关度 {{ formatScore(source.score) }}</span>
+            <span class="source-expand-icon" :class="{'source-expand-icon-rotated': source.expanded}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+          </div>
+          <div v-if="source.expanded" class="source-item-detail">
+            <div v-if="source.section_title" class="source-section">{{ source.section_title }}</div>
+            <div v-if="source.snippet" class="source-snippet">{{ source.snippet }}</div>
+          </div>
+        </div>
+      </div>
+    </div>`
+}
+
+/* ========== MAIN APP ========== */
+const DemoApp = {
+  name: 'DemoApp',
+  components: { ZButton, ZCard, ZBadge, ZModal, ZTable, ZSearch, ZSpinner, ZPagination, ZAlert, ZProgress, ZStepper, ZSelect, ZConfirm, ZAvatar, ZTag, ZFormField, ZStatCard, ZEmpty, ZSkeleton, ZToast, ZDragDrop, ZHero, ZSparkline, ZMetricBar, ZLLMConfig, ZEmbeddingConfig, ZChatWindow, ZStreamingText, ZMarkdown, ZChatComposer, ZChatFeedback, ZSourceList },
+  template: '#demo-app-template',
+  setup() {
+    const modalVis = ref(false)
+    const confirmVis = ref(false)
+    const searchQ = ref('')
+    const pagCur = ref(1)
+    const pagTotal = ref(156)
+    const selectVal = ref('')
+    const toasts = ref([])
+    const dropMsg = ref('')
+    const showAlert = ref(true)
+    const selectOpts = [{value:'admin',label:'管理员'},{value:'user',label:'普通用户'},{value:'viewer',label:'只读用户'}]
+    const selExample = ref('')
+    let tid = 0
+
+    function addToast(msg, type='info') {
+      const id = ++tid
+      toasts.value.push({ id, message: msg, type })
+      setTimeout(() => { toasts.value = toasts.value.filter(t=>t.id!==id) }, 3000)
+    }
+
+    const tableData = [
+      { id:1, name:'轨道交通人防会签项目', status:'进行中', updated:'2026-05-06' },
+      { id:2, name:'地下空间数字化平台', status:'已完成', updated:'2026-04-28' },
+      { id:3, name:'模板工程合规审查', status:'待审核', updated:'2026-04-20' },
+      { id:4, name:'设备采购资料包', status:'编制中', updated:'2026-04-15' }
+    ]
+    const tableCols = [
+      { key:'name', label:'项目名称' },
+      { key:'status', label:'状态' },
+      { key:'updated', label:'最后更新' }
+    ]
+
+    const steps = [{ label:'需求' },{ label:'分析' },{ label:'大纲' },{ label:'生成' },{ label:'导出' }]
+    const stepCur = ref(1)
+
+    const dropZoneIcon = '&#128196;'
+
+    const chatMessages = ref([
+      { role: 'user', content: '人防工程设计规范有哪些要点？', timestamp: Date.now() - 120000 },
+      { role: 'assistant', content: '根据《人民防空工程设计规范》，人防工程设计需遵循以下要点：\n\n**1. 防护等级划分**\n- 甲级：重要人防工程，高抗力防护\n- 乙级：一般人防工程，标准防护\n- 丙级：次要人防工程，基本防护\n\n**2. 通风系统要求**\n- 清洁通风量：≥ 30 m³/(人·h)\n- 滤毒通风量：≥ 20 m³/(人·h)\n\n**3. 计算公式**\n$$\\sigma = \\frac{N}{A} + \\frac{M \\cdot y}{I}$$', timestamp: Date.now() - 60000, sources: [
+        { filename: 'GB 50038-2005 人民防空地下室设计规范', page_label: '第3章' },
+        { filename: 'GB 50225-2019 人民防空工程设计防火规范', page_label: '第5章' }
+      ]},
+      { role: 'user', content: '请提供具体的设计参数', timestamp: Date.now() },
+      { role: 'assistant', content: '以下是关键设计参数汇总：\n\n| 参数类型 | 取值要求 | 依据标准 |\n|----------|----------|----------|\n| 防护厚度 | ≥300mm | GB 50038 |\n| 密闭性能 | 压差≥50Pa | GB 50038 |\n| 抗震等级 | 不低于二级 | GB 50981 |\n\n> 注：具体项目需根据实际情况进行详细计算和校核。', streaming: false, sources: [
+        { filename: '人防工程设计手册', page_label: '第8章' }
+      ]}
+    ])
+
+    const streamText = ref('')
+    const streamComplete = ref(true)
+    
+    const demoText = '您好！我是您的智能助手。我可以帮助您了解地下空间数字化平台的功能，解答项目管理相关问题，以及提供合规审查的建议。请问有什么我可以帮助您的吗？'
+
+    const markdownDemo = `# 人防工程设计规范要点
+
+## 1. 防护等级划分
+
+根据《人民防空工程设计规范》，防护等级分为以下几类：
+
+| 等级 | 适用范围 | 防护要求 |
+|------|----------|----------|
+| 甲级 | 重要人防工程 | 高抗力防护 |
+| 乙级 | 一般人防工程 | 标准防护 |
+| 丙级 | 次要人防工程 | 基本防护 |
+
+## 2. 计算公式
+
+结构设计中常用的公式：
+
+$$
+\\sigma = \\frac{N}{A} + \\frac{M \\cdot y}{I}
+$$
+
+其中：
+- \\(\\sigma\\) 为正应力
+- \\(N\\) 为轴力
+- \\(A\\) 为截面面积
+- \\(M\\) 为弯矩
+- \\(I\\) 为惯性矩
+
+## 3. 关键要点
+
+**通风系统要求：**
+- 清洁通风量：≥ 30 m³/(人·h)
+- 滤毒通风量：≥ 20 m³/(人·h)
+- 隔绝防护时间：≥ 3小时
+
+**引用标准：**
+> GB 50038-2005 《人民防空地下室设计规范》
+> GB 50225-2019 《人民防空工程设计防火规范》
+
+\`\`\`python
+def calculate_protection_level(project_type):
+    """计算人防工程防护等级"""
+    if project_type == "重要":
+        return "甲级"
+    elif project_type == "一般":
+        return "乙级"
+    else:
+        return "丙级"
+\`\`\`
+
+---
+
+*以上内容仅供参考，请以正式规范文件为准。*`
+
+    function startStream() {
+      streamComplete.value = false
+      streamText.value = demoText
+    }
+
+    function resetStream() {
+      streamComplete.value = true
+      streamText.value = ''
+    }
+
+    const composerText = ref('')
+    const composerText2 = ref('')
+    const composerLoading = ref(false)
+
+    function onComposerSubmit(text) {
+      addToast('提交问题：' + text, 'info')
+    }
+
+    function onComposerSubmit2(text) {
+      addToast('开始生成回答：' + text, 'info')
+      composerLoading.value = true
+      setTimeout(() => {
+        composerLoading.value = false
+        addToast('回答生成完毕', 'success')
+      }, 3000)
+    }
+
+    const feedbackStatus1 = ref('')
+    const feedbackStatus2 = ref('')
+    const feedbackStatus3 = ref('failed')
+
+    function onFeedbackSubmit({ comment }) {
+      addToast('提交评价：' + comment, 'info')
+    }
+
+    const demoSources = [
+      { source_id: 'src-1', filename: 'GB 50038-2005 人民防空地下室设计规范', page_label: '第3.2.1条', section_title: '3.2 防护分区设计要求', snippet: '防护单元建筑面积不应大于2000m²，且相邻防护单元的出入口应错开布置。人民防空工程抗力级别应按相应抗力值确定。', score: 0.91, source_type: 'document', rank: 1 },
+      { source_id: 'src-2', filename: 'GB 50225-2019 人民防空工程设计防火规范', page_label: '第5.4.2条', section_title: '5.4 消防给水', snippet: '室内消火栓的设置应符合下列规定：消火栓栓口动压不应大于0.50MPa，当大于0.70MPa时必须设置减压设施。', score: 0.73, source_type: 'document', rank: 2 },
+      { source_id: 'src-3', filename: '人防工程防护设备选用手册', page_label: '附录B', section_title: 'B.1 密闭门选型表', score: 0.51, source_type: 'document', rank: 3 },
+      { source_id: 'src-4', filename: 'RFJ 01-2008 防护设备产品质量检验与验收', page_label: '第6章', score: 0.22, source_type: 'document', rank: 4 },
+    ]
+
+    return {
+        modalVis, confirmVis, searchQ,
+      pagCur, pagTotal, selectVal, toasts, dropMsg, showAlert,
+      selectOpts, selExample,
+      addToast, tableData, tableCols, steps, stepCur, dropZoneIcon,
+      chatMessages, streamText, streamComplete, startStream, resetStream,
+      markdownDemo,
+      composerText, composerText2, composerLoading,
+      onComposerSubmit, onComposerSubmit2,
+      feedbackStatus1, feedbackStatus2, feedbackStatus3,
+      onFeedbackSubmit,
+      demoSources
+    }
+  }
+}
+
+/* ========== STYLES ========== */
+const style = document.createElement('style')
+style.textContent = `
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);font-family:'Noto Sans SC',system-ui,sans-serif;font-size:var(--text-base);font-weight:500;line-height:1;padding:0 var(--sp-5);height:40px;border:1px solid transparent;cursor:pointer;transition:all var(--duration-fast) ease;text-decoration:none;white-space:nowrap;border-radius:var(--radius-sm)}.btn:active{transform:translateY(1px)}.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-primary:hover:not(:disabled){background:var(--accent-hover);border-color:var(--accent-hover)}.btn-secondary{background:var(--bg-card);color:var(--text-primary);border-color:var(--border)}.btn-secondary:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}.btn-ghost{background:transparent;color:var(--text-primary)}.btn-ghost:hover:not(:disabled){background:var(--accent-light)}.btn-danger{background:var(--error);color:#fff;border-color:var(--error)}.btn-danger:hover:not(:disabled){background:#722a2a;border-color:#722a2a}.btn-sm{height:32px;padding:0 var(--sp-4);font-size:var(--text-sm)}.btn-lg{height:48px;padding:0 var(--sp-8);font-size:var(--text-md)}.btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}.btn-spinner{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+.card{background:var(--bg-card);border:1px solid var(--border);transition:border-color var(--duration-normal) var(--ease-out)}.card-hover:hover{border-color:var(--border-hover)}.card-muted{background:var(--bg-secondary)}.card-header{padding:var(--sp-5) var(--sp-6);border-bottom:1px solid var(--rule-light);display:flex;align-items:center;justify-content:space-between}.card-body{padding:var(--sp-6)}.card-footer{padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--rule-light);display:flex;align-items:center;gap:var(--sp-3)}
+.badge{display:inline-flex;align-items:center;gap:var(--sp-1);font-size:var(--text-xs);font-weight:500;padding:2px var(--sp-2);letter-spacing:.02em;white-space:nowrap;border-radius:var(--radius-sm)}.badge-default{background:var(--bg-secondary);color:var(--text-secondary)}.badge-accent{background:var(--accent-light);color:var(--accent)}.badge-amber{background:var(--amber-light);color:var(--amber)}.badge-success{background:var(--success-light);color:var(--success)}.badge-warning{background:var(--warning-light);color:var(--warning)}.badge-error{background:var(--error-light);color:var(--error)}.badge-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:2px}.b-dot-default{background:var(--surface-400)}.b-dot-accent{background:var(--accent)}.b-dot-success{background:var(--success)}.b-dot-warning{background:var(--warning)}.b-dot-error{background:var(--error)}
+.tag{display:inline-flex;align-items:center;gap:var(--sp-1);font-size:var(--text-xs);padding:var(--sp-1) var(--sp-3);border:1px solid var(--border);color:var(--text-secondary);background:var(--bg-card);border-radius:var(--radius-sm)}.tag-x{cursor:pointer;background:none;border:none;color:var(--text-disabled);font-size:14px;line-height:1;padding:0;margin-left:2px}.tag-x:hover{color:var(--error)}
+.modal-overlay{position:fixed;inset:0;background:rgba(28,27,24,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:var(--sp-6)}.modal{background:var(--bg-card);border:1px solid var(--border);width:100%;max-height:85vh;overflow-y:auto}.modal-header{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-5) var(--sp-6);border-bottom:1px solid var(--rule-light)}.modal-title{font-family:'Noto Serif SC',serif;font-size:var(--text-lg);font-weight:600}.modal-close{background:none;border:none;color:var(--text-tertiary);cursor:pointer;font-size:20px;line-height:1;padding:var(--sp-1);transition:color var(--duration-fast) ease}.modal-close:hover{color:var(--text-primary)}.modal-body{padding:var(--sp-6)}.modal-footer{padding:var(--sp-4) var(--sp-6);border-top:1px solid var(--rule-light);display:flex;justify-content:flex-end;gap:var(--sp-3)}.modal-fade-enter-active,.modal-fade-leave-active{transition:opacity 200ms ease}.modal-fade-enter-from,.modal-fade-leave-to{opacity:0}
+.confirm-dlg{background:var(--bg-card);border:1px solid var(--border);width:100%;max-width:400px}
+.table-wrap{overflow-x:auto;border:1px solid var(--border)}.table{width:100%;border-collapse:collapse;font-size:var(--text-base)}.table th{font-size:var(--text-xs);font-weight:500;color:var(--text-secondary);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:var(--sp-3) var(--sp-4);background:var(--bg-secondary);border-bottom:1px solid var(--border);white-space:nowrap}.table td{padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--rule-light);vertical-align:middle}.table tr:last-child td{border-bottom:none}.table tbody tr{transition:background var(--duration-fast) ease}.table tbody tr:hover{background:var(--accent-light)}.table-empty{text-align:center;color:var(--text-tertiary);padding:var(--sp-8)!important}
+.search-bar{display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap}.search-input-wrap{position:relative;flex:1;min-width:200px;max-width:360px}.search-ico{position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);color:var(--text-tertiary);pointer-events:none}.search-input{width:100%;height:40px;padding:0 var(--sp-8) 0 var(--sp-8);background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);font-family:'Noto Sans SC',system-ui,sans-serif;font-size:var(--text-base);transition:border-color var(--duration-fast) ease}.search-input:focus{outline:none;border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.search-input::placeholder{color:var(--text-disabled)}.search-clear{position:absolute;right:var(--sp-2);top:50%;transform:translateY(-50%);background:none;border:none;font-size:18px;line-height:1;cursor:pointer;color:var(--text-tertiary);padding:var(--sp-1)}
+.spinner{border-radius:50%;border-style:solid;border-color:var(--surface-300);border-top-color:var(--accent);animation:spin .7s linear infinite}.spinner-sm{width:18px;height:18px;border-width:2px}.spinner-md{width:28px;height:28px;border-width:3px}.spinner-lg{width:40px;height:40px;border-width:4px}.spinner-var-light{border-color:var(--surface-200);border-top-color:var(--accent-muted)}.spinner-var-white{border-color:rgba(255,255,255,.2);border-top-color:#fff}
+.pagination{display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap}.page-info{font-size:var(--text-sm);color:var(--text-secondary)}.page-info strong{color:var(--text-primary)}.page-ctrls{display:flex;align-items:center;gap:2px}.page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 var(--sp-2);border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:var(--text-sm);font-family:'Noto Sans SC',system-ui,sans-serif;cursor:pointer;transition:all var(--duration-fast) ease;border-radius:var(--radius-sm)}.page-btn:hover:not(:disabled):not(.active){border-color:var(--accent);color:var(--accent)}.page-btn:disabled{opacity:.35;cursor:not-allowed}.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}.page-ell{padding:0 var(--sp-1);color:var(--text-tertiary)}
+.alert{display:flex;align-items:flex-start;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);font-size:var(--text-sm);line-height:1.6;border-left:3px solid transparent}.alert-info{background:var(--accent-light);border-left-color:var(--accent);color:var(--accent)}.alert-success{background:var(--success-light);border-left-color:var(--success);color:var(--success)}.alert-warning{background:var(--warning-light);border-left-color:var(--warning);color:var(--warning)}.alert-error{background:var(--error-light);border-left-color:var(--error);color:var(--error)}.alert-t{flex:1;min-width:0}.alert-x{flex-shrink:0;background:none;border:none;font-size:18px;line-height:1;cursor:pointer;opacity:.6;padding:0;color:inherit;margin-left:auto}.alert-x:hover{opacity:1}
+.prog-wrap{width:100%}.prog{height:2px;background:var(--bg-secondary);overflow:hidden}.prog-fill{height:100%;background:var(--accent);transition:width 300ms ease}.prog-indi{height:100%;background:var(--accent);animation:prog-indi 1.4s ease infinite}@keyframes prog-indi{0%{transform:translateX(-100%);width:40%}50%{width:70%}100%{transform:translateX(200%);width:40%}}
+.sel-wrap{position:relative;display:inline-block;width:200px}.sel-wrap::after{content:'\\25BE';position:absolute;right:var(--sp-3);top:50%;transform:translateY(-50%);font-size:var(--text-sm);color:var(--text-tertiary);pointer-events:none}.sel{appearance:none;height:40px;padding:0 var(--sp-8) 0 var(--sp-3);background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);font-family:'Noto Sans SC',system-ui,sans-serif;font-size:var(--text-base);cursor:pointer;width:100%}.sel:focus{outline:none;border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.stepper-demo{display:flex;align-items:flex-start;justify-content:center;padding:var(--sp-4) 0}.step-item{display:flex;flex-direction:column;align-items:center;position:relative;flex:1;min-width:0}.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--text-sm);font-weight:600;position:relative;z-index:1;transition:all var(--duration-normal) ease}.done .step-dot{background:var(--accent);color:#fff}.active .step-dot{background:var(--accent);color:#fff}.pending .step-dot{background:var(--bg-secondary);color:var(--text-tertiary);border:2px solid var(--border)}.step-chk{font-size:14px;line-height:1}.step-num{font-size:13px;line-height:1}.step-label{font-size:var(--text-xs);font-weight:500;margin-top:var(--sp-1);color:var(--text-tertiary);text-align:center}.active .step-label{color:var(--text-primary);font-weight:600}.done .step-label{color:var(--text-secondary)}.step-line{position:absolute;top:16px;left:calc(50%+16px);right:calc(-50%+16px);height:2px;background:var(--border);transition:background var(--duration-normal) ease}.step-line.done{background:var(--accent)}.last .step-line{display:none}
+.hero-demo{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-4);align-items:end;margin-bottom:var(--sp-6)}.hero-t{min-width:0}.hero-eb{font-family:'JetBrains Mono',monospace;font-size:var(--text-xs);font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:var(--sp-2)}.hero-tt{font-family:'Noto Serif SC',serif;font-size:clamp(1.5rem,2.6vw,2.5rem);line-height:1.1;font-weight:700;color:var(--text-primary);margin:0 0 var(--sp-2)}.hero-desc-demo{font-size:var(--text-base);color:var(--text-secondary);max-width:42rem;margin:0}.hero-mt{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-4)}.hero-chip-demo{display:inline-flex;align-items:center;gap:var(--sp-1);border:1px solid var(--border);background:var(--bg-card);padding:var(--sp-1) var(--sp-3);font-family:'JetBrains Mono',monospace;font-size:var(--text-xs);font-weight:500;letter-spacing:.04em;color:var(--text-secondary);border-radius:var(--radius-sm)}.hero-act{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-3)}.mb-demo{display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4);width:100%}.mb-demo+.mb-demo{border-top:1px solid var(--rule-light)}.mb-ico{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);color:var(--text-secondary)}.mb-ico svg{width:18px;height:18px}.mb-info{flex:1;min-width:0}.mb-lbl{font-size:var(--text-xs);font-weight:500;color:var(--text-tertiary);letter-spacing:.06em;text-transform:uppercase;margin:0 0 2px}.mb-val{font-family:'JetBrains Mono',monospace;font-size:var(--text-base);font-weight:600;color:var(--text-primary);margin:0;letter-spacing:-.01em}.mb-spark{flex-shrink:0}.mb-period{font-size:var(--text-xs);color:var(--text-tertiary);flex-shrink:0;white-space:nowrap}
+.ff{display:flex;flex-direction:column;gap:var(--sp-1);margin-bottom:var(--sp-5)}.ff-label{font-size:var(--text-sm);font-weight:500;color:var(--text-secondary)}.ff-req::after{content:' *';color:var(--error)}.ff-hint{font-size:var(--text-xs);color:var(--text-tertiary)}.ff-err-msg{font-size:var(--text-xs);color:var(--error)}.stat-c{display:flex;align-items:flex-start;gap:var(--sp-4);padding:var(--sp-5);background:var(--bg-card);border:1px solid var(--border)}.stat-ico{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);background:var(--bg-secondary);color:var(--accent)}.stat-ico svg{width:22px;height:22px}.stat-inf{display:flex;flex-direction:column;gap:var(--sp-1)}.stat-val{font-family:'JetBrains Mono',monospace;font-size:var(--text-2xl);font-weight:500;line-height:1.1;color:var(--text-primary)}.stat-desc{font-size:var(--text-xs);color:var(--text-tertiary);letter-spacing:.04em}
+.empty{border:1px dashed var(--border);padding:var(--sp-12) var(--sp-6);text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--sp-3);min-height:140px;justify-content:center}.empty-ico{width:40px;height:40px;color:var(--text-disabled)}.empty-ico svg{width:100%;height:100%}.empty-title{font-size:var(--text-md);font-weight:500;color:var(--text-secondary);margin:0}.empty-desc{font-size:var(--text-sm);color:var(--text-tertiary);max-width:360px;margin:0}
+.toast-ctn{position:fixed;top:68px;right:var(--sp-6);z-index:200;display:flex;flex-direction:column;gap:var(--sp-3);pointer-events:none}.toast-demo{display:flex;align-items:flex-start;gap:var(--sp-3);background:var(--surface-900);color:#fff;padding:var(--sp-3) var(--sp-5);min-width:300px;max-width:420px;border-left:3px solid var(--surface-500);pointer-events:auto;animation:toast-in .3s var(--ease-out);font-size:var(--text-base);font-family:'Noto Sans SC',system-ui,sans-serif;border-radius:var(--radius-sm)}.t-success{border-left-color:var(--success)}.t-warning{border-left-color:var(--warning)}.t-error{border-left-color:var(--error)}@keyframes toast-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.avatar-demo{display:inline-flex;align-items:center;justify-content:center;font-family:'Noto Sans SC',system-ui,sans-serif;font-weight:600;color:#fff;background:var(--accent);flex-shrink:0;border-radius:50%;user-select:none}.avatar-sm{width:28px;height:28px;font-size:11px}.avatar-md{width:36px;height:36px;font-size:13px}.avatar-lg{width:44px;height:44px;font-size:16px}
+.drop-zone-demo{border:1px dashed var(--border);padding:var(--sp-8) var(--sp-6);text-align:center;cursor:pointer;transition:all var(--duration-fast) ease}.drop-zone-demo:hover{border-color:var(--border-hover);background:var(--bg-secondary)}.hidden-input{display:none}
+.skeleton-demo{background:var(--bg-secondary);position:relative;overflow:hidden;height:14px}.skeleton-demo::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--surface-200),transparent);animation:sk-pulse 1.8s ease-in-out infinite}.sk-heading{height:20px}.sk-avatar{width:40px;height:40px;border-radius:50%}.sk-image{height:140px}@keyframes sk-pulse{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes spin{to{transform:rotate(360deg)}}.chat-win{width:100%;height:100%;display:flex;flex-direction:column;background:var(--bg-card);border:1px solid var(--border)}.chat-msgs{flex:1;overflow-y:auto;padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-4)}.chat-msg{display:flex;animation:fadeIn .3s ease;width:100%}@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.chat-cnt{min-width:0}.chat-meta{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-1)}.chat-role{font-size:var(--text-xs);font-weight:500;color:var(--text-tertiary);letter-spacing:.06em;text-transform:uppercase}.chat-time{font-size:var(--text-xs);color:var(--text-disabled)}.chat-text{font-size:var(--text-base);line-height:1.7;color:var(--text-primary);word-break:break-word}.chat-srcs{margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--rule-light)}.chat-srcs-tit{font-size:var(--text-xs);font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin:0 0 var(--sp-2)}.chat-srcs-lst{display:flex;flex-wrap:wrap;gap:var(--sp-2)}.chat-src{display:flex;align-items:center;gap:var(--sp-1);padding:var(--sp-1) var(--sp-2);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:var(--text-xs);color:var(--text-secondary)}.chat-msg-user{justify-content:flex-end}.chat-msg-user .chat-cnt{background:var(--accent-light);padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-md) var(--radius-md) 0 var(--radius-md);max-width:85%}.chat-msg-assistant{justify-content:flex-start}.chat-msg-assistant .chat-cnt{background:var(--bg-secondary);padding:var(--sp-3) var(--sp-4);border-radius:0 var(--radius-md) var(--radius-md) 0;max-width:85%}.chat-msg-system{justify-content:flex-start}.chat-msg-system .chat-cnt{background:var(--bg-secondary);padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-md);max-width:85%}.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-3);padding:var(--sp-12)}.chat-empty-ico{font-size:48px;opacity:.5}.chat-empty-tit{font-family:'Noto Serif SC',serif;font-size:var(--text-lg);font-weight:600;color:var(--text-primary);margin:0}.chat-empty-desc{font-size:var(--text-sm);color:var(--text-tertiary);margin:0;text-align:center}.stx-wrap{display:inline}.stx{white-space:pre-wrap;word-break:break-word}.stx-cur{animation:blink 1s step-end infinite;color:var(--accent)}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.md-content{font-size:var(--text-base);line-height:1.7;color:var(--text-primary)}.md-content.streaming{min-height:24px}.md-content h1,.md-content h2,.md-content h3{font-family:'Noto Serif SC',serif;font-weight:600;margin-top:var(--sp-4);margin-bottom:var(--sp-2);line-height:1.3}.md-content h1{font-size:var(--text-xl)}.md-content h2{font-size:var(--text-lg)}.md-content h3{font-size:var(--text-base)}.md-content strong{font-weight:600}.md-content em{font-style:italic}.md-content ul,.md-content ol{padding-left:var(--sp-5);margin:var(--sp-3) 0}.md-content li{margin-bottom:var(--sp-1)}.md-content blockquote{border-left:3px solid var(--accent);padding-left:var(--sp-3);margin:var(--sp-4) 0;color:var(--text-secondary);font-style:italic}.md-content code{background:var(--bg-secondary);padding:2px var(--sp-1);font-family:'JetBrains Mono',monospace;font-size:var(--text-sm);border-radius:var(--radius-sm)}.md-content pre{background:var(--surface-800);color:#e4e4e7;padding:var(--sp-4);border-radius:var(--radius-md);overflow-x:auto;margin:var(--sp-4) 0}.md-content pre code{background:none;padding:0;color:inherit}.md-content table{width:100%;border-collapse:collapse;margin:var(--sp-4) 0}.md-content th,.md-content td{border:1px solid var(--border);padding:var(--sp-2) var(--sp-3);text-align:left}.md-content th{background:var(--bg-secondary);font-weight:500;font-size:var(--text-sm)}.md-content a{color:var(--accent);text-decoration:underline}.md-content a:hover{color:var(--accent-hover)}.chat-text h1,.chat-text h2,.chat-text h3{font-family:'Noto Serif SC',serif;font-weight:600;margin-top:var(--sp-4);margin-bottom:var(--sp-2);line-height:1.3}.chat-text h1{font-size:var(--text-xl)}.chat-text h2{font-size:var(--text-lg)}.chat-text h3{font-size:var(--text-base)}.chat-text strong{font-weight:600;color:var(--text-primary)}.chat-text em{font-style:italic}.chat-text ul,.chat-text ol{padding-left:var(--sp-5);margin:var(--sp-3) 0}.chat-text li{margin-bottom:var(--sp-1)}.chat-text blockquote{border-left:3px solid var(--accent);padding-left:var(--sp-3);margin:var(--sp-4) 0;color:var(--text-secondary);font-style:italic}.chat-text code{background:var(--bg-secondary);padding:2px var(--sp-1);font-family:'JetBrains Mono',monospace;font-size:var(--text-sm);border-radius:var(--radius-sm)}.chat-text pre{background:var(--surface-800);color:#e4e4e7;padding:var(--sp-4);border-radius:var(--radius-md);overflow-x:auto;margin:var(--sp-4) 0}.chat-text pre code{background:none;padding:0;color:inherit}.chat-text table{width:100%;border-collapse:collapse;margin:var(--sp-4) 0}.chat-text th,.chat-text td{border:1px solid var(--border);padding:var(--sp-2) var(--sp-3);text-align:left}.chat-text th{background:var(--bg-secondary);font-weight:500;font-size:var(--text-sm)}.chat-text a{color:var(--accent);text-decoration:underline}.chat-text a:hover{color:var(--accent-hover)}.chat-text .math-block{display:block;font-family:'JetBrains Mono',monospace;font-size:var(--text-sm);color:var(--text-secondary);padding:var(--sp-2) 0}.chat-text .math-inline{font-family:'JetBrains Mono',monospace;font-size:var(--text-sm);color:var(--text-secondary)}
+
+.demo-wrapper{max-width:1200px;margin:0 auto;padding:0 var(--sp-6)}.demo-hero{padding:var(--sp-16) 0 var(--sp-10);border-bottom:1px solid var(--rule-light);margin-bottom:var(--sp-10)}.demo-eyebrow{font-family:'JetBrains Mono',monospace;font-size:var(--text-xs);font-weight:500;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:var(--sp-2)}.demo-title{font-family:'Noto Serif SC',serif;font-size:var(--text-3xl);font-weight:700;letter-spacing:-.02em;margin-bottom:var(--sp-3)}.demo-desc{color:var(--text-secondary);max-width:580px;font-size:var(--text-base);line-height:1.7}.demo-meta{display:flex;flex-wrap:wrap;gap:var(--sp-8);padding:var(--sp-6) 0;border-bottom:1px solid var(--rule-light);margin-bottom:var(--sp-10)}.demo-meta-item{display:flex;flex-direction:column;gap:2px}.demo-meta-val{font-family:'JetBrains Mono',monospace;font-size:var(--text-xl);font-weight:500}.demo-meta-lbl{font-size:var(--text-xs);color:var(--text-tertiary);letter-spacing:.06em}.demo-nav{position:sticky;top:0;z-index:50;background:var(--bg-header);border-bottom:1px solid var(--border);padding:0 var(--sp-6)}.demo-nav-inner{display:flex;align-items:center;gap:var(--sp-6);max-width:1200px;margin:0 auto;height:52px;overflow-x:auto;scrollbar-width:none}.demo-nav a{font-size:var(--text-sm);color:var(--text-secondary);text-decoration:none;white-space:nowrap;transition:color var(--duration-fast) ease;border-bottom:2px solid transparent;padding:var(--sp-1) 0;flex-shrink:0}.demo-nav a:hover{color:var(--text-primary);border-bottom-color:var(--border-hover)}.demo-section{margin-bottom:var(--sp-12)}.demo-section-eyebrow{font-family:'JetBrains Mono',monospace;font-size:var(--text-xs);font-weight:500;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:var(--sp-1)}.demo-section-title{font-family:'Noto Serif SC',serif;font-size:var(--text-xl);font-weight:700;margin-bottom:var(--sp-1)}.demo-section-desc{color:var(--text-tertiary);font-size:var(--text-sm);margin-bottom:var(--sp-6)}.demo-grid{display:flex;flex-wrap:wrap;gap:var(--sp-4)}.demo-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--sp-4)}.demo-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-4)}.demo-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-4)}@media(max-width:768px){.demo-grid-2,.demo-grid-3,.demo-grid-4{grid-template-columns:repeat(2,1fr)}.demo-hero{padding:var(--sp-10) 0 var(--sp-8)}}@media(max-width:480px){.demo-grid-2,.demo-grid-3,.demo-grid-4{grid-template-columns:1fr}}.demo-item{background:var(--bg-card);border:1px solid var(--border);padding:var(--sp-5)}.demo-item-title{font-family:'JetBrains Mono',monospace;font-size:var(--text-xs);color:var(--text-tertiary);letter-spacing:.04em;border-bottom:1px solid var(--rule-light);padding-bottom:var(--sp-2);margin-bottom:var(--sp-3)}.demo-item-body{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-3)}.demo-item-body-col{display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-3);width:100%}
+.demo-footer{padding:var(--sp-10) 0;text-align:center;border-top:1px solid var(--rule-light);font-size:var(--text-sm);color:var(--text-tertiary)}
+.mc-demo{border:1px solid var(--border);background:var(--bg-card);padding:var(--sp-5)}.mc-demo-labels{margin-bottom:var(--sp-4)}.mc-demo-eb{font-family:'JetBrains Mono',monospace;font-size:var(--text-xs);font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}.mc-demo-title{font-family:'Noto Serif SC',serif;font-size:var(--text-lg);font-weight:600;margin:var(--sp-2) 0 var(--sp-1)}.mc-demo-desc{font-size:var(--text-sm);color:var(--text-tertiary)}.mc-demo-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-5)}@media(min-width:768px){.mc-demo-grid{grid-template-columns:minmax(0,1fr) 260px}}.mc-fld{display:flex;flex-direction:column;gap:var(--sp-1);margin-bottom:var(--sp-3)}.mc-lbl{font-size:var(--text-xs);font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary)}.mc-iw{position:relative}.mc-i{width:100%;height:44px;padding:0 var(--sp-10) 0 var(--sp-4);background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);font-size:var(--text-sm);font-family:inherit}.mc-i:focus{outline:none;border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.mc-e{position:absolute;right:var(--sp-2);top:50%;transform:translateY(-50%);width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:16px}.mc-mr{display:flex;gap:var(--sp-2)}.mc-s{flex:1;height:44px;padding:0 var(--sp-4);background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);font-size:var(--text-sm);font-family:inherit;cursor:pointer}.mc-s:focus{outline:none;border-color:var(--accent)}.mc-r{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--bg-secondary);border:1px solid var(--border);cursor:pointer;color:var(--text-secondary);flex-shrink:0;font-size:20px}.mc-r:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}.mc-r:disabled{opacity:.5;cursor:not-allowed}.spin{display:inline-block;animation:spin .8s linear infinite}.mc-h{font-size:var(--text-xs);color:var(--text-tertiary)}.mc-pg{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);border-top:1px solid var(--rule-light);padding-top:var(--sp-4)}.mc-sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-2)}.mc-sv{font-size:var(--text-sm);font-weight:500;color:var(--text-tertiary);font-family:'JetBrains Mono',monospace}.mc-rg{width:100%;height:6px;appearance:none;background:var(--surface-200);outline:none;cursor:pointer}.mc-rg::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}.mc-rg::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}.mc-rl{display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--text-tertiary);margin-top:var(--sp-1)}.mc-demo-side{display:flex;flex-direction:column;gap:var(--sp-3)}.mc-sb{border:1px solid var(--border);background:var(--bg-secondary);padding:var(--sp-4)}.mc-se{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);margin:0 0 var(--sp-2)}.mc-st{font-family:'Noto Serif SC',serif;font-size:var(--text-sm);font-weight:600;color:var(--text-primary);margin:0 0 var(--sp-1)}.mc-sd{font-size:var(--text-xs);color:var(--text-tertiary);margin:0}.mc-as{display:flex;gap:var(--sp-3);margin-top:var(--sp-5)}.mc-b{display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 var(--sp-5);font-size:var(--text-sm);font-weight:500;font-family:inherit;cursor:pointer;transition:all var(--duration-fast) ease}.mc-b1{background:var(--accent);color:#fff;border:1px solid var(--accent)}.mc-b1:hover:not(:disabled){background:var(--accent-hover)}.mc-b2{background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border)}.mc-b2:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}.mc-b:disabled{opacity:.5;cursor:not-allowed}
+.composer{width:100%;display:flex;flex-direction:column;gap:var(--sp-2)}.composer-header{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:0 var(--sp-1)}.composer-form{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;transition:border-color var(--duration-fast) ease}.composer-form:focus-within{border-color:var(--accent)}.composer-input-wrap{padding:var(--sp-3) var(--sp-4)}.composer-textarea{width:100%;min-height:44px;resize:none;border:none;background:transparent;font-family:'Noto Sans SC',system-ui,sans-serif;font-size:var(--text-base);line-height:1.6;color:var(--text-primary);outline:none;padding:0;overflow:hidden}.composer-textarea::placeholder{color:var(--text-disabled);font-style:italic}.composer-textarea:disabled{opacity:.6;cursor:not-allowed}.composer-footer{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-2) var(--sp-3);border-top:1px solid var(--rule-light);gap:var(--sp-3)}.composer-hints{flex:1;min-width:0}.composer-hint{font-size:var(--text-xs);color:var(--text-disabled)}.composer-actions{display:flex;align-items:center;gap:var(--sp-2);flex-shrink:0}.composer-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-1);height:34px;padding:0 var(--sp-4);font-family:'Noto Sans SC',system-ui,sans-serif;font-size:var(--text-sm);font-weight:500;border:1px solid transparent;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--duration-fast) ease;white-space:nowrap}.composer-btn-send{background:var(--accent);color:#fff;border-color:var(--accent)}.composer-btn-send:hover:not(:disabled){background:var(--accent-hover);border-color:var(--accent-hover)}.composer-btn-send:disabled{opacity:.45;cursor:not-allowed}.composer-btn-stop{background:var(--bg-secondary);color:var(--text-secondary);border-color:var(--border)}.composer-btn-stop:hover{border-color:var(--border-hover);color:var(--text-primary)}.composer-spinner{width:16px;height:16px;animation:composer-spin .8s linear infinite}@keyframes composer-spin{to{transform:rotate(360deg)}}.composer-footer-note{font-size:var(--text-xs);color:var(--text-disabled);text-align:center}
+.feedback{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2)}.feedback-actions{display:flex;flex-wrap:wrap;gap:var(--sp-1)}.feedback-btn{display:inline-flex;align-items:center;gap:var(--sp-1);height:28px;padding:0 var(--sp-3);background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-secondary);font-family:'Noto Sans SC',system-ui,sans-serif;font-size:var(--text-xs);font-weight:500;cursor:pointer;transition:all var(--duration-fast) ease;white-space:nowrap}.feedback-btn:hover:not(:disabled){background:var(--bg-secondary);border-color:var(--border-hover);color:var(--text-primary)}.feedback-btn:active:not(:disabled){background:var(--surface-200)}.feedback-btn:disabled{opacity:.45;cursor:not-allowed}.feedback-btn-icon{display:flex;align-items:center;flex-shrink:0}.feedback-btn-icon svg{width:14px;height:14px}.feedback-status{font-size:var(--text-xs)}.feedback-status-done{color:var(--text-disabled)}.feedback-status-error{color:var(--error)}.feedback-hint{font-size:var(--text-xs);color:var(--text-disabled)}
+.source-list{margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--rule-light)}.source-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3)}.source-list-title{font-size:var(--text-xs);font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin:0}.source-list-count{font-size:var(--text-xs);color:var(--text-disabled)}.source-list-items{display:flex;flex-direction:column;gap:var(--sp-2)}.source-item{padding:var(--sp-3);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:border-color var(--duration-fast) ease}.source-item:hover{border-color:var(--border-hover)}.source-item-expanded{border-color:var(--border-hover)}.source-item-meta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2)}.source-badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--text-xs);font-weight:500;padding:1px var(--sp-2);border-radius:var(--radius-sm);flex-shrink:0}.source-badge-success{background:var(--success-light);color:var(--success)}.source-badge-warning{background:var(--warning-light);color:var(--warning)}.source-badge-error{background:var(--error-light);color:var(--error)}.source-badge-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}.source-badge-dot-success{background:var(--success)}.source-badge-dot-warning{background:var(--warning)}.source-badge-dot-error{background:var(--error)}.source-filename{font-size:var(--text-xs);font-weight:600;color:var(--text-primary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.source-page{font-size:var(--text-xs);color:var(--text-tertiary);flex-shrink:0}.source-type{font-size:var(--text-xs);color:var(--text-tertiary);flex-shrink:0}.source-score{font-size:var(--text-xs);color:var(--text-disabled);font-family:'JetBrains Mono',monospace;flex-shrink:0}.source-expand-icon{display:flex;align-items:center;color:var(--text-disabled);flex-shrink:0;transition:transform var(--duration-fast) ease}.source-expand-icon-rotated{transform:rotate(180deg)}.source-expand-icon svg{width:14px;height:14px}.source-item-detail{margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--rule-light)}.source-section{font-size:var(--text-xs);color:var(--text-tertiary);margin-bottom:var(--sp-2)}.source-snippet{font-size:var(--text-xs);line-height:1.6;color:var(--text-secondary);white-space:pre-wrap;padding-left:var(--sp-3);border-left:2px solid var(--surface-300)}
+`
+document.head.appendChild(style)
+
+const app = createApp(DemoApp)
+app.mount('#app')
+</script>
+</body>
+</html>
