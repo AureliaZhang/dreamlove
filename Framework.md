@@ -484,7 +484,7 @@ backdrop-filter: saturate(180%) blur(20px);
 
 | 模块 | 说明 |
 |------|------|
-| AI 聊天 | OpenAI 兼容 API，支持所有第三方供应商 |
+| AI 聊天 | OpenAI 兼容 + Anthropic 原生 API，自动检测格式 |
 | 多对话管理 | 新建/切换/删除对话，每个对话独立消息历史 |
 | RAG 知识库 | 故事内容分块索引，关键词检索，自动注入相关背景到 system prompt |
 | 角色记忆 | 角色级记忆，按对话归属，支持清除全部记忆 |
@@ -496,6 +496,19 @@ backdrop-filter: saturate(180%) blur(20px);
 | 选词查询 | 鼠标选中消息文本弹出查词/翻译气泡 |
 | CODEC 双向编码 | 敏感词 ↔ 文学化编码互转，独立可复用模块 |
 | 互动剧情小说 | 三部 10 万字级互动小说，角色扮演模式（AI 演角色，非写小说） |
+
+### API 双格式兼容
+
+`callChatAPI()` 统一函数自动检测 API 格式：
+
+| 检测条件 | 格式 | 端点 | 认证方式 |
+|----------|------|------|----------|
+| URL 含 `anthropic` | Anthropic 原生 | `/v1/messages` | `x-api-key` header |
+| 其他 | OpenAI 兼容 | `/v1/chat/completions` | `Authorization: Bearer` |
+
+- Anthropic 格式：`system` 提取为顶层字段，响应取 `content[].text`
+- OpenAI 格式：`system` 在 messages 数组中，响应取 `choices[0].message.content`
+- 所有 API 调用点（聊天、翻译、摘要、日记）统一走 `callChatAPI()`
 
 ### CODEC 分级双向编码系统
 

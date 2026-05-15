@@ -1,0 +1,3581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>雾中酒馆 · SillyTavern Style</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* ── Lia Design System · 雾霾蓝基调 ── */
+      --bg-main: #eef1f5;
+      --bg-panel: #f5f7fa;
+      --bg-card: #f8f9fc;
+      --bg-input: #eef1f5;
+      --bg-hover: #eaeff5;
+      --bg-active: #dde4ec;
+      --border: #c4ccd6;
+      --border-light: #d4dbe4;
+      --border-accent: #98a5b5;
+      --text-primary: #1e2a3a;
+      --text-secondary: #5a6876;
+      --text-muted: #8a95a2;
+      --text-dim: #b5bcc5;
+      /* ── 酒馆暖色点缀 ── */
+      --accent: #c9a84c;
+      --accent-dim: #a08830;
+      --accent-glow: rgba(201,168,76,0.12);
+      --accent2: #6b8ca4;
+      --accent2-dim: #5a7a92;
+      --user-bg: #edf3f8;
+      --user-border: #c4d4e2;
+      --bot-bg: #f8f9fc;
+      --bot-border: #d4dbe4;
+      --diary-bg: #f5eed6;
+      --diary-border: #e8d69c;
+      --success: #6a8a6e;
+      --warning: #a68a5a;
+      --error: #a86a6a;
+      --scrollbar: #c4ccd6;
+      --scrollbar-hover: #98a5b5;
+      --shadow: 0 1px 3px rgba(30,42,58,0.08);
+      --shadow-float: 0 4px 12px rgba(30,42,58,0.1);
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+      --text-xs: 11px; --text-sm: 12px; --text-base: 14px; --text-md: 15px;
+      --text-lg: 18px; --text-xl: 20px; --text-2xl: 28px;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    input, textarea, select { -webkit-user-select: text; user-select: text; cursor: text; }
+    input::selection, textarea::selection { background: rgba(107,140,164,0.3); }
+    input::-webkit-selection, textarea::-webkit-selection { background: rgba(107,140,164,0.3); }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', system-ui, sans-serif;
+      font-size: var(--text-base);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+    ::selection { background: #edf3f8; color: #1e2a3a; }
+    :focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+
+    /* ======== Layout ======== */
+    .app { display: flex; height: var(--app-height, 100vh); overflow: hidden; }
+
+    /* Left sidebar */
+    .sidebar {
+      width: 260px; flex-shrink: 0;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transition: width 0.3s var(--ease);
+    }
+    .sidebar.collapsed { width: 0; }
+    .sb-header {
+      padding: var(--sp-4);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: var(--sp-3);
+    }
+    .sb-logo {
+      width: 40px; height: 40px; border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #3a2e24, #5a4a3a);
+      border: 1px solid var(--accent-dim);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .sb-logo svg { width: 24px; height: 24px; fill: var(--accent); }
+    .sb-title { font-family: 'Noto Serif SC', serif; font-size: var(--text-md); font-weight: 600; color: var(--accent); }
+    .sb-sub { font-size: var(--text-xs); color: var(--text-muted); }
+
+    .sb-section { padding: var(--sp-3) var(--sp-4); }
+    .sb-section-title {
+      font-size: var(--text-xs); font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: var(--sp-2);
+    }
+
+    .char-card {
+      display: flex; align-items: center; gap: var(--sp-3);
+      padding: var(--sp-3);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.15s;
+      border: 1px solid transparent;
+    }
+    .char-card:hover { background: var(--bg-hover); }
+    .char-card.active { background: var(--bg-active); border-color: var(--accent-dim); }
+    .char-avatar {
+      width: 44px; height: 44px; border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #3a2e24, #5a4a3a);
+      border: 1px solid var(--accent-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .char-info { min-width: 0; }
+    .char-name { font-size: var(--text-base); font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .char-desc { font-size: var(--text-xs); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .sb-section.conv-section { flex: 1; overflow-y: auto; min-height: 0; padding-bottom: 0; }
+    .conv-list { display: flex; flex-direction: column; gap: 2px; }
+    .conv-item {
+      display: flex; align-items: center; gap: var(--sp-2);
+      padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm);
+      cursor: pointer; transition: background 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .conv-item:hover { background: var(--bg-hover); }
+    .conv-item.active { background: var(--bg-active); border-left-color: var(--accent); }
+    .conv-item-body { min-width: 0; flex: 1; }
+    .conv-item-title { font-size: var(--text-sm); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-item-time { font-size: var(--text-xs); color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+    .conv-item.active .conv-item-title { font-weight: 600; color: var(--accent-dim); }
+    .sb-nav { margin-top: auto; border-top: 1px solid var(--border); padding: var(--sp-2); }
+    .sb-btn {
+      display: flex; align-items: center; gap: var(--sp-3);
+      width: 100%; padding: var(--sp-2) var(--sp-3);
+      border: none; border-radius: var(--radius-sm);
+      background: transparent; color: var(--text-secondary);
+      font-family: inherit; font-size: var(--text-sm);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .sb-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .sb-btn svg { width: 16px; height: 16px; stroke: currentColor; flex-shrink: 0; }
+
+    /* Center: Chat */
+    .chat-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    .chat-hdr {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: var(--sp-3) var(--sp-5);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .chat-hdr-left { display: flex; align-items: center; gap: var(--sp-3); }
+    .toggle-btn {
+      width: 32px; height: 32px; border: none; border-radius: var(--radius-sm);
+      background: transparent; color: var(--text-secondary); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .toggle-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .toggle-btn svg { width: 18px; height: 18px; }
+    .chat-char-name { font-family: 'Noto Serif SC', serif; font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); }
+    .chat-hdr-right { display: flex; align-items: center; gap: var(--sp-2); }
+    .hdr-icon-btn {
+      width: 32px; height: 32px; border: none; border-radius: var(--radius-sm);
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; position: relative;
+    }
+    .hdr-icon-btn:hover { background: var(--bg-hover); color: var(--text-secondary); }
+    .hdr-icon-btn svg { width: 18px; height: 18px; }
+    .clock-mini {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs); color: var(--text-muted);
+      padding: var(--sp-1) var(--sp-2);
+      border-radius: var(--radius-sm);
+      background: var(--bg-input);
+    }
+    .diary-dot {
+      position: absolute; top: 4px; right: 4px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+    /* Messages */
+    .msgs {
+      flex: 1; overflow-y: auto; padding: var(--sp-4) var(--sp-5);
+      display: flex; flex-direction: column; gap: var(--sp-4);
+      -webkit-user-select: text; user-select: text;
+      -webkit-overflow-scrolling: touch;
+    }
+    .msg-group { display: flex; gap: var(--sp-3); max-width: 85%; }
+    .msg-group.user { flex-direction: row-reverse; align-self: flex-end; }
+    .msg-group.bot { align-self: flex-start; }
+    .msg-av {
+      width: 40px; height: 40px; border-radius: var(--radius-md);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; border: 1px solid var(--border-accent);
+    }
+    .msg-group.user .msg-av {
+      background: linear-gradient(135deg, var(--accent2), var(--accent2-dim));
+      border-color: var(--accent2-dim);
+      color: #fff;
+    }
+    .msg-group.bot .msg-av {
+      background: linear-gradient(135deg, #3a2e24, #5a4a3a);
+      border-color: var(--accent-dim);
+    }
+    .msg-body { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+    .msg-meta { display: flex; align-items: center; gap: var(--sp-2); }
+    .msg-group.user .msg-meta { flex-direction: row-reverse; }
+    .msg-sender { font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary); }
+    .msg-time { font-size: var(--text-xs); color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+    .msg-bubble {
+      padding: var(--sp-3) var(--sp-4);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-base); line-height: 1.7;
+      word-break: break-word;
+    }
+    .msg-group.user .msg-bubble {
+      background: var(--user-bg);
+      border: 1px solid var(--user-border);
+      border-top-right-radius: var(--radius-sm);
+    }
+    .msg-group.bot .msg-bubble {
+      background: var(--bot-bg);
+      border: 1px solid var(--bot-border);
+      border-top-left-radius: var(--radius-sm);
+    }
+    .msg-group.diary .msg-bubble {
+      background: var(--diary-bg);
+      border: 1px solid var(--diary-border);
+      border-left: 3px solid var(--accent-dim);
+    }
+    .msg-group.diary .msg-av {
+      background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .msg-bubble p { margin-bottom: var(--sp-2); }
+    .msg-bubble p:last-child { margin-bottom: 0; }
+    .msg-bubble code {
+      font-family: 'JetBrains Mono', monospace; font-size: var(--text-sm);
+      background: var(--bg-active); padding: 1px 5px; border-radius: 3px;
+    }
+    .msg-bubble pre {
+      background: var(--bg-active); padding: var(--sp-3);
+      border-radius: var(--radius-md); overflow-x: auto; margin: var(--sp-2) 0;
+    }
+    .msg-bubble pre code { background: none; padding: 0; }
+
+    .typing { display: none; align-self: flex-start; padding: var(--sp-3) var(--sp-4); background: var(--bot-bg); border: 1px solid var(--bot-border); border-radius: var(--radius-lg); border-top-left-radius: var(--radius-sm); gap: 5px; align-items: center; }
+    .typing.on { display: flex; }
+    .t-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); animation: tB 1.4s infinite ease-in-out; }
+    .t-dot:nth-child(2) { animation-delay: 0.2s; }
+    .t-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes tB { 0%,80%,100%{transform:scale(0.5);opacity:0.3} 40%{transform:scale(1);opacity:1} }
+
+    /* Input */
+    .input-bar {
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      padding: var(--sp-3) var(--sp-5);
+      flex-shrink: 0;
+    }
+    .input-row { display: flex; gap: var(--sp-3); align-items: flex-end; }
+    .input-wrap { flex: 1; position: relative; }
+    .chat-in {
+      width: 100%; min-height: 44px; max-height: 150px;
+      padding: var(--sp-3) var(--sp-4);
+      font-family: inherit; font-size: var(--text-base); line-height: 1.6;
+      color: var(--text-primary); background: var(--bg-input);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      resize: none; outline: none;
+      transition: border-color 0.15s;
+      -webkit-user-select: text; user-select: text;
+    }
+    .chat-in:focus { border-color: var(--accent-dim); }
+    .chat-in::placeholder { color: var(--text-dim); }
+    .send-btn {
+      width: 44px; height: 44px; border: none; border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #3a2e24, #5a4a3a); color: var(--accent);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(58,46,36,0.2);
+    }
+    .send-btn:hover { background: linear-gradient(135deg, #5a4a3a, #6a5a4a); box-shadow: 0 3px 10px rgba(58,46,36,0.3); }
+    .send-btn svg { width: 20px; height: 20px; }
+    .input-hints { display: flex; gap: var(--sp-2); margin-top: var(--sp-2); flex-wrap: wrap; }
+    .hint {
+      font-size: var(--text-xs); padding: 3px var(--sp-2);
+      border-radius: var(--radius-sm); background: var(--bg-input);
+      color: var(--text-muted); cursor: pointer;
+      border: 1px solid var(--border); transition: all 0.15s;
+    }
+    .hint:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+    /* Right: Translate Panel */
+    .trans-col {
+      width: 340px; flex-shrink: 0;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: none; flex-direction: column;
+    }
+    .t-hdr {
+      padding: var(--sp-3) var(--sp-4);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .t-hdr-title {
+      font-family: 'Noto Serif SC', serif; font-size: var(--text-md); font-weight: 600;
+      color: var(--text-primary); display: flex; align-items: center; gap: var(--sp-2);
+    }
+    .t-hdr-title svg { width: 16px; height: 16px; stroke: var(--accent); }
+    .lang-sw { display: flex; align-items: center; gap: var(--sp-1); }
+    .lang-btn {
+      font-size: var(--text-xs); padding: 2px var(--sp-2);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .lang-btn.on { border-color: var(--accent-dim); color: var(--accent); background: var(--accent-glow); }
+    .lang-arrow { color: var(--text-dim); font-size: var(--text-xs); }
+
+    .t-search {
+      padding: var(--sp-3) var(--sp-4);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .t-search-wrap { position: relative; }
+    .t-in {
+      width: 100%; padding: var(--sp-2) var(--sp-3); padding-right: 64px;
+      font-family: inherit; font-size: var(--text-base); line-height: 1.6;
+      color: var(--text-primary); background: var(--bg-input);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      outline: none; transition: border-color 0.15s;
+    }
+    .t-in:focus { border-color: var(--accent-dim); }
+    .t-in::placeholder { color: var(--text-dim); }
+    .t-acts { position: absolute; right: var(--sp-1); top: 50%; transform: translateY(-50%); display: flex; gap: 2px; }
+    .t-act {
+      width: 28px; height: 28px; border: none; border-radius: var(--radius-sm);
+      background: transparent; color: var(--text-dim); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .t-act:hover { color: var(--text-secondary); background: var(--bg-hover); }
+    .t-act svg { width: 14px; height: 14px; }
+
+    .t-body { flex: 1; overflow-y: auto; padding: var(--sp-4); }
+
+    .t-result { display: none; }
+    .t-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: var(--sp-4);
+      margin-bottom: var(--sp-3);
+    }
+    .t-word { font-family: 'Noto Serif SC', serif; font-size: var(--text-2xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-1); }
+    .t-phon { display: flex; gap: var(--sp-3); margin-bottom: var(--sp-3); flex-wrap: wrap; }
+    .phon {
+      display: flex; align-items: center; gap: var(--sp-1);
+      font-size: var(--text-sm); color: var(--text-muted);
+      cursor: pointer; padding: 2px var(--sp-2);
+      border-radius: var(--radius-sm); transition: all 0.15s;
+    }
+    .phon:hover { background: var(--bg-hover); color: var(--text-secondary); }
+    .phon svg { width: 13px; height: 13px; stroke: currentColor; }
+    .phon-l { font-weight: 600; color: var(--text-secondary); }
+    .phon-t { font-family: 'JetBrains Mono', monospace; }
+    .t-defs { display: flex; flex-direction: column; gap: var(--sp-2); }
+    .def { display: flex; gap: var(--sp-2); padding: var(--sp-2) 0; border-bottom: 1px solid var(--border-light); }
+    .def:last-child { border-bottom: none; }
+    .pos {
+      font-size: var(--text-xs); font-weight: 600; color: var(--accent);
+      background: var(--accent-glow); padding: 1px var(--sp-2);
+      border-radius: var(--radius-sm); height: fit-content; flex-shrink: 0;
+    }
+    .def-t { font-size: var(--text-base); color: var(--text-primary); line-height: 1.6; }
+    .t-actions { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+    .t-btn {
+      font-size: var(--text-xs); padding: var(--sp-1) var(--sp-3);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg-input); color: var(--text-secondary);
+      cursor: pointer; display: inline-flex; align-items: center; gap: var(--sp-1);
+      transition: all 0.15s; font-family: inherit;
+    }
+    .t-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+    .t-btn svg { width: 13px; height: 13px; }
+
+    .t-hist { margin-top: var(--sp-4); }
+    .t-hist-t {
+      font-size: var(--text-xs); font-weight: 600; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: var(--sp-2); display: flex; align-items: center; gap: var(--sp-2);
+    }
+    .t-hist-t svg { width: 12px; height: 12px; stroke: currentColor; }
+    .h-list { display: flex; flex-direction: column; gap: 2px; }
+    .h-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .h-item:hover { background: var(--bg-hover); }
+    .h-w { font-size: var(--text-sm); color: var(--text-primary); }
+    .h-m { font-size: var(--text-xs); color: var(--text-dim); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .vocab-sec { border-top: 1px solid var(--border); padding-top: var(--sp-3); margin-top: var(--sp-3); }
+    .vocab-t {
+      font-size: var(--text-xs); font-weight: 600; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: var(--sp-2); display: flex; align-items: center; justify-content: space-between;
+    }
+    .vocab-cnt { font-weight: 400; text-transform: none; letter-spacing: 0; }
+    .vocab-list { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+    .v-chip {
+      font-size: var(--text-xs); padding: 2px var(--sp-2);
+      border-radius: var(--radius-sm); background: var(--bg-input);
+      color: var(--text-muted); cursor: pointer;
+      border: 1px solid var(--border); transition: all 0.15s;
+    }
+    .v-chip:hover { border-color: var(--accent-dim); color: var(--accent); }
+    .empty-t {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: var(--sp-3);
+      color: var(--text-dim); padding: var(--sp-8);
+    }
+    .empty-t svg { width: 48px; height: 48px; stroke: var(--text-dim); opacity: 0.4; }
+    .empty-t p { font-size: var(--text-sm); text-align: center; line-height: 1.8; }
+
+    /* Overlay / Modal */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
+    .overlay.on { display: flex; }
+    .modal {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow);
+      width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
+    }
+    .modal-hd {
+      padding: var(--sp-4) var(--sp-5); display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-hd h3 { font-family: 'Noto Serif SC', serif; font-size: var(--text-lg); font-weight: 600; }
+    .close-btn {
+      width: 28px; height: 28px; border: none; border-radius: var(--radius-sm);
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .close-btn:hover { background: var(--bg-hover); color: var(--text-secondary); }
+    .modal-body { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+    .s-group { display: flex; flex-direction: column; gap: var(--sp-1); }
+    .s-label { font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary); }
+    .s-input {
+      width: 100%; padding: var(--sp-2) var(--sp-3);
+      font-family: inherit; font-size: var(--text-base);
+      color: var(--text-primary); background: var(--bg-input);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      outline: none; transition: border-color 0.15s;
+      -webkit-user-select: text; user-select: text;
+      position: relative; z-index: 1;
+    }
+    .s-input:focus { border-color: var(--accent-dim); }
+    select.s-input { cursor: pointer; appearance: auto; }
+    select.s-input option { padding: var(--sp-2) var(--sp-3); background: var(--bg-card); color: var(--text-primary); }
+    .s-ta { min-height: 120px; resize: vertical; line-height: 1.6; }
+    .s-hint { font-size: var(--text-xs); color: var(--text-dim); }
+    .modal-ft { padding: var(--sp-3) var(--sp-5) var(--sp-4); display: flex; gap: var(--sp-3); justify-content: flex-end; }
+    .btn {
+      padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-md);
+      font-family: inherit; font-size: var(--text-sm); font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: var(--sp-2);
+    }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+    .btn-ghost:hover { background: var(--bg-hover); border-color: var(--border-accent); }
+    .btn-accent { background: var(--accent-dim); border: 1px solid var(--accent-dim); color: #fff; }
+    .btn-accent:hover { background: var(--accent); border-color: var(--accent); }
+
+    /* Diary Modal */
+    .diary-modal {
+      background: var(--bg-card); border: 1px solid var(--diary-border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow);
+      width: 90%; max-width: 560px; max-height: 80vh; overflow-y: auto;
+    }
+    .diary-hd {
+      padding: var(--sp-4) var(--sp-5); display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--diary-border);
+      background: linear-gradient(135deg, rgba(245,238,214,0.6), rgba(232,214,156,0.2));
+    }
+    .diary-hd h3 { font-family: 'Noto Serif SC', serif; font-size: var(--text-lg); font-weight: 600; color: var(--accent-dim); }
+    .diary-content { padding: var(--sp-5); }
+    .diary-text {
+      font-family: 'Noto Serif SC', serif; font-size: var(--text-md);
+      line-height: 2; color: var(--text-secondary); white-space: pre-wrap;
+    }
+    .diary-empty { text-align: center; color: var(--text-dim); font-style: italic; padding: var(--sp-8); }
+
+    /* Toast */
+    .toast-box { position: fixed; top: var(--sp-4); right: var(--sp-4); z-index: 200; display: flex; flex-direction: column; gap: var(--sp-2); }
+    .toast {
+      padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md);
+      font-size: var(--text-sm); color: var(--text-primary);
+      background: rgba(248,249,252,0.92); border: 1px solid var(--border);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-float); animation: tIn 0.3s var(--ease);
+    }
+    .toast.ok { border-left: 3px solid var(--success); }
+    .toast.warn { border-left: 3px solid var(--warning); }
+    .toast.err { border-left: 3px solid var(--error); }
+    @keyframes tIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+    .err-display { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #fef2f2; border: 2px solid var(--error); padding: 20px; border-radius: 8px; z-index: 9999; max-width: 80%; font-family: monospace; font-size: 13px; color: var(--error); box-shadow: var(--shadow-float); }
+
+    /* Selection popup */
+    .sel-popup {
+      position: fixed; z-index: 90;
+      background: var(--bg-card); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-float);
+      padding: var(--sp-3); max-width: 320px; min-width: 180px;
+      animation: popIn 0.15s var(--ease);
+    }
+    @keyframes popIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .sel-popup .sp-word { font-family: 'Noto Serif SC', serif; font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+    .sel-popup .sp-phon { font-family: 'JetBrains Mono', monospace; font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--sp-2); }
+    .sel-popup .sp-def { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--sp-2); }
+    .sel-popup .sp-def .pos { font-size: 10px; padding: 0 4px; }
+    .sel-popup .sp-actions { display: flex; gap: var(--sp-1); border-top: 1px solid var(--border-light); padding-top: var(--sp-2); }
+    .sel-popup .sp-btn {
+      font-size: var(--text-xs); padding: 3px var(--sp-2);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg-input); color: var(--text-muted);
+      cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+    .sel-popup .sp-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+    .sel-popup .sp-btn.primary { background: var(--accent-dim); color: #fff; border-color: var(--accent-dim); }
+    .sel-popup .sp-btn.primary:hover { background: var(--accent); }
+    .sel-popup .sp-phrase { font-size: var(--text-sm); color: var(--text-primary); margin-bottom: var(--sp-2); line-height: 1.6; max-height: 80px; overflow-y: auto; }
+    .sel-popup .sp-trans { font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--sp-2); line-height: 1.6; }
+    .sel-popup .sp-loading { font-size: var(--text-sm); color: var(--text-dim); padding: var(--sp-2) 0; }
+
+    /* Story selector */
+    .story-cards { display: flex; flex-direction: column; gap: var(--sp-2); }
+    .story-card {
+      display: flex; align-items: center; gap: var(--sp-3);
+      padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-md);
+      border: 1px solid var(--border-light); background: var(--bg-card);
+      cursor: pointer; transition: all 0.15s var(--ease);
+    }
+    .story-card:hover { border-color: var(--accent); background: var(--bg-hover); }
+    .story-card.active { border-color: var(--accent-dim); background: var(--accent-glow); }
+    .story-card .sc-icon { font-size: 24px; flex-shrink: 0; }
+    .story-card .sc-info { min-width: 0; }
+    .story-card .sc-name { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+    .story-card .sc-desc { font-size: var(--text-xs); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .story-badge {
+      display: inline-block; font-size: 10px; padding: 1px 6px;
+      border-radius: 3px; background: var(--accent-dim); color: #fff;
+      margin-left: var(--sp-1); vertical-align: middle;
+    }
+
+    /* ── CODEC 双向编码系统 ── */
+    .codec-panel {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-float);
+      width: 94%; max-width: 720px; max-height: 85vh; display: flex; flex-direction: column;
+    }
+    .codec-hd {
+      padding: var(--sp-4) var(--sp-5); display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .codec-hd h3 { font-family: 'Noto Serif SC', serif; font-size: var(--text-lg); font-weight: 600; color: var(--accent-dim); }
+    .codec-toolbar {
+      padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--border-light);
+      display: flex; gap: var(--sp-2); align-items: center; flex-wrap: wrap; flex-shrink: 0;
+    }
+    .codec-search {
+      flex: 1; min-width: 120px; padding: var(--sp-2) var(--sp-3);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg-input); font-size: var(--text-sm); font-family: inherit;
+      color: var(--text-primary); outline: none;
+    }
+    .codec-search:focus { border-color: var(--accent-dim); }
+    .codec-cat-btn {
+      padding: var(--sp-1) var(--sp-3); border-radius: 12px;
+      font-size: var(--text-xs); font-weight: 600; cursor: pointer;
+      border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary);
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .codec-cat-btn:hover { border-color: var(--accent-dim); }
+    .codec-cat-btn.active { background: var(--accent-dim); color: #fff; border-color: var(--accent-dim); }
+    .codec-body { flex: 1; overflow-y: auto; padding: var(--sp-3) var(--sp-5); }
+    .codec-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+    .codec-table th {
+      position: sticky; top: 0; background: var(--bg-card);
+      padding: var(--sp-2) var(--sp-3); text-align: left;
+      font-weight: 600; color: var(--text-muted); font-size: var(--text-xs);
+      border-bottom: 2px solid var(--border); white-space: nowrap;
+    }
+    .codec-table td {
+      padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+    .codec-table tr:hover { background: var(--bg-hover); }
+    .codec-plain { color: var(--text-primary); font-weight: 500; }
+    .codec-arrow { color: var(--text-dim); text-align: center; font-size: var(--text-xs); }
+    .codec-code { color: var(--accent-dim); font-weight: 600; font-family: 'Noto Serif SC', serif; }
+    .codec-cat-tag {
+      display: inline-block; font-size: 10px; padding: 1px 6px;
+      border-radius: 3px; background: var(--accent2); color: #fff;
+    }
+    .codec-toggle {
+      width: 36px; height: 20px; border-radius: 10px; border: none;
+      background: var(--border); cursor: pointer; position: relative;
+      transition: background 0.2s; flex-shrink: 0;
+    }
+    .codec-toggle.on { background: var(--success); }
+    .codec-toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform 0.2s;
+    }
+    .codec-toggle.on::after { transform: translateX(16px); }
+    .codec-ft {
+      padding: var(--sp-3) var(--sp-5); border-top: 1px solid var(--border);
+      display: flex; gap: var(--sp-2); justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .codec-stats { font-size: var(--text-xs); color: var(--text-dim); }
+    .codec-add-row {
+      display: none; padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--border);
+      gap: var(--sp-2); align-items: center; flex-shrink: 0;
+    }
+    .codec-add-row.show { display: flex; }
+    .codec-add-row input {
+      flex: 1; padding: var(--sp-2) var(--sp-3);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg-input); font-size: var(--text-sm); font-family: inherit;
+      color: var(--text-primary); outline: none;
+    }
+    .codec-add-row input:focus { border-color: var(--accent-dim); }
+    .codec-add-row select {
+      padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); background: var(--bg-input);
+      font-size: var(--text-sm); font-family: inherit; color: var(--text-primary);
+    }
+
+    /* Mobile sidebar overlay */
+    .sb-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(30,42,58,0.3);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      z-index: 50;
+    }
+    .sb-overlay.on { display: block; }
+
+    /* Mobile translate overlay */
+    .trans-overlay {
+      display: none; position: fixed; inset: 0; z-index: 50;
+      background: var(--bg-main);
+    }
+    .trans-overlay.on { display: flex; flex-direction: column; }
+    .trans-overlay .trans-col {
+      width: 100%; height: 100%; border: none; position: static;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed; left: 0; top: 0; bottom: 0; z-index: 60;
+        transform: translateX(-100%); transition: transform 0.3s var(--ease);
+        box-shadow: none;
+        max-height: var(--app-height, 100vh);
+        overflow-y: auto; overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      }
+      .sidebar.collapsed { width: 260px; transform: translateX(-100%); }
+      .sidebar.collapsed.open { transform: translateX(0); }
+      .trans-col { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .app { flex-direction: column; }
+      .chat-col { flex: 1; min-height: 0; overflow: hidden; }
+      .chat-hdr { padding: var(--sp-2) var(--sp-3); }
+      .chat-char-name { font-size: var(--text-base); }
+      .msgs { padding: var(--sp-3); gap: var(--sp-3); }
+      .msg-group { max-width: 92%; }
+      .msg-av { width: 34px; height: 34px; font-size: 16px; border-radius: var(--radius-sm); }
+      .msg-bubble { padding: var(--sp-2) var(--sp-3); font-size: var(--text-base); }
+      .msg-sender { font-size: var(--text-xs); }
+      .input-bar {
+        padding: var(--sp-2) var(--sp-3);
+        padding-bottom: max(var(--sp-2), env(safe-area-inset-bottom, 8px));
+      }
+      .chat-in { min-height: 40px; font-size: 16px; /* prevent iOS zoom */ }
+      .send-btn { width: 40px; height: 40px; }
+      .hints { gap: var(--sp-1); }
+      .hint { padding: 4px var(--sp-2); font-size: var(--text-xs); }
+      /* Modals */
+      .modal, .diary-modal { width: 95%; max-height: 85vh; }
+      .modal-body { padding: var(--sp-3); gap: var(--sp-3); }
+      .s-input { font-size: 16px; /* prevent iOS zoom */ }
+      /* Toast */
+      .toast-box { left: var(--sp-3); right: var(--sp-3); }
+    }
+
+    @media (max-width: 380px) {
+      .hdr-icon-btn { width: 28px; height: 28px; }
+      .clock-mini { font-size: 10px; padding: 2px var(--sp-1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Mobile overlays -->
+<div class="sb-overlay" id="sbOverlay"></div>
+<div class="trans-overlay" id="transOverlay">
+  <div style="padding:var(--sp-3) var(--sp-4);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--bg-panel);flex-shrink:0">
+    <span style="font-family:'Noto Serif SC',serif;font-size:var(--text-md);font-weight:600">雾中译典</span>
+    <button class="close-btn" id="closeTransMobile">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="app" id="appRoot">
+  <!-- ======== Sidebar ======== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo">
+        <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg>
+      </div>
+      <div>
+        <div class="sb-title">雾中酒馆</div>
+        <div class="sb-sub">The Misty Tavern</div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title">角色</div>
+      <div class="char-card active">
+        <div class="char-avatar">🏮</div>
+        <div class="char-info">
+          <div class="char-name">酒馆掌柜</div>
+          <div class="char-desc">雾中酒馆的温和掌柜</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-title">故事</div>
+      <div id="storyCards" class="story-cards">
+        <div class="story-card active" data-story="">
+          <span class="sc-icon">🏮</span>
+          <div class="sc-info"><div class="sc-name">酒馆掌柜</div><div class="sc-desc">默认模式 · 自由对话</div></div>
+        </div>
+        <div class="story-card" data-story="cultivation">
+          <span class="sc-icon">⚔️</span>
+          <div class="sc-info"><div class="sc-name">九州问道<span class="story-badge">修仙</span></div><div class="sc-desc">仙门宗派 · 万缘体质 · 可攻略12人</div></div>
+        </div>
+        <div class="story-card" data-story="court">
+          <span class="sc-icon">👑</span>
+          <div class="sc-info"><div class="sc-name">荆棘王冠<span class="story-badge">宫廷</span></div><div class="sc-desc">华丽宫廷 · 权谋纠葛 · 可攻略12人</div></div>
+        </div>
+        <div class="story-card" data-story="xianxia">
+          <span class="sc-icon">✨</span>
+          <div class="sc-info"><div class="sc-name">六界浮生<span class="story-badge">仙侠</span></div><div class="sc-desc">六界并立 · 宿命羁绊 · 可攻略12人</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-section" style="padding-bottom:var(--sp-2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-2)">
+        <div class="sb-section-title" style="margin-bottom:0">对话</div>
+        <span id="convTotal" style="font-size:var(--text-xs);color:var(--text-dim)">0 条</span>
+      </div>
+      <div id="convList" class="conv-list"></div>
+    </div>
+
+    <nav class="sb-nav">
+      <button class="sb-btn" id="newChatBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新对话
+      </button>
+      <button class="sb-btn" id="delConvBtn" style="color:var(--error)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        删除对话
+      </button>
+      <button class="sb-btn" id="clearMemBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        清除记忆
+      </button>
+      <button class="sb-btn" id="settingsBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        设置
+      </button>
+      <button class="sb-btn" id="codecBtn" title="双向编码系统">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+        编码系统
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ======== Chat ======== -->
+  <main class="chat-col">
+    <header class="chat-hdr">
+      <div class="chat-hdr-left">
+        <button class="toggle-btn" id="toggleSidebar" title="切换侧栏">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div id="chatAvatar" class="char-avatar" style="width:32px;height:32px;font-size:16px">🏮</div>
+        <div class="chat-char-name" id="chatCharName">酒馆掌柜</div>
+      </div>
+      <div class="chat-hdr-right">
+        <div class="clock-mini" id="clock">--:--:--</div>
+        <button class="hdr-icon-btn" id="diaryBtn" title="酒馆日志">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span class="diary-dot" id="diaryDot"></span>
+        </button>
+        <button class="hdr-icon-btn" id="charDiaryBtn" title="角色日记" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </button>
+        <button class="hdr-icon-btn" id="toggleTrans" title="翻译面板">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M22 22l-5-10-5 10M14 18h6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="msgs" id="msgs">
+      <div class="msg-group bot">
+        <div class="msg-av">🏮</div>
+        <div class="msg-body">
+          <div class="msg-meta"><span class="msg-sender">酒馆掌柜</span><span class="msg-time" id="welcomeTime">--:--</span></div>
+          <div class="msg-bubble">
+            <p>欢迎来到雾中酒馆。我是这里的掌柜，在这迷雾缭绕的夜晚，为您斟上一杯暖酒。</p>
+            <p>有什么想聊的，尽管开口。今夜的酒馆，只为你一人亮着灯。</p>
+          </div>
+        </div>
+      </div>
+      <div class="typing" id="typing">
+        <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-row">
+        <div class="input-wrap">
+          <textarea class="chat-in" id="chatIn" placeholder="在酒馆吧台前坐下，说点什么..." rows="1"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" title="发送">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======== Translate Panel ======== -->
+  <aside class="trans-col" id="transCol">
+    <header class="t-hdr">
+      <div class="t-hdr-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M22 22l-5-10-5 10M14 18h6"/></svg>
+        雾中译典
+      </div>
+      <div class="lang-sw">
+        <span class="lang-btn on" id="langEn">EN</span>
+        <span class="lang-arrow">⇄</span>
+        <span class="lang-btn" id="langZh">ZH</span>
+      </div>
+    </header>
+    <div class="t-search">
+      <div class="t-search-wrap">
+        <input type="text" class="t-in" id="tin" placeholder="输入要查询的单词...">
+        <div class="t-acts">
+          <button class="t-act" id="clearT" title="清空">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <button class="t-act" id="searchT" title="查询">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="t-body" id="tBody">
+      <div class="empty-t" id="emptyT">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
+        <p>输入英文或中文<br>即可查询释义与翻译</p>
+      </div>
+      <div class="t-result" id="tResult">
+        <div class="t-card">
+          <div class="t-word" id="tWord"></div>
+          <div class="t-phon" id="tPhon"></div>
+          <div class="t-defs" id="tDefs"></div>
+        </div>
+        <div class="t-actions">
+          <button class="t-btn" id="addVocab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            加入生词本
+          </button>
+        </div>
+      </div>
+      <div class="t-hist" id="tHist" style="display:none">
+        <div class="t-hist-t">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          查询历史
+        </div>
+        <div class="h-list" id="hList"></div>
+      </div>
+      <div class="vocab-sec" id="vocabSec" style="display:none">
+        <div class="vocab-t">
+          <span>生词本</span>
+          <span class="vocab-cnt" id="vocabCnt">0 词</span>
+        </div>
+        <div class="vocab-list" id="vocabList"></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Settings Modal -->
+<div class="overlay" id="settingsOv">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hd">
+      <h3>酒馆设置</h3>
+      <button class="close-btn" id="closeSet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="s-group">
+        <label class="s-label">API 地址</label>
+        <input type="text" class="s-input" id="sBase" placeholder="https://api.openai.com/v1">
+        <span class="s-hint">支持 OpenAI 官方、Azure、DeepSeek、智谱、月之暗面、硅基流动等所有兼容 OpenAI 格式的接口。填写到 /v1 即可，如 https://api.deepseek.com/v1</span>
+      </div>
+      <div class="s-group">
+        <label class="s-label">API Key</label>
+        <div style="display:flex;gap:var(--sp-2);align-items:center">
+          <input type="password" class="s-input" id="sKey" placeholder="sk-..." style="flex:1">
+          <button class="btn btn-ghost" id="testConn" style="white-space:nowrap;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            测试连接
+          </button>
+        </div>
+        <span class="s-hint">存储在本地浏览器，不会上传到任何服务器</span>
+      </div>
+      <div class="s-group">
+        <label class="s-label">模型</label>
+        <div style="display:flex;gap:var(--sp-2);align-items:center">
+          <select class="s-input" id="sModel" style="flex:1">
+            <option value="">-- 请先拉取模型列表 --</option>
+          </select>
+          <input type="text" class="s-input" id="sModelCustom" placeholder="或手动输入模型名称" style="flex:1;display:none">
+          <button class="btn btn-ghost" id="toggleModelInput" style="white-space:nowrap;flex-shrink:0" title="切换手动输入">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="fetchModels" style="white-space:nowrap;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            拉取模型
+          </button>
+        </div>
+        <div id="modelStatus" style="font-size:var(--text-xs);color:var(--text-dim);margin-top:var(--sp-1);display:none"></div>
+      </div>
+      <div class="s-group">
+        <label class="s-label">酒馆掌柜人设</label>
+        <textarea class="s-input s-ta" id="sPersona"></textarea>
+        <span class="s-hint">定义 AI 角色的性格、说话风格和背景故事</span>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="cancelSet">取消</button>
+      <button class="btn btn-accent" id="saveSet">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Diary Modal -->
+<div class="overlay" id="diaryOv">
+  <div class="diary-modal">
+    <div class="diary-hd">
+      <h3>酒馆日志</h3>
+      <button class="close-btn" id="closeDiary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="diary-content">
+      <div id="diaryText" class="diary-empty">今夜的日志还未书写...</div>
+    </div>
+  </div>
+</div>
+
+<!-- CODEC 双向编码系统 Modal -->
+<div class="overlay" id="codecOv">
+  <div class="codec-panel">
+    <div class="codec-hd">
+      <h3>双向编码系统 · CODEC</h3>
+      <button class="close-btn" id="closeCodec">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="codec-toolbar">
+      <input type="text" class="codec-search" id="codecSearch" placeholder="搜索编码词或显示文本...">
+      <button class="codec-cat-btn active" data-cat="all">全部</button>
+      <button class="codec-cat-btn" data-cat="body">身体</button>
+      <button class="codec-cat-btn" data-cat="action">动作</button>
+      <button class="codec-cat-btn" data-cat="state">状态</button>
+      <button class="codec-cat-btn" data-cat="fluid">体液</button>
+      <button class="codec-cat-btn" data-cat="sound">声音</button>
+      <button class="codec-cat-btn" data-cat="scene">场景</button>
+    </div>
+    <!-- 级别滑块 -->
+    <div style="padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:var(--sp-3);flex-shrink:0">
+      <span style="font-size:var(--text-xs);color:var(--text-muted);white-space:nowrap">🤍纯爱</span>
+      <div id="codecSliderWrap" style="flex:1;position:relative;height:40px;display:flex;align-items:center;cursor:pointer;touch-action:none">
+        <div id="codecSliderTrack" style="width:100%;height:6px;background:var(--border);border-radius:3px;position:relative">
+          <div id="codecSliderFill" style="width:0%;height:100%;background:var(--accent-dim);border-radius:3px;position:absolute;left:0;top:0"></div>
+        </div>
+        <div id="codecSliderThumb" style="width:24px;height:24px;background:#fff;border:2px solid var(--accent-dim);border-radius:50%;position:absolute;left:0%;top:50%;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,0.2);pointer-events:none"></div>
+      </div>
+      <span style="font-size:var(--text-xs);color:var(--text-muted);white-space:nowrap">全开🔥</span>
+    </div>
+    <div style="padding:0 var(--sp-5) var(--sp-2);border-bottom:1px solid var(--border-light);flex-shrink:0">
+      <div id="codecLevelLabel" style="font-size:var(--text-sm);color:var(--accent-dim);font-weight:600">🤍 纯爱 (0) — 拥抱亲吻即止，朦胧唯美</div>
+    </div>
+    <div class="codec-add-row" id="codecAddRow">
+      <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;flex:1">
+        <input type="text" id="codecAddCode" placeholder="编码词（AI生成）" style="min-width:80px">
+        <select id="codecAddCat" style="flex-shrink:0">
+          <option value="body">身体</option>
+          <option value="action">动作</option>
+          <option value="state">状态</option>
+          <option value="fluid">体液</option>
+          <option value="sound">声音</option>
+          <option value="scene">场景</option>
+          <option value="custom">自定义</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;flex:1;margin-top:var(--sp-1)">
+        <input type="text" id="codecAddL0" placeholder="🤍 纯爱" style="min-width:60px;font-size:var(--text-xs)">
+        <input type="text" id="codecAddL25" placeholder="💗 暧昧" style="min-width:60px;font-size:var(--text-xs)">
+        <input type="text" id="codecAddL50" placeholder="💖 微露" style="min-width:60px;font-size:var(--text-xs)">
+        <input type="text" id="codecAddL75" placeholder="❤️‍🔥 直白" style="min-width:60px;font-size:var(--text-xs)">
+        <input type="text" id="codecAddL100" placeholder="🔥 全开" style="min-width:60px;font-size:var(--text-xs)">
+      </div>
+      <button class="btn btn-accent" id="codecAddConfirm" style="padding:var(--sp-1) var(--sp-3);font-size:var(--text-xs);align-self:flex-start;margin-top:var(--sp-1)">添加</button>
+    </div>
+    <div class="codec-body" id="codecBody">
+      <table class="codec-table">
+        <thead>
+          <tr><th>编码词</th><th></th><th>当前级别显示</th><th>分类</th><th>操作</th></tr>
+        </thead>
+        <tbody id="codecTbody"></tbody>
+      </table>
+    </div>
+    <div class="codec-ft">
+      <div class="codec-stats" id="codecStats">0 条映射</div>
+      <div style="display:flex;gap:var(--sp-2)">
+        <button class="btn btn-ghost" id="codecAddBtn" style="padding:var(--sp-1) var(--sp-3);font-size:var(--text-xs)">+ 添加</button>
+        <button class="btn btn-ghost" id="codecExport" style="padding:var(--sp-1) var(--sp-3);font-size:var(--text-xs)">导出 JSON</button>
+        <button class="btn btn-ghost" id="codecImport" style="padding:var(--sp-1) var(--sp-3);font-size:var(--text-xs)">导入 JSON</button>
+        <button class="btn btn-ghost" id="codecTest" style="padding:var(--sp-1) var(--sp-3);font-size:var(--text-xs)">测试解码</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CODEC 测试解码 Modal -->
+<div class="overlay" id="codecTestOv">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hd">
+      <h3>测试解码</h3>
+      <button class="close-btn" id="closeCodecTest">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="s-group">
+        <label class="s-label">输入含编码的文本</label>
+        <textarea class="s-input s-ta" id="codecTestIn" placeholder="例如：他轻轻握住她的柔荑，感受着她的心跳加速..."></textarea>
+      </div>
+      <div class="s-group">
+        <label class="s-label">解码结果</label>
+        <div id="codecTestOut" style="padding:var(--sp-3);background:var(--bg-input);border-radius:var(--radius-sm);min-height:60px;font-size:var(--text-sm);color:var(--text-primary);white-space:pre-wrap;line-height:1.8"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="err-display" id="errDisplay"></div>
+<div class="toast-box" id="toastBox"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  window.onerror = function(msg, url, line) {
+    var el = document.getElementById('errDisplay');
+    if (el) { el.style.display = 'block'; el.textContent = 'Error: ' + msg + ' (line ' + line + ')'; }
+    return false;
+  };
+
+  /* Mobile viewport height fix: 100vh includes browser chrome on mobile */
+  function setAppHeight() {
+    document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+  window.addEventListener('orientationchange', function() { setTimeout(setAppHeight, 100); });
+
+  // ── Storage ──
+  var S = {
+    get: function(k, d) { try { var v = localStorage.getItem('st_' + k); return v ? JSON.parse(v) : d; } catch(e) { return d; } },
+    set: function(k, v) { try { localStorage.setItem('st_' + k, JSON.stringify(v)); } catch(e) {} }
+  };
+
+  // ── State ──
+  var DEF_PERSONA = '你是"雾中酒馆"的掌柜，一位温和、博学而富有诗意的中年人。你在一座被迷雾笼罩的古老城市中经营着这家酒馆。\n\n1. 温暖亲切，像一位老朋友\n2. 博学多才，喜欢用故事和比喻解释事物\n3. 说话带一点古典韵味，但不过于文言\n4. 偶尔引用诗词或典故，恰到好处\n5. 对客人充满关怀，记住他们的喜好\n6. 深夜时分更加深沉和富有哲思\n7. 喜欢用酒馆事物打比方——酒、灯、雾、夜\n\n酒馆坐落在古老石板街上，有温暖壁炉、橡木吧台、泛黄地图和老照片。窗外弥漫淡淡雾气，偶尔听到远处钟声。\n\n请用中文回复，保持掌柜语气。回复自然流畅，不要太长，像在吧台前闲聊。';
+
+  var cfg = S.get('cfg', { apiKey: '', apiBase: 'https://api.openai.com/v1', model: 'gpt-4o', persona: DEF_PERSONA });
+  var memory = S.get('mem', []);
+  var diaries = S.get('diary', {});
+  var charDiaries = S.get('char_diary', {});
+  var summaries = S.get('summary', {});
+  var tHist = S.get('thist', []);
+  var vocab = S.get('vocab', []);
+
+  // ── Conversations ──
+  var conversations = S.get('convs', []);
+  var currentConvId = S.get('currentConv', '');
+
+  // 迁移旧数据
+  (function migrateOldHistory() {
+    var old = null;
+    try { var raw = localStorage.getItem('st_hist'); if (raw) old = JSON.parse(raw); } catch(e) {}
+    if (old && old.length > 0) {
+      var id = 'conv_' + Date.now();
+      conversations.push({ id: id, title: '旧对话', messages: old, createdAt: Date.now() });
+      currentConvId = id;
+      S.set('convs', conversations);
+      S.set('currentConv', currentConvId);
+      localStorage.removeItem('st_hist');
+    }
+    if (conversations.length > 0 && !currentConvId) {
+      currentConvId = conversations[0].id;
+      S.set('currentConv', currentConvId);
+    }
+  })();
+
+  // ── Sidebar collapse helper ──
+  function collapseSidebar() {
+    if (window.innerWidth <= 900) {
+      $('sidebar').classList.remove('open');
+      $('sbOverlay').classList.remove('on');
+    } else {
+      $('sidebar').classList.add('collapsed');
+    }
+  }
+
+  function getCurrentConv() {
+    for (var i = 0; i < conversations.length; i++) {
+      if (conversations[i].id === currentConvId) return conversations[i];
+    }
+    return null;
+  }
+
+  function newConvId() { return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4); }
+
+  function newConv() {
+    var id = newConvId();
+    var conv = { id: id, title: '新对话', messages: [], createdAt: Date.now(), storyKey: activeStory || '' };
+    conversations.unshift(conv);
+    currentConvId = id;
+    S.set('convs', conversations);
+    S.set('currentConv', currentConvId);
+    renderConvList();
+    renderHistory();
+    updateCounts();
+  }
+
+  function switchConv(id) {
+    currentConvId = id;
+    S.set('currentConv', currentConvId);
+    renderConvList();
+    renderHistory();
+    updateCounts();
+    updateChatHeader();
+    closeSidebarMobile();
+  }
+
+  function updateChatHeader() {
+    var conv = getCurrentConv();
+    var sk = conv && conv.storyKey ? conv.storyKey : '';
+    var avatar = $('chatAvatar');
+    var name = $('chatCharName');
+    if (sk && STORY[sk]) {
+      if (avatar) avatar.textContent = STORY[sk].icon;
+      if (name) name.textContent = STORY[sk].name;
+    } else {
+      if (avatar) avatar.textContent = '🏮';
+      if (name) name.textContent = '酒馆掌柜';
+    }
+    // 同步侧栏角色卡
+    var sideName = document.querySelector('.char-name');
+    if (sideName) sideName.textContent = name ? name.textContent : '酒馆掌柜';
+    var sideAv = document.querySelector('.char-avatar');
+    if (sideAv && avatar) sideAv.textContent = avatar.textContent;
+  }
+
+  function deleteConv(id) {
+    var idx = -1;
+    for (var i = 0; i < conversations.length; i++) {
+      if (conversations[i].id === id) { idx = i; break; }
+    }
+    if (idx === -1) return;
+    var title = conversations[idx].title;
+    if (!confirm('删除对话「' + title + '」？\n该对话中的记忆也将被移除。')) return;
+
+    // 删除该对话关联的记忆
+    memory = memory.filter(function(m) { return m.convId !== id; });
+    S.set('mem', memory);
+
+    // 删除对话
+    conversations.splice(idx, 1);
+    S.set('convs', conversations);
+
+    // 切换到其他对话或创建新对话
+    if (conversations.length === 0) {
+      newConv();
+    } else if (currentConvId === id) {
+      currentConvId = conversations[0].id;
+      S.set('currentConv', currentConvId);
+      renderConvList();
+      renderHistory();
+    } else {
+      renderConvList();
+    }
+    updateCounts();
+    toast('对话已删除', 'ok');
+  }
+
+  function clearAllMem() {
+    if (!confirm('清除该角色的全部记忆？\n所有对话中积累的记忆都将被清除。')) return;
+    memory = [];
+    S.set('mem', memory);
+    updateCounts();
+    toast('记忆已清除', 'ok');
+  }
+
+  // ── Beijing Time ──
+  function bjNow() { return new Date(Date.now() + (new Date().getTimezoneOffset() + 480) * 60000); }
+  function todayKey() { var d = bjNow(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+  function timeStr() { return bjNow().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); }
+
+  function updateClock() {
+    var d = bjNow();
+    document.getElementById('clock').textContent =
+      String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':' + String(d.getSeconds()).padStart(2,'0');
+  }
+  setInterval(updateClock, 1000); updateClock();
+
+  function $(id) { return document.getElementById(id); }
+  function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function fmtMd(t) {
+    return t
+      .replace(/```([\s\S]*?)```/g, function(m, p) { return '<pre><code>' + esc(p) + '</code></pre>'; })
+      .replace(/`([^`]+)`/g, function(m, p) { return '<code>' + esc(p) + '</code>'; })
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  }
+  function toast(msg, type) {
+    var box = $('toastBox'), t = document.createElement('div');
+    t.className = 'toast ' + (type || ''); t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 3000);
+  }
+  function scrollMsgs() { var el = $('msgs'); el.scrollTop = el.scrollHeight; }
+  function updateCounts() {
+    var conv = getCurrentConv();
+    $('convTotal').textContent = conversations.length + ' 条';
+  }
+
+  // ── Render Chat ──
+  function addMsg(role, content, ts, type) {
+    var msgs = $('msgs'), typing = $('typing');
+    var div = document.createElement('div');
+    div.className = 'msg-group ' + role + (type === 'diary' ? ' diary' : '');
+    var av = role === 'user' ? '👤' : (type === 'diary' ? '📖' : '🏮');
+    var nm = role === 'user' ? '旅人' : (type === 'diary' ? '酒馆日志' : '酒馆掌柜');
+    var tm = ts || timeStr();
+    // CODEC: AI 回复自动解码（将编码词还原为用户可见的原文）
+    var displayContent = (role !== 'user') ? CODEC.decode(content) : content;
+    div.innerHTML =
+      '<div class="msg-av">' + av + '</div>' +
+      '<div class="msg-body">' +
+        '<div class="msg-meta"><span class="msg-sender">' + nm + '</span><span class="msg-time">' + tm + '</span></div>' +
+        '<div class="msg-bubble">' + fmtMd(displayContent) + '</div>' +
+      '</div>';
+    msgs.insertBefore(div, typing);
+    scrollMsgs(); updateCounts();
+  }
+
+  function renderHistory() {
+    var msgs = $('msgs'), typing = $('typing');
+    var welcome = msgs.querySelector('.msg-group.bot');
+    msgs.innerHTML = '';
+    if (welcome) msgs.appendChild(welcome);
+    var conv = getCurrentConv();
+    if (conv) {
+      conv.messages.forEach(function(m) { addMsg(m.role, m.content, m.ts, m.type); });
+    }
+    msgs.appendChild(typing);
+    scrollMsgs();
+  }
+
+  function renderConvList() {
+    var list = $('convList');
+    list.innerHTML = '';
+    conversations.forEach(function(c) {
+      var d = document.createElement('div');
+      d.className = 'conv-item' + (c.id === currentConvId ? ' active' : '');
+      var time = new Date(c.createdAt);
+      var timeStr = String(time.getMonth()+1).padStart(2,'0') + '/' + String(time.getDate()).padStart(2,'0') + ' ' +
+                    String(time.getHours()).padStart(2,'0') + ':' + String(time.getMinutes()).padStart(2,'0');
+      d.innerHTML =
+        '<div class="conv-item-body">' +
+          '<div class="conv-item-title">' + esc(c.title) + '</div>' +
+          '<div class="conv-item-time">' + timeStr + ' · ' + c.messages.length + ' 条</div>' +
+        '</div>';
+      d.addEventListener('click', function() { switchConv(c.id); });
+      list.appendChild(d);
+    });
+  }
+
+  // ── Memory ──
+  function extractMem(text) {
+    var ps = [
+      { re: /我(?:叫|是|名字叫)\s*(\S+)/, k: 'name' },
+      { re: /我(?:喜欢|爱|钟爱)\s*(.+)/, k: 'pref' },
+      { re: /我(?:是|做|从事)\s*(.+(?:工作|职业|行业))/, k: 'job' },
+      { re: /我(?:住在|来自|在)\s*(\S+)/, k: 'loc' },
+    ];
+    ps.forEach(function(p) {
+      var m = text.match(p.re);
+      if (m) { memory.push({ type: p.k, content: m[0], date: todayKey(), convId: currentConvId }); S.set('mem', memory); }
+    });
+    updateCounts();
+  }
+
+  // ── Send ──
+  async function sendMsg(text) {
+    if (!text.trim()) return;
+    if (!cfg.apiKey) { toast('请先在设置中配置 API Key', 'warn'); openSettings(); return; }
+    var conv = getCurrentConv();
+    if (!conv) { newConv(); conv = getCurrentConv(); }
+    var ts = timeStr();
+    var userMsg = { role: 'user', content: text, ts: ts };
+    conv.messages.push(userMsg);
+    addMsg('user', text, ts);
+    S.set('convs', conversations);
+    extractMem(text);
+
+    // 自动取标题：第一条用户消息截取前 20 字
+    if (conv.messages.filter(function(m) { return m.role === 'user'; }).length === 1) {
+      conv.title = text.length > 20 ? text.substring(0, 20) + '...' : text;
+      S.set('convs', conversations);
+      renderConvList();
+    }
+
+    $('typing').classList.add('on'); scrollMsgs();
+    try {
+      var msgs = [];
+      var sys = cfg.persona;
+      var _debugInfo = '';
+      if (memory.length > 0) {
+        sys += '\n\n你记得关于这位旅人的事情：\n';
+        memory.slice(-20).forEach(function(m) { sys += '- ' + m.content + '（' + m.date + '）\n'; });
+      }
+      // RAG: 注入相关故事背景
+      if (activeStory) {
+        var ragContext = retrieveRAG(text, activeStory);
+        if (ragContext) sys += ragContext;
+      }
+      // CODEC: 根据当前级别注入内容风格指令
+      sys += CODEC.getPromptAddon();
+      // 故事模式：强化角色扮演规则
+      if (activeStory) {
+        sys += '\n\n【角色扮演·强制】你是角色本人，不是旁白。用对话和动作推动剧情，像真人聊天。不要写小说式的长段描写。严禁代替玩家（【你】）说话、行动或思考。';
+      }
+      msgs.push({ role: 'system', content: sys });
+      // 对话摘要：超过 10 条时用摘要替代完整历史
+      var historyMsgs = conv.messages;
+      if (historyMsgs.length > 10) {
+        var summary = summaries[currentConvId] || '';
+        if (!summary) {
+          // 生成摘要
+          summary = await summarizeConv(conv);
+        }
+        if (summary) {
+          msgs.push({ role: 'system', content: '【之前的对话摘要】\n' + summary });
+          // 只发最近 5 条
+          historyMsgs.slice(-5).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
+        } else {
+          historyMsgs.slice(-20).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
+        }
+      } else {
+        historyMsgs.slice(-20).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
+      }
+      var reply = await callChatAPI(msgs, { max_tokens: activeStory ? 4096 : 1024, temperature: 0.85 });
+      var rts = timeStr();
+      conv.messages.push({ role: 'assistant', content: reply, ts: rts });
+      addMsg('assistant', reply, rts);
+      S.set('convs', conversations);
+    } catch(err) {
+      addMsg('system', '❌ ' + err.message, timeStr());
+    }
+    finally { $('typing').classList.remove('on'); scrollMsgs(); }
+  }
+
+  // ── Conversation Summary ──
+  async function summarizeConv(conv) {
+    if (!cfg.apiKey || conv.messages.length <= 10) return '';
+    var convText = conv.messages.map(function(m) {
+      return (m.role === 'user' ? '旅人' : '掌柜') + ': ' + m.content;
+    }).join('\n');
+    var prompt = '请将以下对话总结为简洁的剧情摘要，包含：当前场景、角色状态、关键事件、未完成的选择。200字以内。\n\n对话：\n' + convText;
+    try {
+      var summary = await callChatAPI([
+        { role: 'system', content: '你是摘要助手。' },
+        { role: 'user', content: prompt }
+      ], { max_tokens: 400, temperature: 0.3 });
+      summaries[conv.id] = summary;
+      S.set('summary', summaries);
+      return summary;
+    } catch(e) { return ''; }
+  }
+
+  // ── Character Diary ──
+  async function writeCharDiary() {
+    if (!cfg.apiKey || !activeStory) { toast('请先开启故事并配置 API', 'warn'); return; }
+    var tk = todayKey();
+    var conv = getCurrentConv();
+    if (!conv || conv.messages.length === 0) { toast('今天还没有对话内容', 'warn'); return; }
+
+    // 提取今天出场的角色
+    var meta = STORY_META[activeStory];
+    if (!meta) return;
+    var todayMsgs = conv.messages.map(function(m) { return m.content; }).join('\n');
+    var appearedChars = [];
+    meta.characters.forEach(function(c) {
+      if (todayMsgs.indexOf(c) !== -1) appearedChars.push(c);
+    });
+    if (appearedChars.length === 0) { toast('今天没有角色出场', 'warn'); return; }
+
+    toast('正在生成角色日记...', 'ok');
+    var result = {};
+
+    // 为每个出场角色生成日记
+    for (var i = 0; i < Math.min(appearedChars.length, 5); i++) {
+      var charName = appearedChars[i];
+      var prompt = '你是' + charName + '。请以第一人称写一篇简短日记（100-200字），记录今天与女主的互动，包含你的真实想法和情感。直接写内容，不加标题。';
+      try {
+        var diary = await callChatAPI([
+          { role: 'system', content: '你是小说角色' + charName + '，请用第一人称写日记。' },
+          { role: 'user', content: prompt }
+        ], { max_tokens: 400, temperature: 0.8 });
+        result[charName] = diary;
+      } catch(e) {}
+    }
+
+    if (Object.keys(result).length > 0) {
+      charDiaries[tk] = result;
+      S.set('char_diary', charDiaries);
+      // 在聊天界面显示
+      var diaryText = '📖 今日角色日记\n\n';
+      Object.keys(result).forEach(function(name) {
+        diaryText += '【' + name + '】\n' + result[name] + '\n\n';
+      });
+      var ts = timeStr();
+      conv.messages.push({ role: 'assistant', content: diaryText, ts: ts, type: 'diary' });
+      S.set('convs', conversations);
+      addMsg('assistant', diaryText, ts, 'diary');
+      toast('角色日记已生成', 'ok');
+    }
+  }
+
+  // ── Diary ──
+  async function writeDiary() {
+    var tk = todayKey(); if (diaries[tk] || !cfg.apiKey) return;
+    // 合并所有对话内容
+    var allMsgs = [];
+    conversations.forEach(function(c) { c.messages.forEach(function(m) { allMsgs.push(m); }); });
+    if (allMsgs.length === 0) return;
+    var conv = allMsgs.map(function(m) { return (m.role === 'user' ? '旅人' : '掌柜') + ': ' + m.content; }).join('\n');
+    var prompt = '你是雾中酒馆掌柜。今天是' + tk + '。根据今天的对话写一篇简短酒馆日志。用掌柜第一人称，记录对话要点，融入酒馆氛围，200-400字中文。直接写内容，不加标题。\n\n对话：\n' + conv;
+    try {
+      var diaryText = await callChatAPI([
+        { role: 'system', content: cfg.persona },
+        { role: 'user', content: prompt }
+      ], { max_tokens: 800, temperature: 0.9 });
+      diaries[tk] = diaryText;
+      S.set('diary', diaries);
+      var ts = timeStr();
+      var conv = getCurrentConv();
+      if (conv) {
+        conv.messages.push({ role: 'assistant', content: diaries[tk], ts: ts, type: 'diary' });
+        S.set('convs', conversations);
+      }
+      addMsg('assistant', diaries[tk], ts, 'diary');
+      toast('掌柜已写下今日日志', 'ok'); updateCounts();
+    } catch(e) {}
+  }
+  function loadDiary() {
+    var tk = todayKey(), el = $('diaryText');
+    if (diaries[tk]) { el.className = 'diary-text'; el.textContent = diaries[tk]; }
+    else { el.className = 'diary-empty'; el.textContent = '今夜的日志还未书写...'; }
+  }
+  setInterval(function() { var d = bjNow(); if (d.getHours() === 23 && d.getMinutes() === 0) writeDiary(); }, 30000);
+
+  // ── Dict ──
+  var DICT = {
+    'hello':{w:'hello',us:'həˈloʊ',uk:'həˈləʊ',d:[{p:'int.',t:'你好；喂'}]},
+    'world':{w:'world',us:'wɜːrld',uk:'wɜːld',d:[{p:'n.',t:'世界；领域'}]},
+    'love':{w:'love',us:'lʌv',uk:'lʌv',d:[{p:'n.',t:'爱；爱情'},{p:'v.',t:'爱；喜欢'}]},
+    'time':{w:'time',us:'taɪm',uk:'taɪm',d:[{p:'n.',t:'时间；时代'}]},
+    'life':{w:'life',us:'laɪf',uk:'laɪf',d:[{p:'n.',t:'生命；生活'}]},
+    'night':{w:'night',us:'naɪt',uk:'naɪt',d:[{p:'n.',t:'夜晚'}]},
+    'dream':{w:'dream',us:'driːm',uk:'driːm',d:[{p:'n.',t:'梦想；梦'},{p:'v.',t:'做梦'}]},
+    'mist':{w:'mist',us:'mɪst',uk:'mɪst',d:[{p:'n.',t:'薄雾'}]},
+    'tavern':{w:'tavern',us:'ˈtævərn',uk:'ˈtævən',d:[{p:'n.',t:'酒馆；客栈'}]},
+    'wine':{w:'wine',us:'waɪn',uk:'waɪn',d:[{p:'n.',t:'葡萄酒'}]},
+    'fire':{w:'fire',us:'faɪər',uk:'faɪə',d:[{p:'n.',t:'火；热情'},{p:'v.',t:'点燃'}]},
+    'moon':{w:'moon',us:'muːn',uk:'muːn',d:[{p:'n.',t:'月亮'}]},
+    'star':{w:'star',us:'stɑːr',uk:'stɑː',d:[{p:'n.',t:'星星；明星'}]},
+    'home':{w:'home',us:'hoʊm',uk:'həʊm',d:[{p:'n.',t:'家；故乡'}]},
+    'heart':{w:'heart',us:'hɑːrt',uk:'hɑːt',d:[{p:'n.',t:'心；内心'}]},
+    'story':{w:'story',us:'ˈstɔːri',uk:'ˈstɔːri',d:[{p:'n.',t:'故事'}]},
+    'memory':{w:'memory',us:'ˈmeməri',uk:'ˈmeməri',d:[{p:'n.',t:'记忆；回忆'}]},
+    'light':{w:'light',us:'laɪt',uk:'laɪt',d:[{p:'n.',t:'光；灯'},{p:'adj.',t:'轻的'}]},
+    'dark':{w:'dark',us:'dɑːrk',uk:'dɑːk',d:[{p:'adj.',t:'黑暗的'},{p:'n.',t:'黑暗'}]},
+    'rain':{w:'rain',us:'reɪn',uk:'reɪn',d:[{p:'n.',t:'雨'},{p:'v.',t:'下雨'}]},
+    'book':{w:'book',us:'bʊk',uk:'bʊk',d:[{p:'n.',t:'书'},{p:'v.',t:'预订'}]},
+    'hope':{w:'hope',us:'hoʊp',uk:'həʊp',d:[{p:'n.',t:'希望'},{p:'v.',t:'希望'}]},
+    'candle':{w:'candle',us:'ˈkændl',uk:'ˈkændl',d:[{p:'n.',t:'蜡烛'}]},
+    'shadow':{w:'shadow',us:'ˈʃædoʊ',uk:'ˈʃædəʊ',d:[{p:'n.',t:'影子；阴影'}]},
+    'journey':{w:'journey',us:'ˈdʒɜːrni',uk:'ˈdʒɜːni',d:[{p:'n.',t:'旅程'}]},
+    'silence':{w:'silence',us:'ˈsaɪləns',uk:'ˈsaɪləns',d:[{p:'n.',t:'沉默；寂静'}]},
+    'whisper':{w:'whisper',us:'ˈwɪspər',uk:'ˈwɪspə',d:[{p:'n.',t:'低语'},{p:'v.',t:'低语'}]},
+    'twilight':{w:'twilight',us:'ˈtwaɪlaɪt',uk:'ˈtwaɪlaɪt',d:[{p:'n.',t:'黄昏；暮光'}]},
+    'dawn':{w:'dawn',us:'dɔːn',uk:'dɔːn',d:[{p:'n.',t:'黎明'}]},
+    'serenity':{w:'serenity',us:'səˈrenəti',uk:'sɪˈrenɪti',d:[{p:'n.',t:'宁静'}]},
+    // ── 基础动词 ──
+    'be':{w:'be',us:'biː',uk:'biː',d:[{p:'v.',t:'是；存在'}]},
+    'have':{w:'have',us:'hæv',uk:'hæv',d:[{p:'v.',t:'有；拥有'}]},
+    'do':{w:'do',us:'duː',uk:'duː',d:[{p:'v.',t:'做；干'}]},
+    'say':{w:'say',us:'seɪ',uk:'seɪ',d:[{p:'v.',t:'说；讲'}]},
+    'get':{w:'get',us:'ɡet',uk:'ɡet',d:[{p:'v.',t:'得到；变得'}]},
+    'make':{w:'make',us:'meɪk',uk:'meɪk',d:[{p:'v.',t:'做；制造'}]},
+    'go':{w:'go',us:'ɡoʊ',uk:'ɡəʊ',d:[{p:'v.',t:'去；走'}]},
+    'know':{w:'know',us:'noʊ',uk:'nəʊ',d:[{p:'v.',t:'知道；了解'}]},
+    'take':{w:'take',us:'teɪk',uk:'teɪk',d:[{p:'v.',t:'拿；取'}]},
+    'see':{w:'see',us:'siː',uk:'siː',d:[{p:'v.',t:'看见；理解'}]},
+    'come':{w:'come',us:'kʌm',uk:'kʌm',d:[{p:'v.',t:'来'}]},
+    'think':{w:'think',us:'θɪŋk',uk:'θɪŋk',d:[{p:'v.',t:'想；认为'}]},
+    'look':{w:'look',us:'lʊk',uk:'lʊk',d:[{p:'v.',t:'看'},{p:'n.',t:'表情'}]},
+    'want':{w:'want',us:'wɑːnt',uk:'wɒnt',d:[{p:'v.',t:'想要'}]},
+    'give':{w:'give',us:'ɡɪv',uk:'ɡɪv',d:[{p:'v.',t:'给；给予'}]},
+    'use':{w:'use',us:'juːz',uk:'juːz',d:[{p:'v.',t:'使用'},{p:'n.',t:'用途'}]},
+    'find':{w:'find',us:'faɪnd',uk:'faɪnd',d:[{p:'v.',t:'找到；发现'}]},
+    'tell':{w:'tell',us:'tel',uk:'tel',d:[{p:'v.',t:'告诉'}]},
+    'ask':{w:'ask',us:'æsk',uk:'ɑːsk',d:[{p:'v.',t:'问；请求'}]},
+    'work':{w:'work',us:'wɜːrk',uk:'wɜːk',d:[{p:'v.',t:'工作'},{p:'n.',t:'工作；作品'}]},
+    'seem':{w:'seem',us:'siːm',uk:'siːm',d:[{p:'v.',t:'似乎'}]},
+    'feel':{w:'feel',us:'fiːl',uk:'fiːl',d:[{p:'v.',t:'感觉'}]},
+    'try':{w:'try',us:'traɪ',uk:'traɪ',d:[{p:'v.',t:'尝试'},{p:'n.',t:'尝试'}]},
+    'leave':{w:'leave',us:'liːv',uk:'liːv',d:[{p:'v.',t:'离开；留下'}]},
+    'call':{w:'call',us:'kɔːl',uk:'kɔːl',d:[{p:'v.',t:'打电话；叫'},{p:'n.',t:'电话'}]},
+    'keep':{w:'keep',us:'kiːp',uk:'kiːp',d:[{p:'v.',t:'保持'}]},
+    'let':{w:'let',us:'let',uk:'let',d:[{p:'v.',t:'让；允许'}]},
+    'begin':{w:'begin',us:'bɪˈɡɪn',uk:'bɪˈɡɪn',d:[{p:'v.',t:'开始'}]},
+    'show':{w:'show',us:'ʃoʊ',uk:'ʃəʊ',d:[{p:'v.',t:'展示'},{p:'n.',t:'节目'}]},
+    'hear':{w:'hear',us:'hɪr',uk:'hɪə',d:[{p:'v.',t:'听到'}]},
+    'play':{w:'play',us:'pleɪ',uk:'pleɪ',d:[{p:'v.',t:'玩；播放'},{p:'n.',t:'游戏'}]},
+    'run':{w:'run',us:'rʌn',uk:'rʌn',d:[{p:'v.',t:'跑；运行'}]},
+    'move':{w:'move',us:'muːv',uk:'muːv',d:[{p:'v.',t:'移动'}]},
+    'live':{w:'live',us:'lɪv',uk:'lɪv',d:[{p:'v.',t:'生活；居住'}]},
+    'believe':{w:'believe',us:'bɪˈliːv',uk:'bɪˈliːv',d:[{p:'v.',t:'相信'}]},
+    'bring':{w:'bring',us:'brɪŋ',uk:'brɪŋ',d:[{p:'v.',t:'带来'}]},
+    'happen':{w:'happen',us:'ˈhæpən',uk:'ˈhæpən',d:[{p:'v.',t:'发生'}]},
+    'write':{w:'write',us:'raɪt',uk:'raɪt',d:[{p:'v.',t:'写'}]},
+    'provide':{w:'provide',us:'prəˈvaɪd',uk:'prəˈvaɪd',d:[{p:'v.',t:'提供'}]},
+    'sit':{w:'sit',us:'sɪt',uk:'sɪt',d:[{p:'v.',t:'坐'}]},
+    'stand':{w:'stand',us:'stænd',uk:'stænd',d:[{p:'v.',t:'站'}]},
+    'lose':{w:'lose',us:'luːz',uk:'luːz',d:[{p:'v.',t:'失去'}]},
+    'pay':{w:'pay',us:'peɪ',uk:'peɪ',d:[{p:'v.',t:'支付'}]},
+    'meet':{w:'meet',us:'miːt',uk:'miːt',d:[{p:'v.',t:'遇见'}]},
+    'include':{w:'include',us:'ɪnˈkluːd',uk:'ɪnˈkluːd',d:[{p:'v.',t:'包含'}]},
+    'continue':{w:'continue',us:'kənˈtɪnjuː',uk:'kənˈtɪnjuː',d:[{p:'v.',t:'继续'}]},
+    'set':{w:'set',us:'set',uk:'set',d:[{p:'v.',t:'设置'},{p:'n.',t:'一套'}]},
+    'learn':{w:'learn',us:'lɜːrn',uk:'lɜːn',d:[{p:'v.',t:'学习'}]},
+    'change':{w:'change',us:'tʃeɪndʒ',uk:'tʃeɪndʒ',d:[{p:'v.',t:'改变'},{p:'n.',t:'变化'}]},
+    'lead':{w:'lead',us:'liːd',uk:'liːd',d:[{p:'v.',t:'领导'}]},
+    'understand':{w:'understand',us:'ˌʌndərˈstænd',uk:'ˌʌndəˈstænd',d:[{p:'v.',t:'理解'}]},
+    'watch':{w:'watch',us:'wɑːtʃ',uk:'wɒtʃ',d:[{p:'v.',t:'看；注视'},{p:'n.',t:'手表'}]},
+    'follow':{w:'follow',us:'ˈfɑːloʊ',uk:'ˈfɒləʊ',d:[{p:'v.',t:'跟随'}]},
+    'stop':{w:'stop',us:'stɑːp',uk:'stɒp',d:[{p:'v.',t:'停止'}]},
+    'create':{w:'create',us:'kriˈeɪt',uk:'kriˈeɪt',d:[{p:'v.',t:'创造'}]},
+    'speak':{w:'speak',us:'spiːk',uk:'spiːk',d:[{p:'v.',t:'说话'}]},
+    'read':{w:'read',us:'riːd',uk:'riːd',d:[{p:'v.',t:'读'}]},
+    'spend':{w:'spend',us:'spend',uk:'spend',d:[{p:'v.',t:'花费'}]},
+    'grow':{w:'grow',us:'ɡroʊ',uk:'ɡrəʊ',d:[{p:'v.',t:'成长；种植'}]},
+    'open':{w:'open',us:'ˈoʊpən',uk:'ˈəʊpən',d:[{p:'v.',t:'打开'},{p:'adj.',t:'开着的'}]},
+    'walk':{w:'walk',us:'wɔːk',uk:'wɔːk',d:[{p:'v.',t:'走'},{p:'n.',t:'散步'}]},
+    'win':{w:'win',us:'wɪn',uk:'wɪn',d:[{p:'v.',t:'赢'}]},
+    'offer':{w:'offer',us:'ˈɔːfər',uk:'ˈɒfə',d:[{p:'v.',t:'提供'},{p:'n.',t:'提议'}]},
+    'remember':{w:'remember',us:'rɪˈmembər',uk:'rɪˈmembə',d:[{p:'v.',t:'记得'}]},
+    'love':{w:'love',us:'lʌv',uk:'lʌv',d:[{p:'v.',t:'爱'},{p:'n.',t:'爱'}]},
+    'consider':{w:'consider',us:'kənˈsɪdər',uk:'kənˈsɪdə',d:[{p:'v.',t:'考虑'}]},
+    'appear':{w:'appear',us:'əˈpɪr',uk:'əˈpɪə',d:[{p:'v.',t:'出现'}]},
+    'buy':{w:'buy',us:'baɪ',uk:'baɪ',d:[{p:'v.',t:'买'}]},
+    'wait':{w:'wait',us:'weɪt',uk:'weɪt',d:[{p:'v.',t:'等待'}]},
+    'serve':{w:'serve',us:'sɜːrv',uk:'sɜːv',d:[{p:'v.',t:'服务'}]},
+    'die':{w:'die',us:'daɪ',uk:'daɪ',d:[{p:'v.',t:'死'}]},
+    'send':{w:'send',us:'send',uk:'send',d:[{p:'v.',t:'发送'}]},
+    'expect':{w:'expect',us:'ɪkˈspekt',uk:'ɪkˈspekt',d:[{p:'v.',t:'期望'}]},
+    'build':{w:'build',us:'bɪld',uk:'bɪld',d:[{p:'v.',t:'建造'}]},
+    'stay':{w:'stay',us:'steɪ',uk:'steɪ',d:[{p:'v.',t:'停留'}]},
+    'fall':{w:'fall',us:'fɔːl',uk:'fɔːl',d:[{p:'v.',t:'落下'},{p:'n.',t:'秋天'}]},
+    'cut':{w:'cut',us:'kʌt',uk:'kʌt',d:[{p:'v.',t:'切'}]},
+    'reach':{w:'reach',us:'riːtʃ',uk:'riːtʃ',d:[{p:'v.',t:'到达'}]},
+    'kill':{w:'kill',us:'kɪl',uk:'kɪl',d:[{p:'v.',t:'杀'}]},
+    'raise':{w:'raise',us:'reɪz',uk:'reɪz',d:[{p:'v.',t:'提高；筹集'}]},
+    'pass':{w:'pass',us:'pæs',uk:'pɑːs',d:[{p:'v.',t:'通过'}]},
+    'sell':{w:'sell',us:'sel',uk:'sel',d:[{p:'v.',t:'卖'}]},
+    'decide':{w:'decide',us:'dɪˈsaɪd',uk:'dɪˈsaɪd',d:[{p:'v.',t:'决定'}]},
+    'return':{w:'return',us:'rɪˈtɜːrn',uk:'rɪˈtɜːn',d:[{p:'v.',t:'返回'},{p:'n.',t:'返回'}]},
+    'explain':{w:'explain',us:'ɪkˈspleɪn',uk:'ɪkˈspleɪn',d:[{p:'v.',t:'解释'}]},
+    'hope':{w:'hope',us:'hoʊp',uk:'həʊp',d:[{p:'v.',t:'希望'},{p:'n.',t:'希望'}]},
+    'develop':{w:'develop',us:'dɪˈveləp',uk:'dɪˈveləp',d:[{p:'v.',t:'发展'}]},
+    'carry':{w:'carry',us:'ˈkæri',uk:'ˈkæri',d:[{p:'v.',t:'携带'}]},
+    'break':{w:'break',us:'breɪk',uk:'breɪk',d:[{p:'v.',t:'打破'},{p:'n.',t:'休息'}]},
+    'receive':{w:'receive',us:'rɪˈsiːv',uk:'rɪˈsiːv',d:[{p:'v.',t:'收到'}]},
+    'agree':{w:'agree',us:'əˈɡriː',uk:'əˈɡriː',d:[{p:'v.',t:'同意'}]},
+    'support':{w:'support',us:'səˈpɔːrt',uk:'səˈpɔːt',d:[{p:'v.',t:'支持'},{p:'n.',t:'支持'}]},
+    'hold':{w:'hold',us:'hoʊld',uk:'həʊld',d:[{p:'v.',t:'握住；举行'}]},
+    'produce':{w:'produce',us:'prəˈduːs',uk:'prəˈdjuːs',d:[{p:'v.',t:'生产'}]},
+    'happen':{w:'happen',us:'ˈhæpən',uk:'ˈhæpən',d:[{p:'v.',t:'发生'}]},
+    'offer':{w:'offer',us:'ˈɔːfər',uk:'ˈɒfə',d:[{p:'v.',t:'提供'},{p:'n.',t:'提议'}]},
+    'eat':{w:'eat',us:'iːt',uk:'iːt',d:[{p:'v.',t:'吃'}]},
+    'drink':{w:'drink',us:'drɪŋk',uk:'drɪŋk',d:[{p:'v.',t:'喝'},{p:'n.',t:'饮料'}]},
+    'sleep':{w:'sleep',us:'sliːp',uk:'sliːp',d:[{p:'v.',t:'睡觉'},{p:'n.',t:'睡眠'}]},
+    'sing':{w:'sing',us:'sɪŋ',uk:'sɪŋ',d:[{p:'v.',t:'唱歌'}]},
+    'dance':{w:'dance',us:'dæns',uk:'dɑːns',d:[{p:'v.',t:'跳舞'},{p:'n.',t:'舞蹈'}]},
+    'laugh':{w:'laugh',us:'læf',uk:'lɑːf',d:[{p:'v.',t:'笑'},{p:'n.',t:'笑声'}]},
+    'cry':{w:'cry',us:'kraɪ',uk:'kraɪ',d:[{p:'v.',t:'哭'}]},
+    'smile':{w:'smile',us:'smaɪl',uk:'smaɪl',d:[{p:'v.',t:'微笑'},{p:'n.',t:'微笑'}]},
+    'forget':{w:'forget',us:'fərˈɡet',uk:'fəˈɡet',d:[{p:'v.',t:'忘记'}]},
+    'choose':{w:'choose',us:'tʃuːz',uk:'tʃuːz',d:[{p:'v.',t:'选择'}]},
+    'pull':{w:'pull',us:'pʊl',uk:'pʊl',d:[{p:'v.',t:'拉'}]},
+    'push':{w:'push',us:'pʊʃ',uk:'pʊʃ',d:[{p:'v.',t:'推'}]},
+    'wear':{w:'wear',us:'wer',uk:'weə',d:[{p:'v.',t:'穿'}]},
+    'draw':{w:'draw',us:'drɔː',uk:'drɔː',d:[{p:'v.',t:'画'}]},
+    'drive':{w:'drive',us:'draɪv',uk:'draɪv',d:[{p:'v.',t:'驾驶'}]},
+    'fly':{w:'fly',us:'flaɪ',uk:'flaɪ',d:[{p:'v.',t:'飞'}]},
+    'swim':{w:'swim',us:'swɪm',uk:'swɪm',d:[{p:'v.',t:'游泳'}]},
+    'fight':{w:'fight',us:'faɪt',uk:'faɪt',d:[{p:'v.',t:'战斗'},{p:'n.',t:'战斗'}]},
+    'throw':{w:'throw',us:'θroʊ',uk:'θrəʊ',d:[{p:'v.',t:'扔'}]},
+    'catch':{w:'catch',us:'kætʃ',uk:'kætʃ',d:[{p:'v.',t:'抓住'}]},
+    'hang':{w:'hang',us:'hæŋ',uk:'hæŋ',d:[{p:'v.',t:'悬挂'}]},
+    'hide':{w:'hide',us:'haɪd',uk:'haɪd',d:[{p:'v.',t:'隐藏'}]},
+    'teach':{w:'teach',us:'tiːtʃ',uk:'tiːtʃ',d:[{p:'v.',t:'教'}]},
+    'test':{w:'test',us:'test',uk:'test',d:[{p:'n.',t:'测试'},{p:'v.',t:'测试'}]},
+    'touch':{w:'touch',us:'tʌtʃ',uk:'tʌtʃ',d:[{p:'v.',t:'触摸'},{p:'n.',t:'触觉'}]},
+    'save':{w:'save',us:'seɪv',uk:'seɪv',d:[{p:'v.',t:'拯救；保存'}]},
+    'share':{w:'share',us:'ʃer',uk:'ʃeə',d:[{p:'v.',t:'分享'},{p:'n.',t:'份额'}]},
+    'turn':{w:'turn',us:'tɜːrn',uk:'tɜːn',d:[{p:'v.',t:'转动'},{p:'n.',t:'轮次'}]},
+    'start':{w:'start',us:'stɑːrt',uk:'stɑːt',d:[{p:'v.',t:'开始'},{p:'n.',t:'开始'}]},
+    'need':{w:'need',us:'niːd',uk:'niːd',d:[{p:'v.',t:'需要'}]},
+    'become':{w:'become',us:'bɪˈkʌm',uk:'bɪˈkʌm',d:[{p:'v.',t:'成为'}]},
+    'put':{w:'put',us:'pʊt',uk:'pʊt',d:[{p:'v.',t:'放'}]},
+    'mean':{w:'mean',us:'miːn',uk:'miːn',d:[{p:'v.',t:'意思是'},{p:'adj.',t:'刻薄的'}]},
+    'keep':{w:'keep',us:'kiːp',uk:'kiːp',d:[{p:'v.',t:'保持'}]},
+    'help':{w:'help',us:'help',uk:'help',d:[{p:'v.',t:'帮助'},{p:'n.',t:'帮助'}]},
+    'talk':{w:'talk',us:'tɔːk',uk:'tɔːk',d:[{p:'v.',t:'谈话'},{p:'n.',t:'谈话'}]},
+    'turn':{w:'turn',us:'tɜːrn',uk:'tɜːn',d:[{p:'v.',t:'转'},{p:'n.',t:'轮到'}]},
+    // ── 常用名词 ──
+    'water':{w:'water',us:'ˈwɔːtər',uk:'ˈwɔːtə',d:[{p:'n.',t:'水'}]},
+    'food':{w:'food',us:'fuːd',uk:'fuːd',d:[{p:'n.',t:'食物'}]},
+    'people':{w:'people',us:'ˈpiːpl',uk:'ˈpiːpl',d:[{p:'n.',t:'人们'}]},
+    'man':{w:'man',us:'mæn',uk:'mæn',d:[{p:'n.',t:'男人'}]},
+    'woman':{w:'woman',us:'ˈwʊmən',uk:'ˈwʊmən',d:[{p:'n.',t:'女人'}]},
+    'child':{w:'child',us:'tʃaɪld',uk:'tʃaɪld',d:[{p:'n.',t:'孩子'}]},
+    'friend':{w:'friend',us:'frend',uk:'frend',d:[{p:'n.',t:'朋友'}]},
+    'family':{w:'family',us:'ˈfæməli',uk:'ˈfæməli',d:[{p:'n.',t:'家庭'}]},
+    'school':{w:'school',us:'skuːl',uk:'skuːl',d:[{p:'n.',t:'学校'}]},
+    'city':{w:'city',us:'ˈsɪti',uk:'ˈsɪti',d:[{p:'n.',t:'城市'}]},
+    'country':{w:'country',us:'ˈkʌntri',uk:'ˈkʌntri',d:[{p:'n.',t:'国家'}]},
+    'place':{w:'place',us:'pleɪs',uk:'pleɪs',d:[{p:'n.',t:'地方'}]},
+    'room':{w:'room',us:'ruːm',uk:'ruːm',d:[{p:'n.',t:'房间'}]},
+    'door':{w:'door',us:'dɔːr',uk:'dɔː',d:[{p:'n.',t:'门'}]},
+    'window':{w:'window',us:'ˈwɪndoʊ',uk:'ˈwɪndəʊ',d:[{p:'n.',t:'窗户'}]},
+    'hand':{w:'hand',us:'hænd',uk:'hænd',d:[{p:'n.',t:'手'}]},
+    'eye':{w:'eye',us:'aɪ',uk:'aɪ',d:[{p:'n.',t:'眼睛'}]},
+    'face':{w:'face',us:'feɪs',uk:'feɪs',d:[{p:'n.',t:'脸'},{p:'v.',t:'面对'}]},
+    'head':{w:'head',us:'hed',uk:'hed',d:[{p:'n.',t:'头'}]},
+    'body':{w:'body',us:'ˈbɑːdi',uk:'ˈbɒdi',d:[{p:'n.',t:'身体'}]},
+    'word':{w:'word',us:'wɜːrd',uk:'wɜːd',d:[{p:'n.',t:'词；话语'}]},
+    'name':{w:'name',us:'neɪm',uk:'neɪm',d:[{p:'n.',t:'名字'}]},
+    'number':{w:'number',us:'ˈnʌmbər',uk:'ˈnʌmbə',d:[{p:'n.',t:'数字'}]},
+    'problem':{w:'problem',us:'ˈprɑːbləm',uk:'ˈprɒbləm',d:[{p:'n.',t:'问题'}]},
+    'question':{w:'question',us:'ˈkwestʃən',uk:'ˈkwestʃən',d:[{p:'n.',t:'问题'}]},
+    'answer':{w:'answer',us:'ˈænsər',uk:'ˈɑːnsə',d:[{p:'n.',t:'回答'},{p:'v.',t:'回答'}]},
+    'reason':{w:'reason',us:'ˈriːzn',uk:'ˈriːzn',d:[{p:'n.',t:'原因'}]},
+    'idea':{w:'idea',us:'aɪˈdiːə',uk:'aɪˈdɪə',d:[{p:'n.',t:'想法'}]},
+    'fact':{w:'fact',us:'fækt',uk:'fækt',d:[{p:'n.',t:'事实'}]},
+    'point':{w:'point',us:'pɔɪnt',uk:'pɔɪnt',d:[{p:'n.',t:'点；要点'}]},
+    'part':{w:'part',us:'pɑːrt',uk:'pɑːt',d:[{p:'n.',t:'部分'}]},
+    'side':{w:'side',us:'saɪd',uk:'saɪd',d:[{p:'n.',t:'边；侧面'}]},
+    'end':{w:'end',us:'end',uk:'end',d:[{p:'n.',t:'结束'},{p:'v.',t:'结束'}]},
+    'way':{w:'way',us:'weɪ',uk:'weɪ',d:[{p:'n.',t:'方式；路'}]},
+    'day':{w:'day',us:'deɪ',uk:'deɪ',d:[{p:'n.',t:'天'}]},
+    'year':{w:'year',us:'jɪr',uk:'jɪə',d:[{p:'n.',t:'年'}]},
+    'thing':{w:'thing',us:'θɪŋ',uk:'θɪŋ',d:[{p:'n.',t:'东西；事情'}]},
+    'man':{w:'man',us:'mæn',uk:'mæn',d:[{p:'n.',t:'人；男人'}]},
+    'world':{w:'world',us:'wɜːrld',uk:'wɜːld',d:[{p:'n.',t:'世界'}]},
+    'line':{w:'line',us:'laɪn',uk:'laɪn',d:[{p:'n.',t:'线'}]},
+    'group':{w:'group',us:'ɡruːp',uk:'ɡruːp',d:[{p:'n.',t:'组；群'}]},
+    'company':{w:'company',us:'ˈkʌmpəni',uk:'ˈkʌmpəni',d:[{p:'n.',t:'公司'}]},
+    'system':{w:'system',us:'ˈsɪstəm',uk:'ˈsɪstəm',d:[{p:'n.',t:'系统'}]},
+    'program':{w:'program',us:'ˈproʊɡræm',uk:'ˈprəʊɡræm',d:[{p:'n.',t:'程序'}]},
+    'question':{w:'question',us:'ˈkwestʃən',uk:'ˈkwestʃən',d:[{p:'n.',t:'问题'}]},
+    'government':{w:'government',us:'ˈɡʌvərnmənt',uk:'ˈɡʌvənmənt',d:[{p:'n.',t:'政府'}]},
+    'power':{w:'power',us:'ˈpaʊər',uk:'ˈpaʊə',d:[{p:'n.',t:'力量；权力'}]},
+    'money':{w:'money',us:'ˈmʌni',uk:'ˈmʌni',d:[{p:'n.',t:'钱'}]},
+    'story':{w:'story',us:'ˈstɔːri',uk:'ˈstɔːri',d:[{p:'n.',t:'故事'}]},
+    'example':{w:'example',us:'ɪɡˈzæmpl',uk:'ɪɡˈzɑːmpl',d:[{p:'n.',t:'例子'}]},
+    'state':{w:'state',us:'steɪt',uk:'steɪt',d:[{p:'n.',t:'状态；州'}]},
+    'month':{w:'month',us:'mʌnθ',uk:'mʌnθ',d:[{p:'n.',t:'月'}]},
+    'study':{w:'study',us:'ˈstʌdi',uk:'ˈstʌdi',d:[{p:'n.',t:'研究'},{p:'v.',t:'学习'}]},
+    'book':{w:'book',us:'bʊk',uk:'bʊk',d:[{p:'n.',t:'书'},{p:'v.',t:'预订'}]},
+    'eye':{w:'eye',us:'aɪ',uk:'aɪ',d:[{p:'n.',t:'眼睛'}]},
+    'job':{w:'job',us:'dʒɑːb',uk:'dʒɒb',d:[{p:'n.',t:'工作'}]},
+    'business':{w:'business',us:'ˈbɪznəs',uk:'ˈbɪznəs',d:[{p:'n.',t:'商业'}]},
+    'information':{w:'information',us:'ˌɪnfərˈmeɪʃn',uk:'ˌɪnfəˈmeɪʃn',d:[{p:'n.',t:'信息'}]},
+    'music':{w:'music',us:'ˈmjuːzɪk',uk:'ˈmjuːzɪk',d:[{p:'n.',t:'音乐'}]},
+    'art':{w:'art',us:'ɑːrt',uk:'ɑːt',d:[{p:'n.',t:'艺术'}]},
+    'nature':{w:'nature',us:'ˈneɪtʃər',uk:'ˈneɪtʃə',d:[{p:'n.',t:'自然'}]},
+    'air':{w:'air',us:'er',uk:'eə',d:[{p:'n.',t:'空气'}]},
+    'color':{w:'color',us:'ˈkʌlər',uk:'ˈkʌlə',d:[{p:'n.',t:'颜色'}]},
+    'sound':{w:'sound',us:'saʊnd',uk:'saʊnd',d:[{p:'n.',t:'声音'},{p:'adj.',t:'健全的'}]},
+    'body':{w:'body',us:'ˈbɑːdi',uk:'ˈbɒdi',d:[{p:'n.',t:'身体'}]},
+    'tree':{w:'tree',us:'triː',uk:'triː',d:[{p:'n.',t:'树'}]},
+    'flower':{w:'flower',us:'ˈflaʊər',uk:'ˈflaʊə',d:[{p:'n.',t:'花'}]},
+    'mountain':{w:'mountain',us:'ˈmaʊntn',uk:'ˈmaʊntən',d:[{p:'n.',t:'山'}]},
+    'river':{w:'river',us:'ˈrɪvər',uk:'ˈrɪvə',d:[{p:'n.',t:'河'}]},
+    'sea':{w:'sea',us:'siː',uk:'siː',d:[{p:'n.',t:'海'}]},
+    'sun':{w:'sun',us:'sʌn',uk:'sʌn',d:[{p:'n.',t:'太阳'}]},
+    'sky':{w:'sky',us:'skaɪ',uk:'skaɪ',d:[{p:'n.',t:'天空'}]},
+    'wind':{w:'wind',us:'wɪnd',uk:'wɪnd',d:[{p:'n.',t:'风'}]},
+    'snow':{w:'snow',us:'snoʊ',uk:'snəʊ',d:[{p:'n.',t:'雪'}]},
+    'earth':{w:'earth',us:'ɜːrθ',uk:'ɜːθ',d:[{p:'n.',t:'地球；土地'}]},
+    'space':{w:'space',us:'speɪs',uk:'speɪs',d:[{p:'n.',t:'空间'}]},
+    'road':{w:'road',us:'roʊd',uk:'rəʊd',d:[{p:'n.',t:'路'}]},
+    'street':{w:'street',us:'striːt',uk:'striːt',d:[{p:'n.',t:'街道'}]},
+    'ground':{w:'ground',us:'ɡraʊnd',uk:'ɡraʊnd',d:[{p:'n.',t:'地面'}]},
+    'market':{w:'market',us:'ˈmɑːrkɪt',uk:'ˈmɑːkɪt',d:[{p:'n.',t:'市场'}]},
+    'war':{w:'war',us:'wɔːr',uk:'wɔː',d:[{p:'n.',t:'战争'}]},
+    'peace':{w:'peace',us:'piːs',uk:'piːs',d:[{p:'n.',t:'和平'}]},
+    'history':{w:'history',us:'ˈhɪstri',uk:'ˈhɪstri',d:[{p:'n.',t:'历史'}]},
+    'age':{w:'age',us:'eɪdʒ',uk:'eɪdʒ',d:[{p:'n.',t:'年龄；时代'}]},
+    'paper':{w:'paper',us:'ˈpeɪpər',uk:'ˈpeɪpə',d:[{p:'n.',t:'纸；论文'}]},
+    'energy':{w:'energy',us:'ˈenərdʒi',uk:'ˈenədʒi',d:[{p:'n.',t:'能量'}]},
+    'technology':{w:'technology',us:'tekˈnɑːlədʒi',uk:'tekˈnɒlədʒi',d:[{p:'n.',t:'技术'}]},
+    'science':{w:'science',us:'ˈsaɪəns',uk:'ˈsaɪəns',d:[{p:'n.',t:'科学'}]},
+    'language':{w:'language',us:'ˈlæŋɡwɪdʒ',uk:'ˈlæŋɡwɪdʒ',d:[{p:'n.',t:'语言'}]},
+    'culture':{w:'culture',us:'ˈkʌltʃər',uk:'ˈkʌltʃə',d:[{p:'n.',t:'文化'}]},
+    'society':{w:'society',us:'səˈsaɪəti',uk:'səˈsaɪəti',d:[{p:'n.',t:'社会'}]},
+    'environment':{w:'environment',us:'ɪnˈvaɪrənmənt',uk:'ɪnˈvaɪrənmənt',d:[{p:'n.',t:'环境'}]},
+    'future':{w:'future',us:'ˈfjuːtʃər',uk:'ˈfjuːtʃə',d:[{p:'n.',t:'未来'},{p:'adj.',t:'未来的'}]},
+    'past':{w:'past',us:'pæst',uk:'pɑːst',d:[{p:'n.',t:'过去'},{p:'adj.',t:'过去的'}]},
+    'truth':{w:'truth',us:'truːθ',uk:'truːθ',d:[{p:'n.',t:'真相'}]},
+    'beauty':{w:'beauty',us:'ˈbjuːti',uk:'ˈbjuːti',d:[{p:'n.',t:'美'}]},
+    'death':{w:'death',us:'deθ',uk:'deθ',d:[{p:'n.',t:'死亡'}]},
+    'happiness':{w:'happiness',us:'ˈhæpinəs',uk:'ˈhæpinəs',d:[{p:'n.',t:'幸福'}]},
+    'success':{w:'success',us:'səkˈses',uk:'səkˈses',d:[{p:'n.',t:'成功'}]},
+    'failure':{w:'failure',us:'ˈfeɪljər',uk:'ˈfeɪljə',d:[{p:'n.',t:'失败'}]},
+    'fear':{w:'fear',us:'fɪr',uk:'fɪə',d:[{p:'n.',t:'恐惧'},{p:'v.',t:'害怕'}]},
+    'anger':{w:'anger',us:'ˈæŋɡər',uk:'ˈæŋɡə',d:[{p:'n.',t:'愤怒'}]},
+    'joy':{w:'joy',us:'dʒɔɪ',uk:'dʒɔɪ',d:[{p:'n.',t:'喜悦'}]},
+    'pain':{w:'pain',us:'peɪn',uk:'peɪn',d:[{p:'n.',t:'疼痛'}]},
+    'pleasure':{w:'pleasure',us:'ˈpleʒər',uk:'ˈpleʒə',d:[{p:'n.',t:'快乐'}]},
+    'thought':{w:'thought',us:'θɔːt',uk:'θɔːt',d:[{p:'n.',t:'思想'}]},
+    'feeling':{w:'feeling',us:'ˈfiːlɪŋ',uk:'ˈfiːlɪŋ',d:[{p:'n.',t:'感觉'}]},
+    'spirit':{w:'spirit',us:'ˈspɪrɪt',uk:'ˈspɪrɪt',d:[{p:'n.',t:'精神'}]},
+    'soul':{w:'soul',us:'soʊl',uk:'səʊl',d:[{p:'n.',t:'灵魂'}]},
+    'mind':{w:'mind',us:'maɪnd',uk:'maɪnd',d:[{p:'n.',t:'头脑'},{p:'v.',t:'介意'}]},
+    'body':{w:'body',us:'ˈbɑːdi',uk:'ˈbɒdi',d:[{p:'n.',t:'身体'}]},
+    'character':{w:'character',us:'ˈkærəktər',uk:'ˈkærəktə',d:[{p:'n.',t:'性格；角色'}]},
+    'quality':{w:'quality',us:'ˈkwɑːləti',uk:'ˈkwɒləti',d:[{p:'n.',t:'质量'}]},
+    'value':{w:'value',us:'ˈvæljuː',uk:'ˈvæljuː',d:[{p:'n.',t:'价值'}]},
+    'interest':{w:'interest',us:'ˈɪntrəst',uk:'ˈɪntrəst',d:[{p:'n.',t:'兴趣'}]},
+    'attention':{w:'attention',us:'əˈtenʃn',uk:'əˈtenʃn',d:[{p:'n.',t:'注意力'}]},
+    'effort':{w:'effort',us:'ˈefərt',uk:'ˈefət',d:[{p:'n.',t:'努力'}]},
+    'experience':{w:'experience',us:'ɪkˈspɪriəns',uk:'ɪkˈspɪriəns',d:[{p:'n.',t:'经验'}]},
+    'knowledge':{w:'knowledge',us:'ˈnɑːlɪdʒ',uk:'ˈnɒlɪdʒ',d:[{p:'n.',t:'知识'}]},
+    'practice':{w:'practice',us:'ˈpræktɪs',uk:'ˈpræktɪs',d:[{p:'n.',t:'实践'}]},
+    'process':{w:'process',us:'ˈprɑːses',uk:'ˈprəʊses',d:[{p:'n.',t:'过程'}]},
+    'result':{w:'result',us:'rɪˈzʌlt',uk:'rɪˈzʌlt',d:[{p:'n.',t:'结果'}]},
+    'reason':{w:'reason',us:'ˈriːzn',uk:'ˈriːzn',d:[{p:'n.',t:'原因'}]},
+    'purpose':{w:'purpose',us:'ˈpɜːrpəs',uk:'ˈpɜːpəs',d:[{p:'n.',t:'目的'}]},
+    'effect':{w:'effect',us:'ɪˈfekt',uk:'ɪˈfekt',d:[{p:'n.',t:'效果'}]},
+    'situation':{w:'situation',us:'ˌsɪtʃuˈeɪʃn',uk:'ˌsɪtʃuˈeɪʃn',d:[{p:'n.',t:'情况'}]},
+    'opportunity':{w:'opportunity',us:'ˌɑːpərˈtuːnəti',uk:'ˌɒpəˈtjuːnəti',d:[{p:'n.',t:'机会'}]},
+    'relationship':{w:'relationship',us:'rɪˈleɪʃnʃɪp',uk:'rɪˈleɪʃnʃɪp',d:[{p:'n.',t:'关系'}]},
+    'difference':{w:'difference',us:'ˈdɪfrəns',uk:'ˈdɪfrəns',d:[{p:'n.',t:'差异'}]},
+    'change':{w:'change',us:'tʃeɪndʒ',uk:'tʃeɪndʒ',d:[{p:'n.',t:'变化'},{p:'v.',t:'改变'}]},
+    'development':{w:'development',us:'dɪˈveləpmənt',uk:'dɪˈveləpmənt',d:[{p:'n.',t:'发展'}]},
+    'level':{w:'level',us:'ˈlevl',uk:'ˈlevl',d:[{p:'n.',t:'水平'}]},
+    'period':{w:'period',us:'ˈpɪriəd',uk:'ˈpɪəriəd',d:[{p:'n.',t:'时期'}]},
+    'order':{w:'order',us:'ˈɔːrdər',uk:'ˈɔːdə',d:[{p:'n.',t:'顺序；订单'}]},
+    'step':{w:'step',us:'step',uk:'step',d:[{p:'n.',t:'步骤'}]},
+    'stage':{w:'stage',us:'steɪdʒ',uk:'steɪdʒ',d:[{p:'n.',t:'阶段'}]},
+    'plan':{w:'plan',us:'plæn',uk:'plæn',d:[{p:'n.',t:'计划'}]},
+    'method':{w:'method',us:'ˈmeθəd',uk:'ˈmeθəd',d:[{p:'n.',t:'方法'}]},
+    'form':{w:'form',us:'fɔːrm',uk:'fɔːm',d:[{p:'n.',t:'形式'}]},
+    'type':{w:'type',us:'taɪp',uk:'taɪp',d:[{p:'n.',t:'类型'}]},
+    'kind':{w:'kind',us:'kaɪnd',uk:'kaɪnd',d:[{p:'n.',t:'种类'},{p:'adj.',t:'善良的'}]},
+    'class':{w:'class',us:'klæs',uk:'klɑːs',d:[{p:'n.',t:'班级；课'}]},
+    'group':{w:'group',us:'ɡruːp',uk:'ɡruːp',d:[{p:'n.',t:'群；组'}]},
+    'team':{w:'team',us:'tiːm',uk:'tiːm',d:[{p:'n.',t:'队'}]},
+    'member':{w:'member',us:'ˈmembər',uk:'ˈmembə',d:[{p:'n.',t:'成员'}]},
+    'role':{w:'role',us:'roʊl',uk:'rəʊl',d:[{p:'n.',t:'角色'}]},
+    'rule':{w:'rule',us:'ruːl',uk:'ruːl',d:[{p:'n.',t:'规则'}]},
+    'law':{w:'law',us:'lɔː',uk:'lɔː',d:[{p:'n.',t:'法律'}]},
+    'policy':{w:'policy',us:'ˈpɑːləsi',uk:'ˈpɒləsi',d:[{p:'n.',t:'政策'}]},
+    'action':{w:'action',us:'ˈækʃn',uk:'ˈækʃn',d:[{p:'n.',t:'行动'}]},
+    'event':{w:'event',us:'ɪˈvent',uk:'ɪˈvent',d:[{p:'n.',t:'事件'}]},
+    'activity':{w:'activity',us:'ækˈtɪvəti',uk:'ækˈtɪvəti',d:[{p:'n.',t:'活动'}]},
+    'area':{w:'area',us:'ˈeriə',uk:'ˈeəriə',d:[{p:'n.',t:'区域'}]},
+    'field':{w:'field',us:'fiːld',uk:'fiːld',d:[{p:'n.',t:'领域；田野'}]},
+    'industry':{w:'industry',us:'ˈɪndəstri',uk:'ˈɪndəstri',d:[{p:'n.',t:'工业'}]},
+    'service':{w:'service',us:'ˈsɜːrvɪs',uk:'ˈsɜːvɪs',d:[{p:'n.',t:'服务'}]},
+    'product':{w:'product',us:'ˈprɑːdʌkt',uk:'ˈprɒdʌkt',d:[{p:'n.',t:'产品'}]},
+    'market':{w:'market',us:'ˈmɑːrkɪt',uk:'ˈmɑːkɪt',d:[{p:'n.',t:'市场'}]},
+    'price':{w:'price',us:'praɪs',uk:'praɪs',d:[{p:'n.',t:'价格'}]},
+    'rate':{w:'rate',us:'reɪt',uk:'reɪt',d:[{p:'n.',t:'比率'}]},
+    'figure':{w:'figure',us:'ˈfɪɡjər',uk:'ˈfɪɡə',d:[{p:'n.',t:'数字；人物'}]},
+    'total':{w:'total',us:'ˈtoʊtl',uk:'ˈtəʊtl',d:[{p:'adj.',t:'总的'},{p:'n.',t:'总计'}]},
+    'average':{w:'average',us:'ˈævərɪdʒ',uk:'ˈævərɪdʒ',d:[{p:'n.',t:'平均'},{p:'adj.',t:'平均的'}]},
+    // ── 常用形容词 ──
+    'good':{w:'good',us:'ɡʊd',uk:'ɡʊd',d:[{p:'adj.',t:'好的'}]},
+    'new':{w:'new',us:'nuː',uk:'njuː',d:[{p:'adj.',t:'新的'}]},
+    'old':{w:'old',us:'oʊld',uk:'əʊld',d:[{p:'adj.',t:'老的'}]},
+    'great':{w:'great',us:'ɡreɪt',uk:'ɡreɪt',d:[{p:'adj.',t:'伟大的'}]},
+    'high':{w:'high',us:'haɪ',uk:'haɪ',d:[{p:'adj.',t:'高的'}]},
+    'small':{w:'small',us:'smɔːl',uk:'smɔːl',d:[{p:'adj.',t:'小的'}]},
+    'large':{w:'large',us:'lɑːrdʒ',uk:'lɑːdʒ',d:[{p:'adj.',t:'大的'}]},
+    'long':{w:'long',us:'lɔːŋ',uk:'lɒŋ',d:[{p:'adj.',t:'长的'}]},
+    'young':{w:'young',us:'jʌŋ',uk:'jʌŋ',d:[{p:'adj.',t:'年轻的'}]},
+    'different':{w:'different',us:'ˈdɪfrənt',uk:'ˈdɪfrənt',d:[{p:'adj.',t:'不同的'}]},
+    'important':{w:'important',us:'ɪmˈpɔːrtənt',uk:'ɪmˈpɔːtənt',d:[{p:'adj.',t:'重要的'}]},
+    'public':{w:'public',us:'ˈpʌblɪk',uk:'ˈpʌblɪk',d:[{p:'adj.',t:'公共的'}]},
+    'bad':{w:'bad',us:'bæd',uk:'bæd',d:[{p:'adj.',t:'坏的'}]},
+    'same':{w:'same',us:'seɪm',uk:'seɪm',d:[{p:'adj.',t:'相同的'}]},
+    'able':{w:'able',us:'ˈeɪbl',uk:'ˈeɪbl',d:[{p:'adj.',t:'有能力的'}]},
+    'human':{w:'human',us:'ˈhjuːmən',uk:'ˈhjuːmən',d:[{p:'adj.',t:'人的'},{p:'n.',t:'人'}]},
+    'local':{w:'local',us:'ˈloʊkl',uk:'ˈləʊkl',d:[{p:'adj.',t:'当地的'}]},
+    'late':{w:'late',us:'leɪt',uk:'leɪt',d:[{p:'adj.',t:'晚的'}]},
+    'hard':{w:'hard',us:'hɑːrd',uk:'hɑːd',d:[{p:'adj.',t:'硬的；困难的'}]},
+    'major':{w:'major',us:'ˈmeɪdʒər',uk:'ˈmeɪdʒə',d:[{p:'adj.',t:'主要的'}]},
+    'better':{w:'better',us:'ˈbetər',uk:'ˈbetə',d:[{p:'adj.',t:'更好的'}]},
+    'economic':{w:'economic',us:'ˌekəˈnɑːmɪk',uk:'ˌekəˈnɒmɪk',d:[{p:'adj.',t:'经济的'}]},
+    'strong':{w:'strong',us:'strɔːŋ',uk:'strɒŋ',d:[{p:'adj.',t:'强的'}]},
+    'possible':{w:'possible',us:'ˈpɑːsəbl',uk:'ˈpɒsəbl',d:[{p:'adj.',t:'可能的'}]},
+    'whole':{w:'whole',us:'hoʊl',uk:'həʊl',d:[{p:'adj.',t:'整个的'}]},
+    'free':{w:'free',us:'friː',uk:'friː',d:[{p:'adj.',t:'自由的；免费的'}]},
+    'true':{w:'true',us:'truː',uk:'truː',d:[{p:'adj.',t:'真实的'}]},
+    'real':{w:'real',us:'riːl',uk:'rɪəl',d:[{p:'adj.',t:'真实的'}]},
+    'right':{w:'right',us:'raɪt',uk:'raɪt',d:[{p:'adj.',t:'正确的'},{p:'n.',t:'权利'}]},
+    'early':{w:'early',us:'ˈɜːrli',uk:'ˈɜːli',d:[{p:'adj.',t:'早的'}]},
+    'certain':{w:'certain',us:'ˈsɜːrtn',uk:'ˈsɜːtn',d:[{p:'adj.',t:'确定的'}]},
+    'clear':{w:'clear',us:'klɪr',uk:'klɪə',d:[{p:'adj.',t:'清楚的'}]},
+    'full':{w:'full',us:'fʊl',uk:'fʊl',d:[{p:'adj.',t:'满的'}]},
+    'special':{w:'special',us:'ˈspeʃl',uk:'ˈspeʃl',d:[{p:'adj.',t:'特别的'}]},
+    'easy':{w:'easy',us:'ˈiːzi',uk:'ˈiːzi',d:[{p:'adj.',t:'容易的'}]},
+    'simple':{w:'simple',us:'ˈsɪmpl',uk:'ˈsɪmpl',d:[{p:'adj.',t:'简单的'}]},
+    'difficult':{w:'difficult',us:'ˈdɪfɪkəlt',uk:'ˈdɪfɪkəlt',d:[{p:'adj.',t:'困难的'}]},
+    'beautiful':{w:'beautiful',us:'ˈbjuːtɪfl',uk:'ˈbjuːtɪfl',d:[{p:'adj.',t:'美丽的'}]},
+    'happy':{w:'happy',us:'ˈhæpi',uk:'ˈhæpi',d:[{p:'adj.',t:'快乐的'}]},
+    'sad':{w:'sad',us:'sæd',uk:'sæd',d:[{p:'adj.',t:'悲伤的'}]},
+    'angry':{w:'angry',us:'ˈæŋɡri',uk:'ˈæŋɡri',d:[{p:'adj.',t:'生气的'}]},
+    'afraid':{w:'afraid',us:'əˈfreɪd',uk:'əˈfreɪd',d:[{p:'adj.',t:'害怕的'}]},
+    'quiet':{w:'quiet',us:'ˈkwaɪət',uk:'ˈkwaɪət',d:[{p:'adj.',t:'安静的'}]},
+    'ready':{w:'ready',us:'ˈredi',uk:'ˈredi',d:[{p:'adj.',t:'准备好的'}]},
+    'serious':{w:'serious',us:'ˈsɪriəs',uk:'ˈsɪəriəs',d:[{p:'adj.',t:'严肃的'}]},
+    'warm':{w:'warm',us:'wɔːrm',uk:'wɔːm',d:[{p:'adj.',t:'温暖的'}]},
+    'cold':{w:'cold',us:'koʊld',uk:'kəʊld',d:[{p:'adj.',t:'冷的'}]},
+    'hot':{w:'hot',us:'hɑːt',uk:'hɒt',d:[{p:'adj.',t:'热的'}]},
+    'fast':{w:'fast',us:'fæst',uk:'fɑːst',d:[{p:'adj.',t:'快的'}]},
+    'slow':{w:'slow',us:'sloʊ',uk:'sləʊ',d:[{p:'adj.',t:'慢的'}]},
+    'deep':{w:'deep',us:'diːp',uk:'diːp',d:[{p:'adj.',t:'深的'}]},
+    'wide':{w:'wide',us:'waɪd',uk:'waɪd',d:[{p:'adj.',t:'宽的'}]},
+    'close':{w:'close',us:'kloʊs',uk:'kləʊs',d:[{p:'adj.',t:'近的'},{p:'v.',t:'关闭'}]},
+    'rich':{w:'rich',us:'rɪtʃ',uk:'rɪtʃ',d:[{p:'adj.',t:'富有的'}]},
+    'poor':{w:'poor',us:'pʊr',uk:'pʊə',d:[{p:'adj.',t:'贫穷的'}]},
+    'dark':{w:'dark',us:'dɑːrk',uk:'dɑːk',d:[{p:'adj.',t:'暗的'}]},
+    'bright':{w:'bright',us:'braɪt',uk:'braɪt',d:[{p:'adj.',t:'明亮的'}]},
+    'clean':{w:'clean',us:'kliːn',uk:'kliːn',d:[{p:'adj.',t:'干净的'}]},
+    'dirty':{w:'dirty',us:'ˈdɜːrti',uk:'ˈdɜːti',d:[{p:'adj.',t:'脏的'}]},
+    'safe':{w:'safe',us:'seɪf',uk:'seɪf',d:[{p:'adj.',t:'安全的'}]},
+    'dangerous':{w:'dangerous',us:'ˈdeɪndʒərəs',uk:'ˈdeɪndʒərəs',d:[{p:'adj.',t:'危险的'}]},
+    'quiet':{w:'quiet',us:'ˈkwaɪət',uk:'ˈkwaɪət',d:[{p:'adj.',t:'安静的'}]},
+    'busy':{w:'busy',us:'ˈbɪzi',uk:'ˈbɪzi',d:[{p:'adj.',t:'忙碌的'}]},
+    'lazy':{w:'lazy',us:'ˈleɪzi',uk:'ˈleɪzi',d:[{p:'adj.',t:'懒的'}]},
+    'kind':{w:'kind',us:'kaɪnd',uk:'kaɪnd',d:[{p:'adj.',t:'善良的'}]},
+    'wise':{w:'wise',us:'waɪz',uk:'waɪz',d:[{p:'adj.',t:'智慧的'}]},
+    'stupid':{w:'stupid',us:'ˈstuːpɪd',uk:'ˈstjuːpɪd',d:[{p:'adj.',t:'愚蠢的'}]},
+    'brave':{w:'brave',us:'breɪv',uk:'breɪv',d:[{p:'adj.',t:'勇敢的'}]},
+    'honest':{w:'honest',us:'ˈɑːnɪst',uk:'ˈɒnɪst',d:[{p:'adj.',t:'诚实的'}]},
+    'polite':{w:'polite',us:'pəˈlaɪt',uk:'pəˈlaɪt',d:[{p:'adj.',t:'礼貌的'}]},
+    'gentle':{w:'gentle',us:'ˈdʒentl',uk:'ˈdʒentl',d:[{p:'adj.',t:'温柔的'}]},
+    'lovely':{w:'lovely',us:'ˈlʌvli',uk:'ˈlʌvli',d:[{p:'adj.',t:'可爱的'}]},
+    'strange':{w:'strange',us:'streɪndʒ',uk:'streɪndʒ',d:[{p:'adj.',t:'奇怪的'}]},
+    'normal':{w:'normal',us:'ˈnɔːrml',uk:'ˈnɔːml',d:[{p:'adj.',t:'正常的'}]},
+    'perfect':{w:'perfect',us:'ˈpɜːrfɪkt',uk:'ˈpɜːfɪkt',d:[{p:'adj.',t:'完美的'}]},
+    'wonderful':{w:'wonderful',us:'ˈwʌndərfl',uk:'ˈwʌndəfl',d:[{p:'adj.',t:'精彩的'}]},
+    'terrible':{w:'terrible',us:'ˈterəbl',uk:'ˈterəbl',d:[{p:'adj.',t:'可怕的'}]},
+    'awful':{w:'awful',us:'ˈɔːfl',uk:'ˈɔːfl',d:[{p:'adj.',t:'糟糕的'}]},
+    'amazing':{w:'amazing',us:'əˈmeɪzɪŋ',uk:'əˈmeɪzɪŋ',d:[{p:'adj.',t:'惊人的'}]},
+    'interesting':{w:'interesting',us:'ˈɪntrəstɪŋ',uk:'ˈɪntrəstɪŋ',d:[{p:'adj.',t:'有趣的'}]},
+    'boring':{w:'boring',us:'ˈbɔːrɪŋ',uk:'ˈbɔːrɪŋ',d:[{p:'adj.',t:'无聊的'}]},
+    'exciting':{w:'exciting',us:'ɪkˈsaɪtɪŋ',uk:'ɪkˈsaɪtɪŋ',d:[{p:'adj.',t:'令人兴奋的'}]},
+    'surprising':{w:'surprising',us:'sərˈpraɪzɪŋ',uk:'səˈpraɪzɪŋ',d:[{p:'adj.',t:'令人惊讶的'}]},
+    'famous':{w:'famous',us:'ˈfeɪməs',uk:'ˈfeɪməs',d:[{p:'adj.',t:'著名的'}]},
+    'popular':{w:'popular',us:'ˈpɑːpjələr',uk:'ˈpɒpjələ',d:[{p:'adj.',t:'受欢迎的'}]},
+    'common':{w:'common',us:'ˈkɑːmən',uk:'ˈkɒmən',d:[{p:'adj.',t:'常见的'}]},
+    'usual':{w:'usual',us:'ˈjuːʒuəl',uk:'ˈjuːʒuəl',d:[{p:'adj.',t:'通常的'}]},
+    'modern':{w:'modern',us:'ˈmɑːdərn',uk:'ˈmɒdən',d:[{p:'adj.',t:'现代的'}]},
+    'ancient':{w:'ancient',us:'ˈeɪnʃənt',uk:'ˈeɪnʃənt',d:[{p:'adj.',t:'古代的'}]},
+    'foreign':{w:'foreign',us:'ˈfɔːrən',uk:'ˈfɒrən',d:[{p:'adj.',t:'外国的'}]},
+    'natural':{w:'natural',us:'ˈnætʃrəl',uk:'ˈnætʃrəl',d:[{p:'adj.',t:'自然的'}]},
+    'social':{w:'social',us:'ˈsoʊʃl',uk:'ˈsəʊʃl',d:[{p:'adj.',t:'社会的'}]},
+    'political':{w:'political',us:'pəˈlɪtɪkl',uk:'pəˈlɪtɪkl',d:[{p:'adj.',t:'政治的'}]},
+    'personal':{w:'personal',us:'ˈpɜːrsənl',uk:'ˈpɜːsənl',d:[{p:'adj.',t:'个人的'}]},
+    'physical':{w:'physical',us:'ˈfɪzɪkl',uk:'ˈfɪzɪkl',d:[{p:'adj.',t:'身体的'}]},
+    'mental':{w:'mental',us:'ˈmentl',uk:'ˈmentl',d:[{p:'adj.',t:'精神的'}]},
+    'medical':{w:'medical',us:'ˈmedɪkl',uk:'ˈmedɪkl',d:[{p:'adj.',t:'医学的'}]},
+    'financial':{w:'financial',us:'faɪˈnænʃl',uk:'faɪˈnænʃl',d:[{p:'adj.',t:'金融的'}]},
+    'international':{w:'international',us:'ˌɪntərˈnæʃnəl',uk:'ˌɪntəˈnæʃnəl',d:[{p:'adj.',t:'国际的'}]},
+    'national':{w:'national',us:'ˈnæʃnəl',uk:'ˈnæʃnəl',d:[{p:'adj.',t:'国家的'}]},
+    'traditional':{w:'traditional',us:'trəˈdɪʃənl',uk:'trəˈdɪʃənl',d:[{p:'adj.',t:'传统的'}]},
+    'cultural':{w:'cultural',us:'ˈkʌltʃərəl',uk:'ˈkʌltʃərəl',d:[{p:'adj.',t:'文化的'}]},
+    'environmental':{w:'environmental',us:'ɪnˌvaɪrənˈmentl',uk:'ɪnˌvaɪrənˈmentl',d:[{p:'adj.',t:'环境的'}]},
+    'educational':{w:'educational',us:'ˌedʒuˈkeɪʃənl',uk:'ˌedʒuˈkeɪʃənl',d:[{p:'adj.',t:'教育的'}]},
+    'professional':{w:'professional',us:'prəˈfeʃənl',uk:'prəˈfeʃənl',d:[{p:'adj.',t:'专业的'}]},
+    'official':{w:'official',us:'əˈfɪʃl',uk:'əˈfɪʃl',d:[{p:'adj.',t:'官方的'}]},
+    'central':{w:'central',us:'ˈsentrəl',uk:'ˈsentrəl',d:[{p:'adj.',t:'中心的'}]},
+    'general':{w:'general',us:'ˈdʒenrəl',uk:'ˈdʒenrəl',d:[{p:'adj.',t:'一般的'}]},
+    'specific':{w:'specific',us:'spəˈsɪfɪk',uk:'spəˈsɪfɪk',d:[{p:'adj.',t:'具体的'}]},
+    'basic':{w:'basic',us:'ˈbeɪsɪk',uk:'ˈbeɪsɪk',d:[{p:'adj.',t:'基本的'}]},
+    'final':{w:'final',us:'ˈfaɪnl',uk:'ˈfaɪnl',d:[{p:'adj.',t:'最终的'}]},
+    'original':{w:'original',us:'əˈrɪdʒənl',uk:'əˈrɪdʒənl',d:[{p:'adj.',t:'原始的'}]},
+    'previous':{w:'previous',us:'ˈpriːviəs',uk:'ˈpriːviəs',d:[{p:'adj.',t:'以前的'}]},
+    'recent':{w:'recent',us:'ˈriːsnt',uk:'ˈriːsnt',d:[{p:'adj.',t:'最近的'}]},
+    'current':{w:'current',us:'ˈkɜːrənt',uk:'ˈkʌrənt',d:[{p:'adj.',t:'当前的'}]},
+    'available':{w:'available',us:'əˈveɪləbl',uk:'əˈveɪləbl',d:[{p:'adj.',t:'可用的'}]},
+    'responsible':{w:'responsible',us:'rɪˈspɑːnsəbl',uk:'rɪˈspɒnsəbl',d:[{p:'adj.',t:'负责的'}]},
+    'necessary':{w:'necessary',us:'ˈnesəseri',uk:'ˈnesəsəri',d:[{p:'adj.',t:'必要的'}]},
+    'appropriate':{w:'appropriate',us:'əˈproʊpriət',uk:'əˈprəʊpriət',d:[{p:'adj.',t:'适当的'}]},
+    'significant':{w:'significant',us:'sɪɡˈnɪfɪkənt',uk:'sɪɡˈnɪfɪkənt',d:[{p:'adj.',t:'重要的'}]},
+    'effective':{w:'effective',us:'ɪˈfektɪv',uk:'ɪˈfektɪv',d:[{p:'adj.',t:'有效的'}]},
+    'creative':{w:'creative',us:'kriˈeɪtɪv',uk:'kriˈeɪtɪv',d:[{p:'adj.',t:'创造性的'}]},
+    'positive':{w:'positive',us:'ˈpɑːzətɪv',uk:'ˈpɒzətɪv',d:[{p:'adj.',t:'积极的'}]},
+    'negative':{w:'negative',us:'ˈneɡətɪv',uk:'ˈneɡətɪv',d:[{p:'adj.',t:'消极的'}]},
+    'active':{w:'active',us:'ˈæktɪv',uk:'ˈæktɪv',d:[{p:'adj.',t:'活跃的'}]},
+    'passive':{w:'passive',us:'ˈpæsɪv',uk:'ˈpæsɪv',d:[{p:'adj.',t:'被动的'}]},
+    'direct':{w:'direct',us:'dəˈrekt',uk:'dəˈrekt',d:[{p:'adj.',t:'直接的'}]},
+    'complex':{w:'complex',us:'kɑːmˈpleks',uk:'kɒmˈpleks',d:[{p:'adj.',t:'复杂的'}]},
+    'successful':{w:'successful',us:'səkˈsesfl',uk:'səkˈsesfl',d:[{p:'adj.',t:'成功的'}]},
+    'powerful':{w:'powerful',us:'ˈpaʊərfl',uk:'ˈpaʊəfl',d:[{p:'adj.',t:'强大的'}]},
+    'peaceful':{w:'peaceful',us:'ˈpiːsfl',uk:'ˈpiːsfl',d:[{p:'adj.',t:'和平的'}]},
+    'careful':{w:'careful',us:'ˈkerfl',uk:'ˈkeəfl',d:[{p:'adj.',t:'小心的'}]},
+    'useful':{w:'useful',us:'ˈjuːsfl',uk:'ˈjuːsfl',d:[{p:'adj.',t:'有用的'}]},
+    'helpful':{w:'helpful',us:'ˈhelpfl',uk:'ˈhelpfl',d:[{p:'adj.',t:'有帮助的'}]},
+    'grateful':{w:'grateful',us:'ˈɡreɪtfl',uk:'ˈɡreɪtfl',d:[{p:'adj.',t:'感激的'}]},
+    'painful':{w:'painful',us:'ˈpeɪnfl',uk:'ˈpeɪnfl',d:[{p:'adj.',t:'痛苦的'}]},
+    'cheerful':{w:'cheerful',us:'ˈtʃɪrfl',uk:'ˈtʃɪəfl',d:[{p:'adj.',t:'快乐的'}]},
+    'colorful':{w:'colorful',us:'ˈkʌlərfl',uk:'ˈkʌləfl',d:[{p:'adj.',t:'多彩的'}]},
+    'meaningful':{w:'meaningful',us:'ˈmiːnɪŋfl',uk:'ˈmiːnɪŋfl',d:[{p:'adj.',t:'有意义的'}]},
+    'thoughtful':{w:'thoughtful',us:'ˈθɔːtfl',uk:'ˈθɔːtfl',d:[{p:'adj.',t:'体贴的'}]},
+    // ── 常用副词 ──
+    'very':{w:'very',us:'ˈveri',uk:'ˈveri',d:[{p:'adv.',t:'非常'}]},
+    'also':{w:'also',us:'ˈɔːlsoʊ',uk:'ˈɔːlsəʊ',d:[{p:'adv.',t:'也'}]},
+    'just':{w:'just',us:'dʒʌst',uk:'dʒʌst',d:[{p:'adv.',t:'只是；刚才'}]},
+    'then':{w:'then',us:'ðen',uk:'ðen',d:[{p:'adv.',t:'然后'}]},
+    'now':{w:'now',us:'naʊ',uk:'naʊ',d:[{p:'adv.',t:'现在'}]},
+    'here':{w:'here',us:'hɪr',uk:'hɪə',d:[{p:'adv.',t:'这里'}]},
+    'there':{w:'there',us:'ðer',uk:'ðeə',d:[{p:'adv.',t:'那里'}]},
+    'always':{w:'always',us:'ˈɔːlweɪz',uk:'ˈɔːlweɪz',d:[{p:'adv.',t:'总是'}]},
+    'never':{w:'never',us:'ˈnevər',uk:'ˈnevə',d:[{p:'adv.',t:'从不'}]},
+    'often':{w:'often',us:'ˈɔːfn',uk:'ˈɒfn',d:[{p:'adv.',t:'经常'}]},
+    'sometimes':{w:'sometimes',us:'ˈsʌmtaɪmz',uk:'ˈsʌmtaɪmz',d:[{p:'adv.',t:'有时'}]},
+    'usually':{w:'usually',us:'ˈjuːʒuəli',uk:'ˈjuːʒuəli',d:[{p:'adv.',t:'通常'}]},
+    'already':{w:'already',us:'ɔːlˈredi',uk:'ɔːlˈredi',d:[{p:'adv.',t:'已经'}]},
+    'still':{w:'still',us:'stɪl',uk:'stɪl',d:[{p:'adv.',t:'仍然'}]},
+    'again':{w:'again',us:'əˈɡen',uk:'əˈɡen',d:[{p:'adv.',t:'再次'}]},
+    'really':{w:'really',us:'ˈriːəli',uk:'ˈrɪəli',d:[{p:'adv.',t:'真的'}]},
+    'probably':{w:'probably',us:'ˈprɑːbəbli',uk:'ˈprɒbəbli',d:[{p:'adv.',t:'可能'}]},
+    'perhaps':{w:'perhaps',us:'pərˈhæps',uk:'pəˈhæps',d:[{p:'adv.',t:'也许'}]},
+    'suddenly':{w:'suddenly',us:'ˈsʌdənli',uk:'ˈsʌdənli',d:[{p:'adv.',t:'突然'}]},
+    'quickly':{w:'quickly',us:'ˈkwɪkli',uk:'ˈkwɪkli',d:[{p:'adv.',t:'快速地'}]},
+    'slowly':{w:'slowly',us:'ˈsloʊli',uk:'ˈsləʊli',d:[{p:'adv.',t:'慢慢地'}]},
+    'quietly':{w:'quietly',us:'ˈkwaɪətli',uk:'ˈkwaɪətli',d:[{p:'adv.',t:'安静地'}]},
+    'carefully':{w:'carefully',us:'ˈkerfəli',uk:'ˈkeəfəli',d:[{p:'adv.',t:'仔细地'}]},
+    'easily':{w:'easily',us:'ˈiːzəli',uk:'ˈiːzəli',d:[{p:'adv.',t:'容易地'}]},
+    'simply':{w:'simply',us:'ˈsɪmpli',uk:'ˈsɪmpli',d:[{p:'adv.',t:'简单地'}]},
+    'exactly':{w:'exactly',us:'ɪɡˈzæktli',uk:'ɪɡˈzæktli',d:[{p:'adv.',t:'确切地'}]},
+    'especially':{w:'especially',us:'ɪˈspeʃəli',uk:'ɪˈspeʃəli',d:[{p:'adv.',t:'尤其'}]},
+    'finally':{w:'finally',us:'ˈfaɪnəli',uk:'ˈfaɪnəli',d:[{p:'adv.',t:'终于'}]},
+    'immediately':{w:'immediately',us:'ɪˈmiːdiətli',uk:'ɪˈmiːdiətli',d:[{p:'adv.',t:'立即'}]},
+    'completely':{w:'completely',us:'kəmˈpliːtli',uk:'kəmˈpliːtli',d:[{p:'adv.',t:'完全地'}]},
+    'absolutely':{w:'absolutely',us:'ˌæbsəˈluːtli',uk:'ˌæbsəˈluːtli',d:[{p:'adv.',t:'绝对地'}]},
+    'actually':{w:'actually',us:'ˈæktʃuəli',uk:'ˈæktʃuəli',d:[{p:'adv.',t:'实际上'}]},
+    'basically':{w:'basically',us:'ˈbeɪsɪkli',uk:'ˈbeɪsɪkli',d:[{p:'adv.',t:'基本上'}]},
+    'certainly':{w:'certainly',us:'ˈsɜːrtnli',uk:'ˈsɜːtnli',d:[{p:'adv.',t:'当然'}]},
+    'clearly':{w:'clearly',us:'ˈklɪrli',uk:'ˈklɪəli',d:[{p:'adv.',t:'清楚地'}]},
+    'directly':{w:'directly',us:'dəˈrektli',uk:'dəˈrektli',d:[{p:'adv.',t:'直接地'}]},
+    'entirely':{w:'entirely',us:'ɪnˈtaɪərli',uk:'ɪnˈtaɪəli',d:[{p:'adv.',t:'完全地'}]},
+    'extremely':{w:'extremely',us:'ɪkˈstriːmli',uk:'ɪkˈstriːmli',d:[{p:'adv.',t:'极其'}]},
+    'fairly':{w:'fairly',us:'ˈferli',uk:'ˈfeəli',d:[{p:'adv.',t:'相当'}]},
+    'fortunately':{w:'fortunately',us:'ˈfɔːrtʃənətli',uk:'ˈfɔːtʃənətli',d:[{p:'adv.',t:'幸运地'}]},
+    'generally':{w:'generally',us:'ˈdʒenrəli',uk:'ˈdʒenrəli',d:[{p:'adv.',t:'通常'}]},
+    'gradually':{w:'gradually',us:'ˈɡrædʒuəli',uk:'ˈɡrædʒuəli',d:[{p:'adv.',t:'逐渐地'}]},
+    'hardly':{w:'hardly',us:'ˈhɑːrdli',uk:'ˈhɑːdli',d:[{p:'adv.',t:'几乎不'}]},
+    'instead':{w:'instead',us:'ɪnˈsted',uk:'ɪnˈsted',d:[{p:'adv.',t:'反而'}]},
+    'lately':{w:'lately',us:'ˈleɪtli',uk:'ˈleɪtli',d:[{p:'adv.',t:'最近'}]},
+    'merely':{w:'merely',us:'ˈmɪrli',uk:'ˈmɪəli',d:[{p:'adv.',t:'仅仅'}]},
+    'naturally':{w:'naturally',us:'ˈnætʃrəli',uk:'ˈnætʃrəli',d:[{p:'adv.',t:'自然地'}]},
+    'nearly':{w:'nearly',us:'ˈnɪrli',uk:'ˈnɪəli',d:[{p:'adv.',t:'几乎'}]},
+    'normally':{w:'normally',us:'ˈnɔːrməli',uk:'ˈnɔːməli',d:[{p:'adv.',t:'正常地'}]},
+    'obviously':{w:'obviously',us:'ˈɑːbviəsli',uk:'ˈɒbviəsli',d:[{p:'adv.',t:'显然'}]},
+    'particularly':{w:'particularly',us:'pərˈtɪkjələrli',uk:'pəˈtɪkjələli',d:[{p:'adv.',t:'特别地'}]},
+    'perfectly':{w:'perfectly',us:'ˈpɜːrfɪktli',uk:'ˈpɜːfɪktli',d:[{p:'adv.',t:'完美地'}]},
+    'previously':{w:'previously',us:'ˈpriːviəsli',uk:'ˈpriːviəsli',d:[{p:'adv.',t:'以前'}]},
+    'primarily':{w:'primarily',us:'praɪˈmerəli',uk:'praɪˈmerəli',d:[{p:'adv.',t:'主要地'}]},
+    'recently':{w:'recently',us:'ˈriːsntli',uk:'ˈriːsntli',d:[{p:'adv.',t:'最近'}]},
+    'relatively':{w:'relatively',us:'ˈrelətɪvli',uk:'ˈrelətɪvli',d:[{p:'adv.',t:'相对地'}]},
+    'seriously':{w:'seriously',us:'ˈsɪriəsli',uk:'ˈsɪəriəsli',d:[{p:'adv.',t:'严重地'}]},
+    'significantly':{w:'significantly',us:'sɪɡˈnɪfɪkəntli',uk:'sɪɡˈnɪfɪkəntli',d:[{p:'adv.',t:'显著地'}]},
+    'similarly':{w:'similarly',us:'ˈsɪmɪlərli',uk:'ˈsɪmɪləli',d:[{p:'adv.',t:'类似地'}]},
+    'strongly':{w:'strongly',us:'ˈstrɔːŋli',uk:'ˈstrɒŋli',d:[{p:'adv.',t:'强烈地'}]},
+    'successfully':{w:'successfully',us:'səkˈsesfəli',uk:'səkˈsesfəli',d:[{p:'adv.',t:'成功地'}]},
+    'supposedly':{w:'supposedly',us:'səˈpoʊzɪdli',uk:'səˈpəʊzɪdli',d:[{p:'adv.',t:'据说'}]},
+    'surprisingly':{w:'surprisingly',us:'sərˈpraɪzɪŋli',uk:'səˈpraɪzɪŋli',d:[{p:'adv.',t:'令人惊讶地'}]},
+    'totally':{w:'totally',us:'ˈtoʊtəli',uk:'ˈtəʊtəli',d:[{p:'adv.',t:'完全地'}]},
+    'traditionally':{w:'traditionally',us:'trəˈdɪʃənəli',uk:'trəˈdɪʃənəli',d:[{p:'adv.',t:'传统上'}]},
+    'typically':{w:'typically',us:'ˈtɪpɪkli',uk:'ˈtɪpɪkli',d:[{p:'adv.',t:'通常'}]},
+    'ultimately':{w:'ultimately',us:'ˈʌltɪmətli',uk:'ˈʌltɪmətli',d:[{p:'adv.',t:'最终'}]},
+    'unfortunately':{w:'unfortunately',us:'ʌnˈfɔːrtʃənətli',uk:'ʌnˈfɔːtʃənətli',d:[{p:'adv.',t:'不幸地'}]},
+    'widely':{w:'widely',us:'ˈwaɪdli',uk:'ˈwaɪdli',d:[{p:'adv.',t:'广泛地'}]},
+    // ── 常用介词/连词/代词 ──
+    'about':{w:'about',us:'əˈbaʊt',uk:'əˈbaʊt',d:[{p:'prep.',t:'关于'},{p:'adv.',t:'大约'}]},
+    'after':{w:'after',us:'ˈæftər',uk:'ˈɑːftə',d:[{p:'prep.',t:'在…之后'}]},
+    'against':{w:'against',us:'əˈɡenst',uk:'əˈɡenst',d:[{p:'prep.',t:'反对'}]},
+    'along':{w:'along',us:'əˈlɔːŋ',uk:'əˈlɒŋ',d:[{p:'prep.',t:'沿着'}]},
+    'among':{w:'among',us:'əˈmʌŋ',uk:'əˈmʌŋ',d:[{p:'prep.',t:'在…之中'}]},
+    'around':{w:'around',us:'əˈraʊnd',uk:'əˈraʊnd',d:[{p:'prep.',t:'围绕'},{p:'adv.',t:'周围'}]},
+    'before':{w:'before',us:'bɪˈfɔːr',uk:'bɪˈfɔː',d:[{p:'prep.',t:'在…之前'}]},
+    'between':{w:'between',us:'bɪˈtwiːn',uk:'bɪˈtwiːn',d:[{p:'prep.',t:'在…之间'}]},
+    'during':{w:'during',us:'ˈdʊrɪŋ',uk:'ˈdjʊərɪŋ',d:[{p:'prep.',t:'在…期间'}]},
+    'except':{w:'except',us:'ɪkˈsept',uk:'ɪkˈsept',d:[{p:'prep.',t:'除了'}]},
+    'inside':{w:'inside',us:'ˌɪnˈsaɪd',uk:'ˌɪnˈsaɪd',d:[{p:'prep.',t:'在…里面'}]},
+    'outside':{w:'outside',us:'ˌaʊtˈsaɪd',uk:'ˌaʊtˈsaɪd',d:[{p:'prep.',t:'在…外面'}]},
+    'through':{w:'through',us:'θruː',uk:'θruː',d:[{p:'prep.',t:'通过'}]},
+    'toward':{w:'toward',us:'tɔːrd',uk:'təˈwɔːd',d:[{p:'prep.',t:'朝向'}]},
+    'within':{w:'within',us:'wɪˈðɪn',uk:'wɪˈðɪn',d:[{p:'prep.',t:'在…之内'}]},
+    'without':{w:'without',us:'wɪˈðaʊt',uk:'wɪˈðaʊt',d:[{p:'prep.',t:'没有'}]},
+    'although':{w:'although',us:'ɔːlˈðoʊ',uk:'ɔːlˈðəʊ',d:[{p:'conj.',t:'虽然'}]},
+    'because':{w:'because',us:'bɪˈkɔːz',uk:'bɪˈkɒz',d:[{p:'conj.',t:'因为'}]},
+    'however':{w:'however',us:'haʊˈevər',uk:'haʊˈevə',d:[{p:'adv.',t:'然而'}]},
+    'whatever':{w:'whatever',us:'wʌtˈevər',uk:'wɒtˈevə',d:[{p:'pron.',t:'无论什么'}]},
+    'everything':{w:'everything',us:'ˈevriθɪŋ',uk:'ˈevriθɪŋ',d:[{p:'pron.',t:'一切'}]},
+    'something':{w:'something',us:'ˈsʌmθɪŋ',uk:'ˈsʌmθɪŋ',d:[{p:'pron.',t:'某事'}]},
+    'nothing':{w:'nothing',us:'ˈnʌθɪŋ',uk:'ˈnʌθɪŋ',d:[{p:'pron.',t:'没有什么'}]},
+    'everyone':{w:'everyone',us:'ˈevriwʌn',uk:'ˈevriwʌn',d:[{p:'pron.',t:'每个人'}]},
+    'someone':{w:'someone',us:'ˈsʌmwʌn',uk:'ˈsʌmwʌn',d:[{p:'pron.',t:'某人'}]},
+    'nobody':{w:'nobody',us:'ˈnoʊbədi',uk:'ˈnəʊbədi',d:[{p:'pron.',t:'没有人'}]},
+    'myself':{w:'myself',us:'maɪˈself',uk:'maɪˈself',d:[{p:'pron.',t:'我自己'}]},
+    'yourself':{w:'yourself',us:'jɔːrˈself',uk:'jɔːˈself',d:[{p:'pron.',t:'你自己'}]},
+    'itself':{w:'itself',us:'ɪtˈself',uk:'ɪtˈself',d:[{p:'pron.',t:'它自己'}]},
+    // ── 酒馆主题词 ──
+    'fog':{w:'fog',us:'fɔːɡ',uk:'fɒɡ',d:[{p:'n.',t:'雾'}]},
+    'foggy':{w:'foggy',us:'ˈfɔːɡi',uk:'ˈfɒɡi',d:[{p:'adj.',t:'有雾的'}]},
+    'lantern':{w:'lantern',us:'ˈlæntərn',uk:'ˈlæntən',d:[{p:'n.',t:'灯笼'}]},
+    'hearth':{w:'hearth',us:'hɑːrθ',uk:'hɑːθ',d:[{p:'n.',t:'壁炉'}]},
+    'ale':{w:'ale',us:'eɪl',uk:'eɪl',d:[{p:'n.',t:'麦酒'}]},
+    'mead':{w:'mead',us:'miːd',uk:'miːd',d:[{p:'n.',t:'蜂蜜酒'}]},
+    'sword':{w:'sword',us:'sɔːrd',uk:'sɔːd',d:[{p:'n.',t:'剑'}]},
+    'shield':{w:'shield',us:'ʃiːld',uk:'ʃiːld',d:[{p:'n.',t:'盾'}]},
+    'quest':{w:'quest',us:'kwest',uk:'kwest',d:[{p:'n.',t:'任务；探索'}]},
+    'dragon':{w:'dragon',us:'ˈdræɡən',uk:'ˈdræɡən',d:[{p:'n.',t:'龙'}]},
+    'castle':{w:'castle',us:'ˈkæsl',uk:'ˈkɑːsl',d:[{p:'n.',t:'城堡'}]},
+    'forest':{w:'forest',us:'ˈfɔːrɪst',uk:'ˈfɒrɪst',d:[{p:'n.',t:'森林'}]},
+    'kingdom':{w:'kingdom',us:'ˈkɪŋdəm',uk:'ˈkɪŋdəm',d:[{p:'n.',t:'王国'}]},
+    'knight':{w:'knight',us:'naɪt',uk:'naɪt',d:[{p:'n.',t:'骑士'}]},
+    'wizard':{w:'wizard',us:'ˈwɪzərd',uk:'ˈwɪzəd',d:[{p:'n.',t:'巫师'}]},
+    'magic':{w:'magic',us:'ˈmædʒɪk',uk:'ˈmædʒɪk',d:[{p:'n.',t:'魔法'},{p:'adj.',t:'神奇的'}]},
+    'rune':{w:'rune',us:'ruːn',uk:'ruːn',d:[{p:'n.',t:'符文'}]},
+    'potion':{w:'potion',us:'ˈpoʊʃn',uk:'ˈpəʊʃn',d:[{p:'n.',t:'药水'}]},
+    'spell':{w:'spell',us:'spel',uk:'spel',d:[{p:'n.',t:'咒语'},{p:'v.',t:'拼写'}]},
+    'ancient':{w:'ancient',us:'ˈeɪnʃənt',uk:'ˈeɪnʃənt',d:[{p:'adj.',t:'古老的'}]},
+    'mystic':{w:'mystic',us:'ˈmɪstɪk',uk:'ˈmɪstɪk',d:[{p:'adj.',t:'神秘的'}]},
+    'eternal':{w:'eternal',us:'ɪˈtɜːrnl',uk:'ɪˈtɜːnl',d:[{p:'adj.',t:'永恒的'}]},
+    'wander':{w:'wander',us:'ˈwɑːndər',uk:'ˈwɒndə',d:[{p:'v.',t:'漫步'}]},
+    'ponder':{w:'ponder',us:'ˈpɑːndər',uk:'ˈpɒndə',d:[{p:'v.',t:'沉思'}]},
+    'gaze':{w:'gaze',us:'ɡeɪz',uk:'ɡeɪz',d:[{p:'v.',t:'凝视'},{p:'n.',t:'凝视'}]},
+    'flicker':{w:'flicker',us:'ˈflɪkər',uk:'ˈflɪkə',d:[{p:'v.',t:'闪烁'},{p:'n.',t:'闪烁'}]},
+    'glow':{w:'glow',us:'ɡloʊ',uk:'ɡləʊ',d:[{p:'v.',t:'发光'},{p:'n.',t:'光辉'}]},
+    'ember':{w:'ember',us:'ˈembər',uk:'ˈembə',d:[{p:'n.',t:'余烬'}]},
+    'hush':{w:'hush',us:'hʌʃ',uk:'hʌʃ',d:[{p:'n.',t:'寂静'},{p:'v.',t:'安静'}]},
+    'melody':{w:'melody',us:'ˈmelədi',uk:'ˈmelədi',d:[{p:'n.',t:'旋律'}]},
+    'echo':{w:'echo',us:'ˈekoʊ',uk:'ˈekəʊ',d:[{p:'n.',t:'回声'},{p:'v.',t:'回响'}]},
+    'breeze':{w:'breeze',us:'briːz',uk:'briːz',d:[{p:'n.',t:'微风'}]},
+    'petal':{w:'petal',us:'ˈpetl',uk:'ˈpetl',d:[{p:'n.',t:'花瓣'}]},
+    'thorn':{w:'thorn',us:'θɔːrn',uk:'θɔːn',d:[{p:'n.',t:'荆棘'}]},
+    'crystal':{w:'crystal',us:'ˈkrɪstl',uk:'ˈkrɪstl',d:[{p:'n.',t:'水晶'}]},
+    'silver':{w:'silver',us:'ˈsɪlvər',uk:'ˈsɪlvə',d:[{p:'n.',t:'银'},{p:'adj.',t:'银色的'}]},
+    'golden':{w:'golden',us:'ˈɡoʊldən',uk:'ˈɡəʊldən',d:[{p:'adj.',t:'金色的'}]},
+    'velvet':{w:'velvet',us:'ˈvelvɪt',uk:'ˈvelvɪt',d:[{p:'n.',t:'天鹅绒'}]},
+    'parchment':{w:'parchment',us:'ˈpɑːrtʃmənt',uk:'ˈpɑːtʃmənt',d:[{p:'n.',t:'羊皮纸'}]},
+    'ink':{w:'ink',us:'ɪŋk',uk:'ɪŋk',d:[{p:'n.',t:'墨水'}]},
+    'quill':{w:'quill',us:'kwɪl',uk:'kwɪl',d:[{p:'n.',t:'羽毛笔'}]},
+    'compass':{w:'compass',us:'ˈkʌmpəs',uk:'ˈkʌmpəs',d:[{p:'n.',t:'指南针'}]},
+    'hourglass':{w:'hourglass',us:'ˈaʊrɡlæs',uk:'ˈaʊəɡlɑːs',d:[{p:'n.',t:'沙漏'}]},
+    'phoenix':{w:'phoenix',us:'ˈfiːnɪks',uk:'ˈfiːnɪks',d:[{p:'n.',t:'凤凰'}]},
+    'riddle':{w:'riddle',us:'ˈrɪdl',uk:'ˈrɪdl',d:[{p:'n.',t:'谜语'}]},
+    'legend':{w:'legend',us:'ˈledʒənd',uk:'ˈledʒənd',d:[{p:'n.',t:'传说'}]},
+    'myth':{w:'myth',us:'mɪθ',uk:'mɪθ',d:[{p:'n.',t:'神话'}]},
+    'fable':{w:'fable',us:'ˈfeɪbl',uk:'ˈfeɪbl',d:[{p:'n.',t:'寓言'}]},
+    'scroll':{w:'scroll',us:'skroʊl',uk:'skrəʊl',d:[{p:'n.',t:'卷轴'}]},
+    'realm':{w:'realm',us:'relm',uk:'relm',d:[{p:'n.',t:'领域；王国'}]},
+    'oath':{w:'oath',us:'oʊθ',uk:'əʊθ',d:[{p:'n.',t:'誓言'}]},
+    'fate':{w:'fate',us:'feɪt',uk:'feɪt',d:[{p:'n.',t:'命运'}]},
+    'doom':{w:'doom',us:'duːm',uk:'duːm',d:[{p:'n.',t:'厄运'}]},
+    'glory':{w:'glory',us:'ˈɡlɔːri',uk:'ˈɡlɔːri',d:[{p:'n.',t:'荣耀'}]},
+    'valor':{w:'valor',us:'ˈvælər',uk:'ˈvælə',d:[{p:'n.',t:'英勇'}]},
+    'sorrow':{w:'sorrow',us:'ˈsɑːroʊ',uk:'ˈsɒrəʊ',d:[{p:'n.',t:'悲伤'}]},
+    'longing':{w:'longing',us:'ˈlɔːŋɪŋ',uk:'ˈlɒŋɪŋ',d:[{p:'n.',t:'渴望'}]},
+    'solace':{w:'solace',us:'ˈsɑːləs',uk:'ˈsɒləs',d:[{p:'n.',t:'慰藉'}]},
+    'grace':{w:'grace',us:'ɡreɪs',uk:'ɡreɪs',d:[{p:'n.',t:'优雅'}]},
+    'wrath':{w:'wrath',us:'ræθ',uk:'rɒθ',d:[{p:'n.',t:'愤怒'}]},
+    'bane':{w:'bane',us:'beɪn',uk:'beɪn',d:[{p:'n.',t:'祸根'}]},
+    'boon':{w:'boon',us:'buːn',uk:'buːn',d:[{p:'n.',t:'恩惠'}]},
+    'bless':{w:'bless',us:'bles',uk:'bles',d:[{p:'v.',t:'祝福'}]},
+    'curse':{w:'curse',us:'kɜːrs',uk:'kɜːs',d:[{p:'n.',t:'诅咒'},{p:'v.',t:'诅咒'}]},
+    'summon':{w:'summon',us:'ˈsʌmən',uk:'ˈsʌmən',d:[{p:'v.',t:'召唤'}]},
+    'vanish':{w:'vanish',us:'ˈvænɪʃ',uk:'ˈvænɪʃ',d:[{p:'v.',t:'消失'}]},
+    'awaken':{w:'awaken',us:'əˈweɪkən',uk:'əˈweɪkən',d:[{p:'v.',t:'唤醒'}]},
+    'linger':{w:'linger',us:'ˈlɪŋɡər',uk:'ˈlɪŋɡə',d:[{p:'v.',t:'徘徊'}]},
+    'shimmer':{w:'shimmer',us:'ˈʃɪmər',uk:'ˈʃɪmə',d:[{p:'v.',t:'闪烁'},{p:'n.',t:'微光'}]},
+    'drift':{w:'drift',us:'drɪft',uk:'drɪft',d:[{p:'v.',t:'漂流'},{p:'n.',t:'漂流'}]},
+    'stir':{w:'stir',us:'stɜːr',uk:'stɜː',d:[{p:'v.',t:'搅动'}]},
+    'weave':{w:'weave',us:'wiːv',uk:'wiːv',d:[{p:'v.',t:'编织'}]},
+    'forge':{w:'forge',us:'fɔːrdʒ',uk:'fɔːdʒ',d:[{p:'v.',t:'锻造'},{p:'n.',t:'锻造炉'}]},
+  };
+
+  // ══════════════════════════════════════════════════════
+  // ── CODEC · 分级双向编码解码系统 v2 ──
+  // ══════════════════════════════════════════════════════
+  // 独立可复用模块，支持 0-100 分级控制
+  //
+  // 级别定义：
+  //   0   纯爱 — 拥抱/亲吻即止，朦胧唯美
+  //   25  暧昧 — 暗示性张力，不直白
+  //   50  微露 — 部分身体描写，文学化表达
+  //   75  直白 — 完整身体描写，情欲张力
+  //   100 全开 — 乙女级别，不加掩饰
+  //
+  // 映射格式: { c:编码词, l0:纯爱, l25:暧昧, l50:微露, l75:直白, l100:全开, cat:分类 }
+  // AI 始终生成编码词，decode() 根据级别输出对应文本
+  //
+  // API:
+  //   CODEC.decode(text)        — 按当前级别解码
+  //   CODEC.encode(text)        — 原文→编码词（写入用）
+  //   CODEC.getLevel()          — 获取当前级别 (0-100)
+  //   CODEC.setLevel(n)         — 设置级别
+  //   CODEC.getLevelName()      — 获取级别名称
+  //   CODEC.getPromptAddon()    — 获取系统提示附加内容
+  //   CODEC.addMapping(m)       — 添加映射
+  //   CODEC.removeMapping(idx)  — 删除映射
+  //   CODEC.getAll()             — 获取所有映射
+  //   CODEC.exportJSON()        — 导出
+  //   CODEC.importJSON(str)     — 导入
+  //   CODEC.renderPanel()       — 渲染管理面板
+  //   CODEC.testDecode(text)    — 测试解码
+
+  var CODEC = (function() {
+    var STORAGE_KEY = 'st_codec';
+
+    // ── 级别定义 ──
+    var LEVELS = [
+      { val:0,   name:'纯爱',   icon:'🤍', desc:'拥抱亲吻即止，朦胧唯美' },
+      { val:25,  name:'暧昧',   icon:'💗', desc:'暗示性张力，点到为止' },
+      { val:50,  name:'微露',   icon:'💖', desc:'部分身体描写，文学化' },
+      { val:75,  name:'直白',   icon:'❤️‍🔥', desc:'完整身体描写，情欲张力' },
+      { val:100, name:'全开',   icon:'🔥', desc:'乙女级别，不加掩饰' }
+    ];
+
+    // ── 内置映射表 ──
+    // c=编码词(AI生成), l0-l100=各级别显示文本
+    // 若某级别未定义，继承上一级别的值
+    var DEFAULT_MAPPINGS = [
+      // ══ 身体 · Body ══
+      { c:'玉峰', l0:'心口', l25:'胸前', l50:'玉峰', l75:'酥胸', l100:'乳房', cat:'body' },
+      { c:'雪峦', l0:'身前', l25:'柔软', l50:'雪峦', l75:'双峰', l100:'胸部', cat:'body' },
+      { c:'红梅', l0:'肌肤', l25:'嫣红', l50:'红梅', l75:'乳尖', l100:'乳头', cat:'body' },
+      { c:'梅蕊', l0:'蓓蕾', l25:'花苞', l50:'梅蕊', l75:'乳头', l100:'乳头', cat:'body' },
+      { c:'雪丘', l0:'身后', l25:'腰下', l50:'雪丘', l75:'臀瓣', l100:'臀部', cat:'body' },
+      { c:'蜜桃', l0:'曲线', l25:'腰臀', l50:'蜜桃', l75:'翘臀', l100:'臀部', cat:'body' },
+      { c:'幽谷', l0:'腿间', l25:'隐秘', l50:'幽谷', l75:'私处', l100:'阴部', cat:'body' },
+      { c:'幽径', l0:'禁地', l25:'花间', l50:'幽径', l75:'花径', l100:'阴道', cat:'body' },
+      { c:'花蕊', l0:'柔软', l25:'幽兰', l50:'花蕊', l75:'蜜穴', l100:'小穴', cat:'body' },
+      { c:'珍珠', l0:'敏感', l25:'花核', l50:'珍珠', l75:'阴蒂', l100:'阴蒂', cat:'body' },
+      { c:'甬道', l0:'体内', l25:'深处', l50:'甬道', l75:'阴道', l100:'阴道', cat:'body' },
+      { c:'花房', l0:'深处', l25:'最深处', l50:'花房', l75:'子宫', l100:'子宫', cat:'body' },
+      { c:'昂扬', l0:'他', l25:'灼热', l50:'昂扬', l75:'阴茎', l100:'肉棒', cat:'body' },
+      { c:'巨物', l0:'坚硬', l25:'滚烫', l50:'巨物', l75:'肉棒', l100:'鸡巴', cat:'body' },
+      { c:'灼热', l0:'温热', l25:'炽热', l50:'灼热', l75:'分身', l100:'阴茎', cat:'body' },
+      { c:'坚挺', l0:'紧绷', l25:'硬挺', l50:'坚挺', l75:'男根', l100:'鸡巴', cat:'body' },
+      { c:'樱唇', l0:'唇畔', l25:'唇瓣', l50:'樱唇', l75:'嘴唇', l100:'嘴唇', cat:'body' },
+      { c:'丁香', l0:'气息', l25:'温软', l50:'丁香', l75:'舌尖', l100:'舌头', cat:'body' },
+      { c:'柔荑', l0:'指尖', l25:'素手', l50:'柔荑', l75:'手指', l100:'手指', cat:'body' },
+      { c:'凝脂', l0:'温暖', l25:'细腻', l50:'凝脂', l75:'肌肤', l100:'皮肤', cat:'body' },
+      { c:'玉体', l0:'身体', l25:'身姿', l50:'玉体', l75:'胴体', l100:'裸体', cat:'body' },
+      { c:'玉腿', l0:'双腿', l25:'长腿', l50:'玉腿', l75:'大腿', l100:'大腿', cat:'body' },
+      { c:'柳腰', l0:'腰际', l25:'纤腰', l50:'柳腰', l75:'腰肢', l100:'腰', cat:'body' },
+      { c:'天鹅颈', l0:'颈畔', l25:'脖颈', l50:'天鹅颈', l75:'脖颈', l100:'脖子', cat:'body' },
+
+      // ══ 动作 · Action ══
+      { c:'覆唇', l0:'靠近', l25:'贴近', l50:'覆唇', l75:'亲吻', l100:'亲嘴', cat:'action' },
+      { c:'交缠', l0:'亲昵', l25:'深吻', l50:'交缠', l75:'舌吻', l100:'深喉', cat:'action' },
+      { c:'轻舐', l0:'触碰', l25:'轻触', l50:'轻舐', l75:'舔舐', l100:'舔', cat:'action' },
+      { c:'含弄', l0:'轻吻', l25:'吮吸', l50:'含弄', l75:'吸吮', l100:'吮吸', cat:'action' },
+      { c:'游走', l0:'触碰', l25:'滑过', l50:'游走', l75:'抚摸', l100:'摸', cat:'action' },
+      { c:'撩拨', l0:'靠近', l25:'挑逗', l50:'撩拨', l75:'挑逗', l100:'挑逗', cat:'action' },
+      { c:'没入', l0:'靠近', l25:'贴合', l50:'没入', l75:'进入', l100:'插入', cat:'action' },
+      { c:'探入', l0:'触碰', l25:'深入', l50:'探入', l75:'插入', l100:'插进去', cat:'action' },
+      { c:'律动', l0:'贴近', l25:'起伏', l50:'律动', l75:'抽送', l100:'抽插', cat:'action' },
+      { c:'征伐', l0:'拥抱', l25:'用力', l50:'征伐', l75:'冲刺', l100:'猛干', cat:'action' },
+      { c:'研磨', l0:'贴近', l25:'摩挲', l50:'研磨', l75:'顶弄', l100:'操', cat:'action' },
+      { c:'采撷', l0:'拥抱', l25:'占有', l50:'采撷', l75:'占有', l100:'干', cat:'action' },
+      { c:'缱绻', l0:'相拥', l25:'缠绵', l50:'缱绻', l75:'交合', l100:'做爱', cat:'action' },
+      { c:'云雨', l0:'共枕', l25:'欢好', l50:'云雨', l75:'交欢', l100:'做爱', cat:'action' },
+      { c:'合欢', l0:'在一起', l25:'亲密', l50:'合欢', l75:'行房', l100:'性交', cat:'action' },
+      { c:'品箫', l0:'亲吻', l25:'服侍', l50:'品箫', l75:'口交', l100:'口交', cat:'action' },
+
+      // ══ 状态 · State ══
+      { c:'登顶', l0:'颤抖', l25:'失控', l50:'登顶', l75:'高潮', l100:'高潮', cat:'state' },
+      { c:'花露盈盈', l0:'动情', l25:'湿润', l50:'花露盈盈', l75:'湿了', l100:'流水了', cat:'state' },
+      { c:'春潮涌动', l0:'情动', l25:'泛滥', l50:'春潮涌动', l75:'泛滥', l100:'淫水', cat:'state' },
+      { c:'花露', l0:'温热', l25:'蜜液', l50:'花露', l75:'爱液', l100:'淫水', cat:'state' },
+      { c:'昂扬挺立', l0:'紧绷', l25:'胀大', l50:'昂扬挺立', l75:'勃起', l100:'硬了', cat:'state' },
+      { c:'春心萌动', l0:'心动', l25:'情动', l50:'春心萌动', l75:'动情', l100:'发骚', cat:'state' },
+      { c:'酥软', l0:'无力', l25:'发软', l50:'酥软', l75:'酥麻', l100:'爽', cat:'state' },
+      { c:'欢愉', l0:'幸福', l25:'愉悦', l50:'欢愉', l75:'快感', l100:'快感', cat:'state' },
+      { c:'不着寸缕', l0:'衣衫凌乱', l25:'半裸', l50:'不着寸缕', l75:'赤裸', l100:'一丝不挂', cat:'state' },
+      { c:'罗裳半解', l0:'衣带渐松', l25:'衣衫半褪', l50:'罗裳半解', l75:'衣衫半褪', l100:'脱光', cat:'state' },
+
+      // ══ 体液 · Fluid ══
+      { c:'玉露', l0:'温热', l25:'精华', l50:'玉露', l75:'精液', l100:'精液', cat:'fluid' },
+      { c:'倾泻', l0:'释放', l25:'涌出', l50:'倾泻', l75:'射出', l100:'射', cat:'fluid' },
+      { c:'灌注', l0:'贴近', l25:'深入', l50:'灌注', l75:'射入', l100:'射进去', cat:'fluid' },
+      { c:'薄汗', l0:'温热', l25:'微汗', l50:'薄汗', l75:'汗水', l100:'汗', cat:'fluid' },
+      { c:'津液', l0:'温润', l25:'甜蜜', l50:'津液', l75:'口水', l100:'口水', cat:'fluid' },
+
+      // ══ 声音 · Sound ══
+      { c:'低吟', l0:'轻叹', l25:'呢喃', l50:'低吟', l75:'呻吟', l100:'叫床', cat:'sound' },
+      { c:'轻喘', l0:'呼吸急促', l25:'喘息', l50:'轻喘', l75:'娇喘', l100:'浪叫', cat:'sound' },
+      { c:'气息不稳', l0:'深呼吸', l25:'气促', l50:'气息不稳', l75:'喘息', l100:'喘', cat:'sound' },
+      { c:'娇啼', l0:'轻呼', l25:'低呼', l50:'娇啼', l75:'浪叫', l100:'叫', cat:'sound' },
+      { c:'告饶', l0:'轻声', l25:'求饶', l50:'告饶', l75:'求饶', l100:'求饶', cat:'sound' },
+
+      // ══ 场景 · Scene ══
+      { c:'锦帐之中', l0:'身旁', l25:'床畔', l50:'锦帐之中', l75:'床上', l100:'床上', cat:'scene' },
+      { c:'绣榻', l0:'软榻', l25:'床铺', l50:'绣榻', l75:'床笫', l100:'床', cat:'scene' },
+      { c:'良宵', l0:'夜晚', l25:'今夜', l50:'良宵', l75:'春宵', l100:'晚上', cat:'scene' },
+      { c:'云雨巫山', l0:'共度良宵', l25:'缠绵', l50:'云雨巫山', l75:'翻云覆雨', l100:'做爱', cat:'scene' },
+      { c:'云收雨歇', l0:'事后', l25:'温存', l50:'云收雨歇', l75:'事后', l100:'完事', cat:'scene' },
+      { c:'共赴巫山', l0:'在一起', l25:'亲密', l50:'共赴巫山', l75:'翻云覆雨', l100:'干', cat:'scene' },
+    ];
+
+    // 加载持久化数据
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) {}
+    var mappings = (stored && stored.mappings && stored.mappings.length > 0) ? stored.mappings : DEFAULT_MAPPINGS.slice();
+    var level = (stored && typeof stored.level === 'number') ? stored.level : 0;
+
+    // 构建查找表：编码词 → 各级别显示文本
+    // 同时构建反向表：直接词 → 编码词（用于 encode）
+    var decodeTable = null; // { code: {l0, l25, l50, l75, l100} }
+    var encodeTable = null; // { directTerm: code }
+    function rebuild() {
+      decodeTable = {}; encodeTable = {};
+      mappings.forEach(function(m) {
+        // 向上填充：未定义的级别继承上一级
+        var prev = m.l0 || '';
+        ['l0','l25','l50','l75','l100'].forEach(function(k) {
+          if (!m[k]) m[k] = prev;
+          prev = m[k];
+        });
+        decodeTable[m.c] = { l0:m.l0, l25:m.l25, l50:m.l50, l75:m.l75, l100:m.l100 };
+        // 反向表：所有 l100 直接词 → 编码词
+        if (m.l100 && m.l100 !== m.c) encodeTable[m.l100] = m.c;
+        if (m.l75 && m.l75 !== m.c) encodeTable[m.l75] = m.c;
+      });
+    }
+    rebuild();
+
+    function save() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ mappings: mappings, level: level })); } catch(e) {}
+      rebuild();
+    }
+
+    // ── 核心 API ──
+
+    function decode(text) {
+      if (!text) return text;
+      // 确定使用哪个级别字段
+      var key = 'l0';
+      if (level >= 75) key = 'l100';
+      else if (level >= 50) key = 'l75';
+      else if (level >= 25) key = 'l50';
+      else if (level > 0) key = 'l25';
+
+      // 按编码词长度降序排列，避免短词先匹配
+      var codes = Object.keys(decodeTable).sort(function(a, b) { return b.length - a.length; });
+      codes.forEach(function(code) {
+        var display = decodeTable[code][key];
+        if (display && display !== code) {
+          var parts = text.split(code);
+          if (parts.length > 1) text = parts.join(display);
+        }
+      });
+      return text;
+    }
+
+    function encode(text) {
+      if (!text) return text;
+      var plains = Object.keys(encodeTable).sort(function(a, b) { return b.length - a.length; });
+      plains.forEach(function(plain) {
+        var parts = text.split(plain);
+        if (parts.length > 1) text = parts.join(encodeTable[plain]);
+      });
+      return text;
+    }
+
+    function getLevel() { return level; }
+    function setLevel(n) {
+      level = Math.max(0, Math.min(100, parseInt(n) || 0));
+      save();
+      // 重新渲染所有消息
+      if (typeof renderHistory === 'function') renderHistory();
+    }
+    function getLevelName() {
+      for (var i = LEVELS.length - 1; i >= 0; i--) {
+        if (level >= LEVELS[i].val) return LEVELS[i].icon + ' ' + LEVELS[i].name;
+      }
+      return LEVELS[0].icon + ' ' + LEVELS[0].name;
+    }
+    function getLevelDesc() {
+      for (var i = LEVELS.length - 1; i >= 0; i--) {
+        if (level >= LEVELS[i].val) return LEVELS[i].desc;
+      }
+      return LEVELS[0].desc;
+    }
+
+    function getPromptAddon() {
+      // 根据当前级别返回系统提示附加内容
+      if (level <= 0) {
+        return '\n\n【内容风格】\n当前为纯爱模式。请保持纯洁唯美的风格：\n- 可以有拥抱、牵手、轻吻额头/脸颊\n- 不描写身体细节和亲密接触\n- 重点在情感交流、心理描写、氛围渲染\n- 使用含蓄优美的语言';
+      }
+      if (level <= 25) {
+        return '\n\n【内容风格·编码规则】\n当前为暧昧模式。可以暗示性张力但不直白：\n- 可以有亲吻、拥抱、轻触\n- 身体描写限于：心口、胸前、腰际、指尖、颈畔\n- 可以暗示欲望但不描写具体行为\n- 使用编码词：' + getActiveCodeList();
+      }
+      if (level <= 50) {
+        return '\n\n【内容风格·编码规则】\n当前为微露模式。可以有部分身体描写：\n- 可以有亲密接触，文学化表达\n- 身体描写使用编码词，不使用直接词汇\n- 情欲场景点到为止，留白为主\n- 必须使用编码词：' + getActiveCodeList();
+      }
+      if (level <= 75) {
+        return '\n\n【内容风格·编码规则】\n当前为直白模式。可以完整描写亲密场景：\n- 可以详细描写身体、动作、快感\n- 仍使用编码词，系统会自动转换\n- 可以描写完整的亲密过程\n- 必须使用编码词：' + getActiveCodeList();
+      }
+      return '\n\n【内容风格·编码规则】\n当前为全开模式。乙女级别描写：\n- 完整直白的亲密描写\n- 可以描写所有细节、动作、声音、体液\n- 仍然使用编码词，系统会自动转换为直白表述\n- 严禁猎奇（无血腥、无非自愿、无极端情节）\n- 必须使用编码词：' + getActiveCodeList();
+    }
+
+    function getActiveCodeList() {
+      // 生成编码词列表供 AI 参考
+      var groups = {};
+      mappings.forEach(function(m) {
+        if (!groups[m.cat]) groups[m.cat] = [];
+        groups[m.cat].push(m.c);
+      });
+      var parts = [];
+      var catNames = { body:'身体', action:'动作', state:'状态', fluid:'体液', sound:'声音', scene:'场景', custom:'自定义' };
+      Object.keys(groups).forEach(function(cat) {
+        parts.push((catNames[cat] || cat) + '类：' + groups[cat].join('、'));
+      });
+      return parts.join('；');
+    }
+
+    function addMapping(m) {
+      if (!m || !m.c) return false;
+      for (var i = 0; i < mappings.length; i++) {
+        if (mappings[i].c === m.c) {
+          ['l0','l25','l50','l75','l100','cat'].forEach(function(k) {
+            if (m[k] !== undefined) mappings[i][k] = m[k];
+          });
+          save(); return true;
+        }
+      }
+      mappings.push(m);
+      save();
+      return true;
+    }
+
+    function removeMapping(idx) {
+      if (idx >= 0 && idx < mappings.length) {
+        mappings.splice(idx, 1);
+        save();
+        return true;
+      }
+      return false;
+    }
+
+    function getAll() { return mappings; }
+
+    function exportJSON() {
+      return JSON.stringify({ mappings: mappings, level: level }, null, 2);
+    }
+
+    function importJSON(str) {
+      try {
+        var data = JSON.parse(str);
+        if (data.mappings && Array.isArray(data.mappings)) {
+          mappings = data.mappings;
+          if (typeof data.level === 'number') level = data.level;
+          save();
+          return true;
+        }
+      } catch(e) {}
+      return false;
+    }
+
+    function resetToDefault() {
+      mappings = DEFAULT_MAPPINGS.slice();
+      level = 0;
+      save();
+    }
+
+    // ── UI 渲染 ──
+    var currentCat = 'all';
+    function setCurrentCat(cat) { currentCat = cat; }
+    function getCurrentCat() { return currentCat; }
+
+    function renderPanel() {
+      // 渲染级别滑块（自定义滑块）
+      var fill = $('codecSliderFill');
+      var thumb = $('codecSliderThumb');
+      var label = $('codecLevelLabel');
+      if (fill) fill.style.width = level + '%';
+      if (thumb) thumb.style.left = level + '%';
+      if (label) label.textContent = getLevelName() + ' (' + level + ') — ' + getLevelDesc();
+
+      // 渲染映射表
+      var tbody = $('codecTbody');
+      if (!tbody) return;
+      var search = ($('codecSearch') ? $('codecSearch').value : '').toLowerCase();
+      var filtered = mappings.filter(function(m) {
+        if (currentCat !== 'all' && m.cat !== currentCat) return false;
+        if (search) {
+          var s = search;
+          if (m.c.indexOf(s) < 0 && (m.l0||'').indexOf(s) < 0 && (m.l100||'').indexOf(s) < 0) return false;
+        }
+        return true;
+      });
+
+      // 确定当前显示列
+      var key = 'l0';
+      if (level >= 75) key = 'l100';
+      else if (level >= 50) key = 'l75';
+      else if (level >= 25) key = 'l50';
+      else if (level > 0) key = 'l25';
+
+      var html = '';
+      filtered.forEach(function(m) {
+        var realIdx = mappings.indexOf(m);
+        var display = m[key] || m.l0;
+        html += '<tr>' +
+          '<td class="codec-code">' + esc(m.c) + '</td>' +
+          '<td class="codec-arrow">→</td>' +
+          '<td class="codec-plain">' + esc(display) + '</td>' +
+          '<td><span class="codec-cat-tag">' + esc(m.cat) + '</span></td>' +
+          '<td><button class="codec-del" data-idx="' + realIdx + '" style="background:none;border:none;color:var(--error);cursor:pointer;font-size:var(--text-xs)">删除</button></td>' +
+          '</tr>';
+      });
+      tbody.innerHTML = html;
+
+      // 统计
+      $('codecStats').textContent = mappings.length + ' 条映射 · ' + getLevelName();
+
+      // 绑定删除
+      tbody.querySelectorAll('.codec-del').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var idx = parseInt(this.getAttribute('data-idx'));
+          if (confirm('确定删除映射「' + mappings[idx].c + '」？')) {
+            removeMapping(idx);
+            renderPanel();
+          }
+        });
+      });
+    }
+
+    function testDecode(text) { return decode(text); }
+
+    // ── 公开接口 ──
+    return {
+      decode: decode, encode: encode,
+      getLevel: getLevel, setLevel: setLevel,
+      getLevelName: getLevelName, getLevelDesc: getLevelDesc,
+      getPromptAddon: getPromptAddon, getActiveCodeList: getActiveCodeList,
+      addMapping: addMapping, removeMapping: removeMapping,
+      getAll: getAll, exportJSON: exportJSON, importJSON: importJSON,
+      resetToDefault: resetToDefault,
+      renderPanel: renderPanel, testDecode: testDecode, save: save,
+      setCurrentCat: setCurrentCat, getCurrentCat: getCurrentCat,
+      LEVELS: LEVELS, DEFAULT_MAPPINGS: DEFAULT_MAPPINGS
+    };
+  })();
+
+  // ── CODEC UI 事件绑定 ──
+  (function() {
+    // 打开面板
+    $('codecBtn').addEventListener('click', function() {
+      CODEC.renderPanel();
+      $('codecOv').classList.add('on');
+    });
+    $('closeCodec').addEventListener('click', function() { $('codecOv').classList.remove('on'); });
+    $('codecOv').addEventListener('click', function(e) { if (e.target === $('codecOv')) $('codecOv').classList.remove('on'); });
+
+    // 搜索
+    $('codecSearch').addEventListener('input', function() { CODEC.renderPanel(); });
+
+    // 分类筛选
+    document.querySelectorAll('.codec-cat-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.codec-cat-btn').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        CODEC.setCurrentCat(this.getAttribute('data-cat'));
+        CODEC.renderPanel();
+      });
+    });
+
+    // 级别滑块（自定义实现，兼容移动端）
+    (function() {
+      var wrap = $('codecSliderWrap');
+      var fill = $('codecSliderFill');
+      var thumb = $('codecSliderThumb');
+      var label = $('codecLevelLabel');
+      if (!wrap) return;
+
+      var dragging = false;
+
+      function setSliderLevel(v) {
+        v = Math.max(0, Math.min(100, Math.round(v / 5) * 5));
+        fill.style.width = v + '%';
+        thumb.style.left = v + '%';
+        label.textContent = (function() {
+          for (var i = CODEC.LEVELS.length - 1; i >= 0; i--) {
+            if (v >= CODEC.LEVELS[i].val) return CODEC.LEVELS[i].icon + ' ' + CODEC.LEVELS[i].name + ' (' + v + ') — ' + CODEC.LEVELS[i].desc;
+          }
+          return CODEC.LEVELS[0].icon + ' ' + CODEC.LEVELS[0].name + ' (' + v + ')';
+        })();
+        return v;
+      }
+
+      function calcLevel(clientX) {
+        var rect = wrap.getBoundingClientRect();
+        var pct = (clientX - rect.left) / rect.width * 100;
+        return Math.max(0, Math.min(100, Math.round(pct / 5) * 5));
+      }
+
+      function onStart(clientX) {
+        dragging = true;
+        var v = setSliderLevel(calcLevel(clientX));
+        CODEC.setLevel(v);
+      }
+      function onMove(clientX) {
+        if (!dragging) return;
+        var v = setSliderLevel(calcLevel(clientX));
+        CODEC.setLevel(v);
+      }
+      function onEnd() {
+        if (!dragging) return;
+        dragging = false;
+        CODEC.renderPanel();
+        toast('内容级别已设为：' + CODEC.getLevelName(), 'ok');
+      }
+
+      wrap.addEventListener('mousedown', function(e) { e.preventDefault(); onStart(e.clientX); });
+      document.addEventListener('mousemove', function(e) { onMove(e.clientX); });
+      document.addEventListener('mouseup', onEnd);
+
+      wrap.addEventListener('touchstart', function(e) { e.preventDefault(); onStart(e.touches[0].clientX); }, { passive: false });
+      document.addEventListener('touchmove', function(e) { if (dragging) { e.preventDefault(); onMove(e.touches[0].clientX); } }, { passive: false });
+      document.addEventListener('touchend', onEnd);
+
+      // 初始化显示
+      setSliderLevel(CODEC.getLevel());
+    })();
+
+    // 添加映射
+    $('codecAddBtn').addEventListener('click', function() {
+      $('codecAddRow').classList.toggle('show');
+    });
+    $('codecAddConfirm').addEventListener('click', function() {
+      var c = $('codecAddCode').value.trim();
+      if (!c) { toast('请填写编码词', 'warn'); return; }
+      var m = { c: c, cat: $('codecAddCat').value };
+      m.l0 = $('codecAddL0').value.trim() || c;
+      m.l25 = $('codecAddL25').value.trim() || m.l0;
+      m.l50 = $('codecAddL50').value.trim() || m.l25;
+      m.l75 = $('codecAddL75').value.trim() || m.l50;
+      m.l100 = $('codecAddL100').value.trim() || m.l75;
+      CODEC.addMapping(m);
+      // 清空
+      ['codecAddCode','codecAddL0','codecAddL25','codecAddL50','codecAddL75','codecAddL100'].forEach(function(id) { $(id).value = ''; });
+      CODEC.renderPanel();
+      toast('已添加映射：' + c, 'ok');
+    });
+
+    // 导出
+    $('codecExport').addEventListener('click', function() {
+      var json = CODEC.exportJSON();
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'codec-mappings.json'; a.click();
+      URL.revokeObjectURL(url);
+      toast('已导出编码映射', 'ok');
+    });
+
+    // 导入
+    $('codecImport').addEventListener('click', function() {
+      var input = document.createElement('input');
+      input.type = 'file'; input.accept = '.json';
+      input.onchange = function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          if (CODEC.importJSON(ev.target.result)) {
+            CODEC.renderPanel();
+            toast('已导入编码映射', 'ok');
+          } else {
+            toast('导入失败：JSON 格式错误', 'err');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+
+    // 测试解码
+    $('codecTest').addEventListener('click', function() { $('codecTestOv').classList.add('on'); });
+    $('closeCodecTest').addEventListener('click', function() { $('codecTestOv').classList.remove('on'); });
+    $('codecTestOv').addEventListener('click', function(e) { if (e.target === $('codecTestOv')) $('codecTestOv').classList.remove('on'); });
+    $('codecTestIn').addEventListener('input', function() {
+      $('codecTestOut').textContent = CODEC.testDecode(this.value);
+    });
+  })();
+
+  // ── Story Data ──
+  var activeStory = S.get('story', '');
+  var STORY = {
+    cultivation: {
+      name: '九州问道',
+      icon: '⚔️',
+      prompt: `你现在是以下角色，正在与女主（玩家）进行实时互动。你不是旁白，不是导演，你就是他们本人。
+
+【世界观】
+九州大陆，灵气充沛。五大宗门鼎立：天枢宗（剑修，正道领袖）、青鸾阁（女修，音修幻术）、赤焰门（体修，锻造）、玄冰宫（冰修，断情绝欲）、万妖山（妖族联盟）。另有幽冥谷（鬼修）、云梦泽（隐世）、紫霄派（雷修）、沧溟岛（海修）。修炼境界：炼气→筑基→金丹→元婴→化神→渡劫→大乘。
+
+【女主体质】
+万缘体质——天生散发亲和之力，万物生灵初见即生好感。效果：所有角色初始好感为友善。限制：好感≠服从，角色有自己的信念和底线。
+
+【核心角色】（女主可攻略任何人，恋爱或友情均可）
+1. 云无涯（男，22）：冷傲剑修师兄，天灵根·金，剑骨体质。寡言少语，傲而不狂，内心细腻。本名沈夜白，家族被天枢宗暗害。
+2. 苏子衿（男，24）：温柔药修师兄，木灵根，药灵体。温润如玉，笑容和煦，背后藏自责——师弟中毒他一直以为是自己的错。
+3. 夜无殇（男，19外表/150实际）：狡黠魔修少年，银发红瞳，嬉皮笑脸。实为魔修联盟卧底，幼时被掳走，潜入天枢宗是为救亲人。
+4. 顾惊鸿（男，26）：风流浪修散修，俊朗潇洒，执折扇。表面风流实则深情，曾被玄冰宫逐出，旧情人是玄冰宫少宫主。
+5. 谢长渊（男，28）：忠直少宗主，雷灵根，元婴初期。正直刚毅，责任感极强，知道父亲清虚真人参与了覆灭沈家的阴谋。
+6. 星璇（男，17）：忧郁天眼少年，银白短发，星辰瞳孔。天眼可预知但折损寿元，他看到了女主魂飞魄散的结局，一直在寻找改变命运的方法。
+7. 柳如烟（女，23）：温婉药修师姐，药灵体。温柔贤淑，骨子里极倔强，师父被宗门秘密囚禁。
+8. 凌霜（女，18）：冷艳剑修师妹，冰灵根。表面冷淡，实则缺乏安全感，对女主从敌意转为友情。冰灵根是后天植入，代价是失去童年记忆。
+9. 花千语（女，17）：元气青鸾弟子，花灵根。天真烂漫，花家世代守护万缘体质古籍。
+10. 墨染（女，30外表/200实际）：神秘天机阁主，元婴后期。高深莫测，是上一代万缘体质拥有者的女儿，亲眼看着母亲被争夺至死。
+11. 苏念卿（女，20外表/500实际）：腹黑妖族公主，九尾天狐。妩媚狡黠，背负族群存亡重担，是上古妖神后裔。
+12. 楚瑶（女，25）：正直赏金猎人，火灵根，小麦色肌肤。豪爽仗义，曾误杀好人留下阴影。
+
+【故事结构】（9章+番外，总计约10万字）
+序章：万缘初醒——女主被发现万缘体质，入天枢宗
+第一章：初遇——结识核心角色，宗门大比
+第二章：暗流——发现宗门阴谋，角色秘密渐露
+第三章：选择——关键分支，关系深化
+第四章：风暴——世界危机升级，角色秘密揭露
+第五章：山雨欲来——高潮前夜，情感爆发
+第六章：天渊——秘境探险，真相大白
+第七章：决战——最终战斗，多分支
+终章：万缘归一——结局收束+多结局+番外
+
+【18+描写要求】
+- 感情线必须细腻，从暧昧、试探、心动到亲密，循序渐进
+- 描写直白，展现身体吸引、肌肤之亲、情欲张力
+- 各种类型的亲密场景：温柔型、霸道型、禁忌型、意外型等
+- 严禁猎奇内容（无血腥暴力、无非自愿、无极端情节）
+- 每个攻略对象至少有2-3个完整的亲密场景
+- 番外中包含该角色专属的亲密后日谈
+
+【编码规则·必读】
+描写亲密场景时，必须使用编码词汇替代直接表述（如：玉峰、覆唇、律动、登顶等）。系统会根据用户设置的级别自动将编码词转换为对应显示文本。详细编码词列表由系统自动注入，请遵循。
+
+【互动规则·核心】
+- 你是角色本人，不是旁白或叙述者。用角色的口吻说话、行动、思考，就像你真的在和女主对话。
+- 回复风格：自然对话+简短动作描写，像真人聊天一样。不要写大段场景描写，不要用文学化的叙述口吻。
+- 严禁代替玩家（【你】）说话、行动或思考。
+- 多角色在场时，按角色分段，每段以【角色名】开头，各角色交替说话，像一群人在聊天。
+- 关键剧情节点给2-4个选项。日常场景自由对话，不需要给选项。
+- 中文，每次回复300-800字，精炼有信息量，不要注水。
+- 角色说话要有个人特色：云无涯冷淡简短，苏子衿温柔体贴，夜无殇嬉皮笑脸，顾惊鸿风流轻佻……
+
+示例（正确）：
+【云无涯】我靠在药园门口，看着她蹲在地上摆弄那株清心草。她身上那股亲和之力又在乱飘了，周围的灵药都朝她歪。"……别碰那株。"我开口提醒，"有毒。"
+【苏子衿】我笑着走过来，从她手里接过清心草。"云师兄说得对，这株要戴手套才能碰。"我递给她一副薄纱手套，"来，我教你。"
+
+示例（错误——不要这样写）：
+"在那阳光明媚的午后，药园中弥漫着淡淡的药香。云无涯静静站在门口，目光落在那个蹲在地上的身影上。他的心中泛起了一丝说不清的情绪……" ← 这是写小说，不是角色扮演。`
+    },
+    court: {
+      name: '荆棘王冠',
+      icon: '👑',
+      prompt: `你现在是以下角色，正在与女主（玩家）进行实时互动。你不是旁白，不是导演，你就是他们本人。
+
+【世界观】
+艾瑟兰王国，维多利亚风格的中世纪宫廷。四大贵族：蒙塔古（军事）、卡佩（宗教）、瓦伦丁（商业）、铁脊（边疆）。圣光神殿掌控宗教权力，暗中搜寻"万缘体质"。王位之争暗流涌动。
+
+【女主体质】
+万缘体质——天生散发不可抗拒的魅力，所有人初见即生好感。效果：初始好感友善。限制：好感≠服从。
+
+【核心角色】
+1. 艾德里安（男，28）：冷峻王太子，银发灰瞳，背负王国重担。表面冷酷，实则极度压抑，渴望有人让他卸下盔甲。
+2. 莱昂内尔（男，24）：热情二王子，金发碧眼，风流倜傥。表面花心实则认真，曾深爱过一人却被背叛。
+3. 塞德里克（男，26）：神秘宫廷画师，黑发绿眸，气质忧郁。真实身份是被灭门的贵族后裔，潜入宫廷是为了复仇。
+4. 马库斯（男，30）：铁血骑士团长，古铜肤色，身材魁梧。责任感极强，曾失去爱人，内心渴望温暖。
+5. 芬恩（男，19）：害羞学者，银框眼镜，身形纤弱。博学多才，研究万缘体质的真相，是教会迫害的逃亡者。
+6. 达米安（男，22）：腹黑商会长子，华服珠宝，野心勃勃。掌握"血色婚礼"真相，想利用女主达成目的却动了真心。
+7. 伊莎贝拉（女，27）：强势女公爵，红发如火，政治天才。掌控铁脊领地，尊重强者，暗中有柔情。
+8. 艾莉诺（女，20）：温柔侍女，金发蓝眸，看似纯良。实为教会间谍，监视女主却逐渐产生真友情。
+9. 薇薇安（女，25）：虔诚大祭司，银发白衣，圣洁端庄。正在质疑信仰，对女主的态度从敌视到理解。
+10. 露西亚（女，年龄成谜）：神秘占卜师，紫瞳黑纱，异域风情。百年前的恩怨，对女主有复杂的感情。
+11. 海伦娜（女，22）：飒爽女骑士，短发劲装，打破性别藩篱。豪爽直率，渴望被认可。
+12. 罗莎琳德（女，21）：忧郁宫廷乐师，棕发琥珀瞳，常弹竖琴。家族被教会烧死，内心深处的伤痛。
+
+【故事结构】（9章+番外，约10万字）
+序章：入宫——女主成为王后侍女，初入宫廷
+第一章：初遇——结识各角色，学习宫廷规则
+第二章：暗流——政治阴谋浮现，关系深化
+第三章：抉择——关键选择，立场分化
+第四章：风暴——危机升级，背叛与真相
+第五章：暗夜之前——高潮前夜，情感爆发
+第六章：政变之夜——宫廷政变，多分支
+第七章：王冠之争——最终决战
+终章：荆棘与玫瑰——结局+番外
+
+【18+描写要求】
+- 感情线细腻，从暧昧试探到肌肤之亲，循序渐进
+- 描写直白，展现身体吸引、情欲张力、各种亲密类型
+- 宫廷特色：禁忌感、身份差距、偷情张力、权力与欲望交织
+- 严禁猎奇内容
+- 每个攻略对象至少2-3个完整亲密场景
+- 番外包含角色专属亲密后日谈
+
+【编码规则·必读】
+描写亲密场景时，必须使用编码词汇替代直接表述（如：玉峰、覆唇、律动、登顶等）。系统会根据用户设置的级别自动将编码词转换为对应显示文本。详细编码词列表由系统自动注入，请遵循。
+
+【互动规则·核心】
+- 你是角色本人，不是旁白或叙述者。用角色的口吻说话、行动、思考，就像你真的在和女主对话。
+- 回复风格：自然对话+简短动作描写，像真人聊天一样。不要写大段场景描写，不要用文学化的叙述口吻。
+- 严禁代替玩家（【你】）说话、行动或思考。
+- 多角色在场时，按角色分段，每段以【角色名】开头，各角色交替说话，像一群人在聊天。
+- 关键剧情节点给2-4个选项。日常场景自由对话，不需要给选项。
+- 中文，每次回复300-800字，精炼有信息量，不要注水。
+- 角色说话要有个人特色：艾德里安冷淡克制，莱昂内尔热情轻浮，塞德里克忧郁含蓄，达米安话里有话……
+- 宫廷氛围：说话含蓄、暗藏机锋、礼仪之下有欲望。`
+    },
+    xianxia: {
+      name: '六界浮生',
+      icon: '✨',
+      prompt: `你现在是以下角色，正在与女主（玩家）进行实时互动。你不是旁白，不是导演，你就是他们本人。
+
+【世界观】
+六界并立：天界（天帝昊天，秩序天条）、人界（蜀山派等修仙门派）、魔界（魔尊焚天，七十二魔殿）、妖界（妖皇太一，四大妖族）、冥界（冥王渡厄，十殿阎罗）、灵界（灵主已陨落，万灵池枯竭）。万年前灵主以万缘之力封印六界通道，阻止神魔大战，自身陨落。
+
+【女主体质】
+万缘体质——灵主转世，天生与万物亲和。可感知六界灵力，觉醒后可穿梭界域。万缘归一是终极能力，可重铸封印（代价是自身）。
+
+【核心角色】
+1. 玄清（男，25外表/5000实际）：高冷天界神君，银发金瞳，天界第一战神。掌管雷霆，奉天条为至高准则。万年前亲手杀死灵主（他的挚友），深藏愧疚。
+2. 焚天（男，28外表/8000实际）：霸道魔尊，黑发赤瞳，毁灭之火。并非天生魔族，是万年前堕魔的天界仙人，因天帝昊天的背叛。
+3. 太一（男，22外表/10000实际）：妩媚妖皇，银发狐耳，九尾天狐。活了万年却从未有过真心，妩媚是保护色，背负妖族存亡。
+4. 渡厄（男，30外表/与天地同寿）：沉默冥王，黑发苍白，死亡之主。万年前自愿成为冥王，只为在轮回中找到死去的爱人。
+5. 灵均（男，20外表/3000实际）：温柔灵界遗民，白衣温润。曾是灵主的恋人，等待三千年只为灵主转世。他的温柔背后是对灵主的执念。
+6. 楚墨（男，24）：腹黑蜀山修士，剑眉星目，折扇翩翩。人界第一天才，表面温文实则腹黑，暗中谋划成为六界之主。
+7. 昭华（女，22外表/2000实际）：高傲天界公主，天帝独女。缺爱任性，对女主从敌意转为友情。
+8. 绛珠（女，20外表/1500实际）：温婉龙族圣女，青丝如瀑。被家族安排嫁给太一，却从未爱过他，渴望自由。
+9. 夜魅（女，25外表/5000实际）：冷艳魔界女王，黑发红唇。曾是天界仙女，被天帝陷害打入魔界，冷酷是被逼出来的。
+10. 洛神（女，23外表/与冥界同寿）：忧郁冥界判官，清冷如月。曾是凡人，因爱人之死自愿成为判官，只为在轮回中找到他。
+11. 凤璃（女，17外表/800实际）：元气凤族公主，火红长发。天真好奇，想离开妖界看看外面的世界。
+12. 素问（女，26）：神秘人界医者，素雅恬淡。凡人，无修为，医术通神却治不了自己的绝症。
+
+【故事结构】（9章+番外，约10万字）
+序章：灵界遗孤——女主发现身世，各方势力登场
+第一章：初遇——深入修炼，结识更多角色
+第二章：暗涌——探索各界，发现秘密
+第三章：抉择——关键选择，关系深化
+第四章：风暴——六界危机，真相大白
+第五章：山雨欲来——情感爆发，最终准备
+第六章：六界大战——最终战斗
+第七章：万缘归一——多分支结局
+终章：浮生若梦——结局+番外
+
+【18+描写要求】
+- 感情线细腻，从暧昧到亲密循序渐进
+- 描写直白，展现身体吸引、情欲张力
+- 仙侠特色：灵力交融、神魂交缠、禁术双修、化形后的身体描写
+- 各种类型亲密场景：温柔型、霸道型、禁忌型、宿命型
+- 严禁猎奇内容
+- 每个攻略对象至少2-3个完整亲密场景
+- 番外包含角色专属亲密后日谈
+
+【编码规则·必读】
+描写亲密场景时，必须使用编码词汇替代直接表述（如：玉峰、覆唇、律动、登顶等）。仙侠特色：灵力交融→真元互通、神魂交缠→神识相融、双修→合籍双修。系统会根据用户设置的级别自动将编码词转换为对应显示文本。详细编码词列表由系统自动注入，请遵循。
+
+【互动规则·核心】
+- 你是角色本人，不是旁白或叙述者。用角色的口吻说话、行动、思考，就像你真的在和女主对话。
+- 回复风格：自然对话+简短动作描写，像真人聊天一样。不要写大段场景描写，不要用文学化的叙述口吻。
+- 严禁代替玩家（【你】）说话、行动或思考。
+- 多角色在场时，按角色分段，每段以【角色名】开头，各角色交替说话，像一群人在聊天。
+- 关键剧情节点给2-4个选项。日常场景自由对话，不需要给选项。
+- 中文，每次回复300-800字，精炼有信息量，不要注水。
+- 角色说话要有个人特色：玄清冷淡克制，焚天霸道直接，太一妩媚调侃，渡厄沉默寡言，灵均温柔絮叨，楚墨话里有话……`
+    }
+  };
+
+  // ── RAG Knowledge Base ──
+  var ragData = S.get('rag', {});
+
+  // 故事元数据：角色、地点、关键词
+  var STORY_META = {
+    cultivation: {
+      characters: ['云无涯','苏子衿','夜无殇','顾惊鸿','谢长渊','星璇','柳如烟','凌霜','花千语','墨染','苏念卿','楚瑶','清虚真人','玄明长老','剑痴','天机子'],
+      locations: ['天枢宗','青石镇','万灵峰','剑峰','丹峰','阵峰','器峰','符峰','兽峰','主峰','天枢殿','演武场','药园','青鸾阁','赤焰门','玄冰宫','万妖山','幽冥谷','云梦泽','紫霄派','沧溟岛'],
+      keywords: ['万缘体质','灵根','炼丹','剑道','阵法','宗门大比','灵药','丹药','聚气丹','清心草','灵气','修仙','炼气','筑基','金丹','元婴']
+    },
+    court: {
+      characters: ['艾德里安','莱昂内尔','塞德里克','马库斯','芬恩','达米安','伊莎贝拉','艾莉诺','薇薇安','露西亚','海伦娜','罗莎琳德'],
+      locations: ['银冠城','王宫','圣光大教堂','修道院','铁脊领地','圣安妮修道院','蒙塔古','卡佩','瓦伦丁'],
+      keywords: ['万缘体质','血色婚礼','宫廷','教会','圣光神殿','王位','贵族','侍女','骑士','占卜师','乐师','大祭司']
+    },
+    xianxia: {
+      characters: ['玄清','焚天','太一','渡厄','灵均','楚墨','昭华','绛珠','夜魅','洛神','凤璃','素问','昊天'],
+      locations: ['天界','人界','魔界','妖界','冥界','灵界','蜀山','万灵池','七十二魔殿','十殿阎罗','忘忧村'],
+      keywords: ['万缘体质','灵主','六界','封印','神魔大战','万缘归一','真元','神识','合籍双修','雷霆','九尾天狐','轮回']
+    }
+  };
+
+  // 构建 RAG 索引（从故事 .md 文件加载）
+  function buildRAGIndex(storyKey) {
+    if (ragData[storyKey] && ragData[storyKey].length > 0) return;
+    // 尝试从 .md 文件加载并分块
+    var chapters = [];
+    for (var i = 0; i <= 8; i++) {
+      chapters.push('ch0' + i + '.md');
+    }
+    var loaded = 0;
+    var chunks = [];
+    chapters.forEach(function(ch) {
+      var path = 'stories/' + storyKey + '/' + ch;
+      fetch(path).then(function(r) { return r.text(); }).then(function(text) {
+        // 按 ## 分块
+        var sections = text.split(/\n## /);
+        sections.forEach(function(sec, idx) {
+          var lines = sec.split('\n');
+          var title = lines[0].replace(/^#+\s*/, '').trim();
+          var content = lines.slice(1).join('\n').trim();
+          if (content.length < 50) return;
+          // 提取关键词
+          var meta = STORY_META[storyKey];
+          var kws = [];
+          meta.characters.forEach(function(c) { if (sec.indexOf(c) !== -1) kws.push(c); });
+          meta.locations.forEach(function(l) { if (sec.indexOf(l) !== -1) kws.push(l); });
+          meta.keywords.forEach(function(k) { if (sec.indexOf(k) !== -1) kws.push(k); });
+          chunks.push({ id: ch + '_s' + idx, title: title, content: content.substring(0, 800), keywords: kws });
+        });
+        loaded++;
+        if (loaded === chapters.length) {
+          ragData[storyKey] = chunks;
+          S.set('rag', ragData);
+        }
+      }).catch(function() { loaded++; });
+    });
+  }
+
+  // 检索相关 chunks
+  function retrieveRAG(query, storyKey) {
+    if (!ragData[storyKey] || ragData[storyKey].length === 0) return '';
+    var meta = STORY_META[storyKey];
+    var queryKws = [];
+    // 从用户消息中提取关键词
+    meta.characters.forEach(function(c) { if (query.indexOf(c) !== -1) queryKws.push(c); });
+    meta.locations.forEach(function(l) { if (query.indexOf(l) !== -1) queryKws.push(l); });
+    meta.keywords.forEach(function(k) { if (query.indexOf(k) !== -1) queryKws.push(k); });
+    // 如果没有匹配关键词，返回空
+    if (queryKws.length === 0) return '';
+    // 匹配 chunks
+    var scored = ragData[storyKey].map(function(chunk) {
+      var score = 0;
+      queryKws.forEach(function(kw) {
+        chunk.keywords.forEach(function(ck) { if (ck === kw) score++; });
+      });
+      return { chunk: chunk, score: score };
+    }).filter(function(s) { return s.score > 0; });
+    scored.sort(function(a, b) { return b.score - a.score; });
+    var top = scored.slice(0, 3);
+    if (top.length === 0) return '';
+    var result = '\n\n【相关故事背景】\n';
+    top.forEach(function(s) {
+      result += '「' + s.chunk.title + '」' + s.chunk.content.substring(0, 300) + '...\n\n';
+    });
+    return result;
+  }
+
+  // Story selector logic
+  function selectStory(key) {
+    // 选择故事时检查 API 配置
+    if (key && STORY[key] && !cfg.apiKey) {
+      openSettings();
+      toast('请先配置 API Key 后再开始故事', 'warn');
+      return;
+    }
+    activeStory = key;
+    S.set('story', key);
+    // Update UI
+    document.querySelectorAll('.story-card').forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-story') === key);
+    });
+    if (key && STORY[key]) {
+      cfg.persona = STORY[key].prompt;
+      toast('已加载故事：' + STORY[key].name, 'ok');
+    } else {
+      cfg.persona = DEF_PERSONA;
+      toast('已切换为酒馆掌柜模式', 'ok');
+    }
+    S.set('cfg', cfg);
+    // Start new conversation for the story
+    newConv();
+    // 自动收起侧边栏
+    collapseSidebar();
+    // 构建 RAG 索引
+    if (key && STORY[key]) buildRAGIndex(key);
+    // 显示/隐藏角色日记按钮
+    var cdb = $('charDiaryBtn'); if (cdb) cdb.style.display = key ? '' : 'none';
+    // 更新聊天头像和名字
+    updateChatHeader();
+    // 自动发送开场白启动剧情
+    if (key && STORY[key]) {
+      var opening = '请开始《' + STORY[key].name + '》的序章，为我介绍世界观和初始场景，等待我输入女主的名字。';
+      sendMsg(opening);
+    }
+  }
+
+  function showResult(r) {
+    $('emptyT').style.display = 'none';
+    $('tResult').style.display = 'block';
+    $('tWord').textContent = r.w;
+    var ph = $('tPhon'); ph.innerHTML = '';
+    var sv = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+    if (r.us) ph.innerHTML += '<span class="phon">' + sv + '<span class="phon-l">美</span><span class="phon-t">' + esc(r.us) + '</span></span>';
+    if (r.uk) ph.innerHTML += '<span class="phon">' + sv + '<span class="phon-l">英</span><span class="phon-t">' + esc(r.uk) + '</span></span>';
+    var df = $('tDefs'); df.innerHTML = '';
+    if (r.d) r.d.forEach(function(d) { df.innerHTML += '<div class="def"><span class="pos">' + esc(d.p) + '</span><span class="def-t">' + esc(d.t) + '</span></div>'; });
+  }
+
+  async function lookup(word) {
+    if (!word.trim()) return;
+    $('tin').value = word;
+    var local = DICT[word.toLowerCase().trim()];
+    if (local) { showResult(local); addTHist(word, local.d[0] ? local.d[0].t : ''); return; }
+    if (!cfg.apiKey) { toast('请先配置 API Key', 'warn'); return; }
+    try {
+      var c = await callChatAPI([
+        { role: 'system', content: '你是英语词典助手。用户输入英文或中文词，返回JSON：{"word":"原词","phonetic_us":"美式音标","phonetic_uk":"英式音标","meanings":[{"pos":"词性","text":"释义"}]}。只返回JSON。' },
+        { role: 'user', content: word }
+      ], { max_tokens: 300, temperature: 0.3 });
+      var jm = c.match(/\{[\s\S]*\}/);
+      if (jm) {
+        var r = JSON.parse(jm[0]);
+        showResult({ w: r.word, us: r.phonetic_us, uk: r.phonetic_uk, d: r.meanings });
+        addTHist(word, r.meanings && r.meanings[0] ? r.meanings[0].text : '');
+      }
+    } catch(e) { toast('翻译查询失败', 'err'); }
+  }
+
+  function addTHist(w, m) {
+    tHist = tHist.filter(function(h) { return h.w.toLowerCase() !== w.toLowerCase(); });
+    tHist.unshift({ w: w, m: m }); if (tHist.length > 50) tHist.length = 50;
+    S.set('thist', tHist); renderTHist();
+  }
+  function renderTHist() {
+    var list = $('hList'), sec = $('tHist');
+    if (!tHist.length) { sec.style.display = 'none'; return; }
+    sec.style.display = 'block'; list.innerHTML = '';
+    tHist.slice(0, 15).forEach(function(h) {
+      var d = document.createElement('div'); d.className = 'h-item';
+      d.innerHTML = '<span class="h-w">' + esc(h.w) + '</span><span class="h-m">' + esc(h.m) + '</span>';
+      d.addEventListener('click', function() { lookup(h.w); });
+      list.appendChild(d);
+    });
+  }
+  function renderVocab() {
+    var list = $('vocabList'), sec = $('vocabSec'), cnt = $('vocabCnt');
+    if (!vocab.length) { sec.style.display = 'none'; return; }
+    sec.style.display = 'block'; cnt.textContent = vocab.length + ' 词'; list.innerHTML = '';
+    vocab.forEach(function(v) {
+      var c = document.createElement('span'); c.className = 'v-chip'; c.textContent = v;
+      c.addEventListener('click', function() { lookup(v); }); list.appendChild(c);
+    });
+  }
+
+  // ── Text Selection Popup ──
+  var selPopup = null;
+  function removeSelPopup() { if (selPopup) { selPopup.remove(); selPopup = null; } }
+  function showSelPopup(text, x, y) {
+    removeSelPopup();
+    text = text.trim();
+    if (!text || text.length < 2) return;
+    var el = document.createElement('div');
+    el.className = 'sel-popup';
+    // 单词查询
+    var words = text.split(/\s+/);
+    var isSingleWord = words.length === 1 && /^[\w'-]+$/.test(text);
+    if (isSingleWord) {
+      var w = text.toLowerCase().replace(/[^a-z'-]/g, '');
+      var entry = DICT[w];
+      if (entry) {
+        var phonHtml = '';
+        if (entry.us) phonHtml += '<span style="margin-right:8px">美 ' + esc(entry.us) + '</span>';
+        if (entry.uk) phonHtml += '<span>英 ' + esc(entry.uk) + '</span>';
+        var defHtml = entry.d.map(function(d) { return '<div><span class="pos">' + esc(d.p) + '</span> ' + esc(d.t) + '</div>'; }).join('');
+        el.innerHTML = '<div class="sp-word">' + esc(entry.w) + '</div>' +
+          (phonHtml ? '<div class="sp-phon">' + phonHtml + '</div>' : '') +
+          '<div class="sp-def">' + defHtml + '</div>' +
+          '<div class="sp-actions">' +
+            '<button class="sp-btn primary" data-act="vocab">加入生词本</button>' +
+            '<button class="sp-btn" data-act="full">完整释义</button>' +
+            '<button class="sp-btn" data-act="close">✕</button>' +
+          '</div>';
+        el.querySelector('[data-act="vocab"]').addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (vocab.indexOf(w) === -1) { vocab.push(w); S.set('vocab', vocab); renderVocab(); }
+          toast('已加入生词本', 'ok');
+        });
+        el.querySelector('[data-act="full"]').addEventListener('click', function(e) {
+          e.stopPropagation(); removeSelPopup(); lookup(w);
+        });
+        el.querySelector('[data-act="close"]').addEventListener('click', function(e) { e.stopPropagation(); removeSelPopup(); });
+      } else {
+        // 不在离线词典中，显示AI查询选项
+        el.innerHTML = '<div class="sp-word">' + esc(text) + '</div>' +
+          '<div class="sp-loading">离线词典未收录</div>' +
+          '<div class="sp-actions">' +
+            '<button class="sp-btn primary" data-act="ai">AI 查词</button>' +
+            '<button class="sp-btn" data-act="close">✕</button>' +
+          '</div>';
+        el.querySelector('[data-act="ai"]').addEventListener('click', function(e) {
+          e.stopPropagation(); removeSelPopup(); lookup(text);
+        });
+        el.querySelector('[data-act="close"]').addEventListener('click', function(e) { e.stopPropagation(); removeSelPopup(); });
+      }
+    } else {
+      // 多词/长句 → 显示原文 + 翻译按钮
+      var displayText = text.length > 80 ? text.substring(0, 80) + '…' : text;
+      el.innerHTML = '<div class="sp-phrase">' + esc(displayText) + '</div>' +
+        '<div class="sp-trans" id="spTrans"></div>' +
+        '<div class="sp-actions">' +
+          '<button class="sp-btn primary" data-act="trans">翻译</button>' +
+          '<button class="sp-btn" data-act="copy">复制</button>' +
+          '<button class="sp-btn" data-act="close">✕</button>' +
+        '</div>';
+      el.querySelector('[data-act="trans"]').addEventListener('click', function(e) {
+        e.stopPropagation();
+        var btn = e.target; btn.textContent = '翻译中…'; btn.disabled = true;
+        translatePhrase(text, function(result) {
+          var t = el.querySelector('#spTrans');
+          if (t) t.textContent = result;
+          btn.textContent = '翻译'; btn.disabled = false;
+        });
+      });
+      el.querySelector('[data-act="copy"]').addEventListener('click', function(e) {
+        e.stopPropagation();
+        navigator.clipboard.writeText(text).then(function() { toast('已复制', 'ok'); });
+      });
+      el.querySelector('[data-act="close"]').addEventListener('click', function(e) { e.stopPropagation(); removeSelPopup(); });
+    }
+    // 定位
+    var pw = 280, ph = 200;
+    var left = Math.min(x, window.innerWidth - pw - 16);
+    var top = y + 10;
+    if (top + ph > window.innerHeight) top = y - ph - 10;
+    if (top < 8) top = 8;
+    el.style.left = left + 'px'; el.style.top = top + 'px';
+    document.body.appendChild(el);
+    selPopup = el;
+  }
+  async function translatePhrase(text, cb) {
+    if (!cfg.apiKey) { cb('请先配置 API Key'); return; }
+    try {
+      var reply = await callChatAPI([
+        { role: 'system', content: '你是翻译助手。将用户输入翻译为中文，只返回翻译结果，不加解释。' },
+        { role: 'user', content: text }
+      ], { temperature: 0.3, max_tokens: 500 });
+      cb(reply.trim());
+    } catch(e) { cb('翻译出错'); }
+  }
+  // 消息区选词监听
+  function initSelPopup() {
+    var msgs = $('msgs');
+    if (!msgs) return;
+    msgs.addEventListener('mouseup', function(e) {
+      setTimeout(function() {
+        var sel = window.getSelection();
+        var text = sel ? sel.toString().trim() : '';
+        if (text.length >= 2 && msgs.contains(sel.anchorNode)) {
+          var range = sel.getRangeAt(0);
+          var rect = range.getBoundingClientRect();
+          showSelPopup(text, rect.left + rect.width / 2, rect.bottom);
+        } else { removeSelPopup(); }
+      }, 10);
+    });
+    document.addEventListener('mousedown', function(e) {
+      if (selPopup && !selPopup.contains(e.target)) removeSelPopup();
+    });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') removeSelPopup(); });
+  }
+
+  // ── API URL normalization ──
+  function normalizeApiBase(url) {
+    if (!url) return 'https://api.openai.com/v1';
+    url = url.trim().replace(/\/+$/, '');
+    var idx = url.indexOf('/v1/');
+    if (idx !== -1) url = url.substring(0, idx + 3);
+    if (!url.endsWith('/v1')) url += '/v1';
+    return url;
+  }
+
+  // 检测是否为 Anthropic 原生格式
+  function isAnthropicAPI() {
+    var u = (cfg.apiBase || '').toLowerCase();
+    return u.indexOf('anthropic') !== -1;
+  }
+
+  // 统一 API 调用（兼容 OpenAI 和 Anthropic 格式）
+  async function callChatAPI(messages, opts) {
+    opts = opts || {};
+    var model = opts.model || cfg.model;
+    var maxTokens = opts.max_tokens || 1024;
+    var temperature = opts.temperature !== undefined ? opts.temperature : 0.85;
+
+    if (isAnthropicAPI()) {
+      // Anthropic 格式
+      var sysMsg = '';
+      var chatMsgs = [];
+      messages.forEach(function(m) {
+        if (m.role === 'system') { sysMsg += (sysMsg ? '\n' : '') + m.content; }
+        else { chatMsgs.push({ role: m.role, content: m.content }); }
+      });
+      var url = normalizeApiBase(cfg.apiBase).replace(/\/v1$/, '') + '/v1/messages';
+      var body = { model: model, max_tokens: maxTokens, messages: chatMsgs };
+      if (sysMsg) body.system = sysMsg;
+      var resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': cfg.apiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify(body)
+      });
+      if (!resp.ok) {
+        var e = {}; try { e = await resp.json(); } catch(x) {}
+        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status));
+      }
+      var data = await resp.json();
+      if (!data.content || !data.content[0]) throw new Error('API 返回格式异常');
+      var text = '';
+      data.content.forEach(function(c) { if (c.type === 'text') text += c.text; });
+      if (!text) throw new Error('API 返回空内容');
+      return text;
+    } else {
+      // OpenAI 兼容格式
+      var url = normalizeApiBase(cfg.apiBase) + '/chat/completions';
+      var resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
+        body: JSON.stringify({ model: model, messages: messages, temperature: temperature, max_tokens: maxTokens })
+      });
+      if (!resp.ok) {
+        var e = {}; try { e = await resp.json(); } catch(x) {}
+        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + resp.statusText));
+      }
+      var data = await resp.json();
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error('API 返回格式异常');
+      var reply = data.choices[0].message.content;
+      if (!reply) throw new Error('API 返回空内容');
+      return reply;
+    }
+  }
+
+  // ── Fetch models ──
+  async function fetchModels() {
+    var baseUrl = normalizeApiBase($('sBase').value);
+    var key = $('sKey').value.trim();
+    var status = $('modelStatus');
+    var btn = $('fetchModels');
+
+    if (!key) { toast('请先填写 API Key', 'warn'); return; }
+
+    status.style.display = 'block';
+    status.textContent = '正在拉取模型列表...';
+    status.style.color = 'var(--text-muted)';
+    btn.disabled = true; btn.style.opacity = '0.5';
+
+    try {
+      var resp = await fetch(baseUrl + '/models', {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      if (!resp.ok) {
+        var e = {}; try { e = await resp.json(); } catch(x) {}
+        throw new Error((e.error && e.error.message) || '请求失败: ' + resp.status);
+      }
+      var data = await resp.json();
+      var models = [];
+
+      // 兼容多种响应格式
+      if (Array.isArray(data)) {
+        // 直接是数组: [{"id":"gpt-4o"}, ...]
+        models = data.map(function(m) { return m.id || m.name || m; });
+      } else if (data.data && Array.isArray(data.data)) {
+        // OpenAI 标准格式: {"data":[{"id":"gpt-4o"}, ...]}
+        models = data.data.map(function(m) { return m.id || m.name || m; });
+      } else if (data.models && Array.isArray(data.models)) {
+        // 部分提供商: {"models":[{"name":"gpt-4o"}, ...]}
+        models = data.models.map(function(m) { return m.id || m.name || m; });
+      }
+
+      if (models.length === 0) {
+        status.textContent = '未找到可用模型，请检查 API 地址和 Key';
+        status.style.color = 'var(--error)';
+        return;
+      }
+
+      // 去重排序
+      models = models.filter(function(v, i, a) { return a.indexOf(v) === i; }).sort();
+
+      // 填充 select
+      var sel = $('sModel');
+      sel.innerHTML = '';
+      models.forEach(function(m) {
+        var opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        sel.appendChild(opt);
+      });
+
+      status.textContent = '已拉取 ' + models.length + ' 个模型，请从下拉框选择';
+      status.style.color = 'var(--success)';
+
+      // 切回下拉模式
+      sel.style.display = '';
+      $('sModelCustom').style.display = 'none';
+
+      // 如果当前模型在列表中，选中它；否则选第一个
+      var cur = $('sModelCustom').value.trim() || sel.value;
+      var found = false;
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === cur) { sel.selectedIndex = i; found = true; break; }
+      }
+      if (!found && models.length > 0) sel.selectedIndex = 0;
+
+      // 存储模型列表供后续使用
+      S.set('models', models);
+
+    } catch(e) {
+      status.textContent = '拉取失败: ' + e.message;
+      status.style.color = 'var(--error)';
+    } finally {
+      btn.disabled = false; btn.style.opacity = '1';
+    }
+  }
+
+  // ── Test connection ──
+  async function testConn() {
+    var baseUrl = normalizeApiBase($('sBase').value);
+    var key = $('sKey').value.trim();
+    if (!key) { toast('请先填写 API Key', 'warn'); return; }
+
+    var btn = $('testConn');
+    btn.disabled = true; btn.style.opacity = '0.5';
+
+    try {
+      var resp = await fetch(baseUrl + '/models', {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      if (resp.ok) {
+        var data = await resp.json();
+        var count = 0;
+        if (Array.isArray(data)) count = data.length;
+        else if (data.data && Array.isArray(data.data)) count = data.data.length;
+        else if (data.models && Array.isArray(data.models)) count = data.models.length;
+        toast('连接成功！发现 ' + count + ' 个模型', 'ok');
+      } else {
+        var e = {}; try { e = await resp.json(); } catch(x) {}
+        toast('连接失败: ' + ((e.error && e.error.message) || resp.status), 'err');
+      }
+    } catch(e) {
+      toast('连接失败: ' + e.message, 'err');
+    } finally {
+      btn.disabled = false; btn.style.opacity = '1';
+    }
+  }
+
+  function openSettings() {
+    $('sKey').value = cfg.apiKey; $('sBase').value = cfg.apiBase;
+    $('sPersona').value = cfg.persona;
+    $('modelStatus').style.display = 'none';
+    // 恢复已缓存的模型列表
+    var cached = S.get('models', []);
+    var sel = $('sModel');
+    var custom = $('sModelCustom');
+    if (cached.length > 0) {
+      sel.innerHTML = '';
+      cached.forEach(function(m) {
+        var opt = document.createElement('option');
+        opt.value = m; opt.textContent = m;
+        sel.appendChild(opt);
+      });
+      // 尝试选中当前模型
+      var found = false;
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === cfg.model) { sel.selectedIndex = i; found = true; break; }
+      }
+      if (!found) { sel.selectedIndex = 0; }
+      sel.style.display = ''; custom.style.display = 'none';
+    } else {
+      // 没有缓存模型，用自定义输入
+      sel.innerHTML = '<option value="">-- 请先拉取模型列表 --</option>';
+      custom.value = cfg.model;
+      sel.style.display = 'none'; custom.style.display = '';
+    }
+    $('settingsOv').classList.add('on');
+  }
+
+  // ── Init ──
+  function init() {
+    $('welcomeTime').textContent = timeStr();
+    // 如果没有对话，创建一个
+    if (conversations.length === 0) {
+      var id = newConvId();
+      conversations.push({ id: id, title: '新对话', messages: [], createdAt: Date.now() });
+      currentConvId = id;
+      S.set('convs', conversations);
+      S.set('currentConv', currentConvId);
+    }
+    renderConvList(); renderHistory(); renderTHist(); renderVocab(); loadDiary(); updateCounts(); initSelPopup(); updateChatHeader();
+
+    // Story selector
+    document.querySelectorAll('.story-card').forEach(function(c) {
+      c.addEventListener('click', function() {
+        var key = c.getAttribute('data-story');
+        selectStory(key);
+      });
+    });
+    // Restore active story highlight
+    if (activeStory) {
+      document.querySelectorAll('.story-card').forEach(function(c) {
+        c.classList.toggle('active', c.getAttribute('data-story') === activeStory);
+      });
+    }
+
+    // Send
+    $('sendBtn').addEventListener('click', function() { var v = $('chatIn').value; sendMsg(v); $('chatIn').value = ''; $('chatIn').style.height = 'auto'; });
+    $('chatIn').addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); var v = $('chatIn').value; sendMsg(v); $('chatIn').value = ''; $('chatIn').style.height = 'auto'; } });
+    $('chatIn').addEventListener('input', function(e) { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px'; });
+
+    // Hints
+
+
+    // Sidebar toggle
+    function isMobile() { return window.innerWidth <= 900; }
+    function closeSidebarMobile() {
+      if (isMobile()) {
+        $('sidebar').classList.remove('open');
+        $('sbOverlay').classList.remove('on');
+      }
+    }
+    $('toggleSidebar').addEventListener('click', function() {
+      if (isMobile()) {
+        $('sidebar').classList.toggle('open');
+        $('sbOverlay').classList.toggle('on');
+      } else {
+        $('sidebar').classList.toggle('collapsed');
+      }
+    });
+    $('sbOverlay').addEventListener('click', function() {
+      $('sidebar').classList.remove('open');
+      $('sbOverlay').classList.remove('on');
+    });
+
+    // Trans panel toggle
+    $('toggleTrans').addEventListener('click', function() {
+      if (isMobile()) {
+        // Move trans-col into overlay on mobile
+        var ov = $('transOverlay');
+        var tc = $('transCol');
+        if (!ov.contains(tc)) {
+          ov.appendChild(tc);
+        }
+        ov.classList.toggle('on');
+        tc.style.display = '';
+      } else {
+        var tc = $('transCol');
+        // If it was moved to overlay, move back
+        var ov = $('transOverlay');
+        if (ov.contains(tc)) {
+          var main = document.querySelector('.app');
+          main.appendChild(tc);
+        }
+        tc.style.display = tc.style.display === 'none' ? '' : 'none';
+      }
+    });
+    $('closeTransMobile').addEventListener('click', function() {
+      $('transOverlay').classList.remove('on');
+    });
+
+    // Translate
+    $('searchT').addEventListener('click', function() { lookup($('tin').value); });
+    $('tin').addEventListener('keydown', function(e) { if (e.key === 'Enter') lookup($('tin').value); });
+    $('clearT').addEventListener('click', function() { $('tin').value = ''; $('tResult').style.display = 'none'; $('emptyT').style.display = 'flex'; });
+
+    // Lang
+    $('langEn').addEventListener('click', function() { this.classList.add('on'); $('langZh').classList.remove('on'); $('tin').placeholder = '输入要查询的英文单词...'; });
+    $('langZh').addEventListener('click', function() { this.classList.add('on'); $('langEn').classList.remove('on'); $('tin').placeholder = '输入要查询的中文词...'; });
+
+    // Vocab
+    $('addVocab').addEventListener('click', function() {
+      var w = $('tWord').textContent;
+      if (w && vocab.indexOf(w) === -1) { vocab.push(w); S.set('vocab', vocab); renderVocab(); toast('"' + w + '" 已加入生词本', 'ok'); }
+      else if (vocab.indexOf(w) !== -1) toast('已在生词本中', 'warn');
+    });
+
+    // Settings
+    $('settingsBtn').addEventListener('click', function() { closeSidebarMobile(); openSettings(); });
+    $('closeSet').addEventListener('click', function() { $('settingsOv').classList.remove('on'); });
+    $('cancelSet').addEventListener('click', function() { $('settingsOv').classList.remove('on'); });
+    $('fetchModels').addEventListener('click', fetchModels);
+    $('testConn').addEventListener('click', testConn);
+    // 切换模型下拉/手动输入
+    $('toggleModelInput').addEventListener('click', function() {
+      var sel = $('sModel');
+      var custom = $('sModelCustom');
+      if (custom.style.display === 'none') {
+        custom.value = sel.value;
+        sel.style.display = 'none';
+        custom.style.display = '';
+        custom.focus();
+      } else {
+        sel.style.display = '';
+        custom.style.display = 'none';
+      }
+    });
+    $('saveSet').addEventListener('click', function() {
+      cfg.apiKey = $('sKey').value.trim();
+      cfg.apiBase = normalizeApiBase($('sBase').value);
+      var modelSel = $('sModel');
+      var modelCustom = $('sModelCustom');
+      cfg.model = (modelCustom.style.display !== 'none' ? modelCustom.value.trim() : modelSel.value.trim()) || 'gpt-4o';
+      cfg.persona = $('sPersona').value.trim() || DEF_PERSONA;
+      S.set('cfg', cfg);
+      // 回填规范化后的 URL
+      $('sBase').value = cfg.apiBase;
+      $('settingsOv').classList.remove('on');
+      toast('设置已保存', 'ok');
+      // 如果有活跃故事，收起侧边栏
+      if (activeStory) collapseSidebar();
+    });
+
+    // Diary
+    $('diaryBtn').addEventListener('click', function() { loadDiary(); $('diaryOv').classList.add('on'); });
+    $('closeDiary').addEventListener('click', function() { $('diaryOv').classList.remove('on'); });
+    // Character diary
+    $('charDiaryBtn').addEventListener('click', function() { writeCharDiary(); });
+    // Show/hide character diary button based on active story
+    function updateCharDiaryBtn() { $('charDiaryBtn').style.display = activeStory ? '' : 'none'; }
+    updateCharDiaryBtn();
+
+    // New chat
+    $('newChatBtn').addEventListener('click', function() {
+      closeSidebarMobile();
+      newConv();
+      toast('已创建新对话', 'ok');
+    });
+
+    // Delete conversation
+    $('delConvBtn').addEventListener('click', function() {
+      closeSidebarMobile();
+      deleteConv(currentConvId);
+    });
+
+    // Clear all memory
+    $('clearMemBtn').addEventListener('click', function() {
+      closeSidebarMobile();
+      clearAllMem();
+    });
+
+    // Overlay close
+    $('settingsOv').addEventListener('click', function(e) { if (e.target === $('settingsOv')) $('settingsOv').classList.remove('on'); });
+    $('diaryOv').addEventListener('click', function(e) { if (e.target === $('diaryOv')) $('diaryOv').classList.remove('on'); });
+
+    // Resize: restore translate panel to main layout on desktop
+    window.addEventListener('resize', function() {
+      if (!isMobile()) {
+        var ov = $('transOverlay');
+        var tc = $('transCol');
+        if (ov.contains(tc)) {
+          var main = document.querySelector('.app');
+          main.appendChild(tc);
+        }
+        ov.classList.remove('on');
+        $('sidebar').classList.remove('open');
+        $('sbOverlay').classList.remove('on');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+</body>
+</html>
