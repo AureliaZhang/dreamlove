@@ -1025,7 +1025,12 @@
     <!-- 级别滑块 -->
     <div style="padding:var(--sp-3) var(--sp-5);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:var(--sp-3);flex-shrink:0">
       <span style="font-size:var(--text-xs);color:var(--text-muted);white-space:nowrap">🤍纯爱</span>
-      <input type="range" id="codecLevelSlider" min="0" max="100" step="5" value="0" style="flex:1;accent-color:var(--accent-dim);touch-action:none;height:44px">
+      <div id="codecSliderWrap" style="flex:1;position:relative;height:40px;display:flex;align-items:center;cursor:pointer;touch-action:none">
+        <div id="codecSliderTrack" style="width:100%;height:6px;background:var(--border);border-radius:3px;position:relative">
+          <div id="codecSliderFill" style="width:0%;height:100%;background:var(--accent-dim);border-radius:3px;position:absolute;left:0;top:0"></div>
+        </div>
+        <div id="codecSliderThumb" style="width:24px;height:24px;background:#fff;border:2px solid var(--accent-dim);border-radius:50%;position:absolute;left:0%;top:50%;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,0.2);pointer-events:none"></div>
+      </div>
       <span style="font-size:var(--text-xs);color:var(--text-muted);white-space:nowrap">全开🔥</span>
     </div>
     <div style="padding:0 var(--sp-5) var(--sp-2);border-bottom:1px solid var(--border-light);flex-shrink:0">
@@ -2469,10 +2474,12 @@
     function getCurrentCat() { return currentCat; }
 
     function renderPanel() {
-      // 渲染级别滑块
-      var slider = $('codecLevelSlider');
+      // 渲染级别滑块（自定义滑块）
+      var fill = $('codecSliderFill');
+      var thumb = $('codecSliderThumb');
       var label = $('codecLevelLabel');
-      if (slider) slider.value = level;
+      if (fill) fill.style.width = level + '%';
+      if (thumb) thumb.style.left = level + '%';
       if (label) label.textContent = getLevelName() + ' (' + level + ') — ' + getLevelDesc();
 
       // 渲染映射表
@@ -2564,25 +2571,62 @@
       });
     });
 
-    // 级别滑块
-    var slider = $('codecLevelSlider');
-    if (slider) {
-      slider.addEventListener('input', function() {
-        var v = parseInt(this.value);
-        $('codecLevelLabel').textContent = (function() {
+    // 级别滑块（自定义实现，兼容移动端）
+    (function() {
+      var wrap = $('codecSliderWrap');
+      var fill = $('codecSliderFill');
+      var thumb = $('codecSliderThumb');
+      var label = $('codecLevelLabel');
+      if (!wrap) return;
+
+      var dragging = false;
+
+      function setSliderLevel(v) {
+        v = Math.max(0, Math.min(100, Math.round(v / 5) * 5));
+        fill.style.width = v + '%';
+        thumb.style.left = v + '%';
+        label.textContent = (function() {
           for (var i = CODEC.LEVELS.length - 1; i >= 0; i--) {
             if (v >= CODEC.LEVELS[i].val) return CODEC.LEVELS[i].icon + ' ' + CODEC.LEVELS[i].name + ' (' + v + ') — ' + CODEC.LEVELS[i].desc;
           }
           return CODEC.LEVELS[0].icon + ' ' + CODEC.LEVELS[0].name + ' (' + v + ')';
         })();
-        // 实时预览映射
+        return v;
+      }
+
+      function calcLevel(clientX) {
+        var rect = wrap.getBoundingClientRect();
+        var pct = (clientX - rect.left) / rect.width;
+        return Math.round(pct * 100 / 5) * 5;
+      }
+
+      function onStart(clientX) {
+        dragging = true;
+        var v = setSliderLevel(calcLevel(clientX));
+        CODEC.setLevel(v);
+      }
+      function onMove(clientX) {
+        if (!dragging) return;
+        setSliderLevel(calcLevel(clientX));
+      }
+      function onEnd() {
+        if (!dragging) return;
+        dragging = false;
         CODEC.renderPanel();
-      });
-      slider.addEventListener('change', function() {
-        CODEC.setLevel(parseInt(this.value));
         toast('内容级别已设为：' + CODEC.getLevelName(), 'ok');
-      });
-    }
+      }
+
+      wrap.addEventListener('mousedown', function(e) { e.preventDefault(); onStart(e.clientX); });
+      document.addEventListener('mousemove', function(e) { onMove(e.clientX); });
+      document.addEventListener('mouseup', onEnd);
+
+      wrap.addEventListener('touchstart', function(e) { e.preventDefault(); onStart(e.touches[0].clientX); }, { passive: false });
+      document.addEventListener('touchmove', function(e) { if (dragging) { e.preventDefault(); onMove(e.touches[0].clientX); } }, { passive: false });
+      document.addEventListener('touchend', onEnd);
+
+      // 初始化显示
+      setSliderLevel(CODEC.getLevel());
+    })();
 
     // 添加映射
     $('codecAddBtn').addEventListener('click', function() {
