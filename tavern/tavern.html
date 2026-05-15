@@ -1433,7 +1433,10 @@
       conv.messages.push({ role: 'assistant', content: reply, ts: rts });
       addMsg('assistant', reply, rts);
       S.set('convs', conversations);
-    } catch(err) { toast('消息发送失败: ' + err.message, 'err'); }
+    } catch(err) {
+      toast('消息发送失败: ' + err.message, 'err');
+      addMsg('system', '❌ 发送失败: ' + err.message, timeStr());
+    }
     finally { $('typing').classList.remove('on'); scrollMsgs(); }
   }
 
