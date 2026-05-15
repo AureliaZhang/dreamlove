@@ -1353,6 +1353,17 @@
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/\n/g, '<br>');
   }
+  // 过滤 OOC 内容（--- 分割线后的元信息、尾部单独的括号）
+  function stripOOC(t) {
+    // 移除 --- 分割线及其后的所有内容
+    var idx = t.indexOf('\n---\n');
+    if (idx === -1) idx = t.indexOf('\n---');
+    if (idx === -1) idx = t.indexOf('---\n');
+    if (idx !== -1) t = t.substring(0, idx);
+    // 移除末尾单独的 ）或 )
+    t = t.replace(/\s*[）)]\s*$/, '');
+    return t.trim();
+  }
   function toast(msg, type) {
     var box = $('toastBox'), t = document.createElement('div');
     t.className = 'toast ' + (type || ''); t.textContent = msg;
@@ -1512,7 +1523,7 @@
 
       // 流式调用
       var reply = await callChatAPIStream(msgs, { max_tokens: activeStory ? 4096 : 1024, temperature: 0.85 }, function(text) {
-        bubbleEl.innerHTML = fmtMd(CODEC.decode(text)) + '<span class="streaming-cursor"></span>';
+        bubbleEl.innerHTML = fmtMd(CODEC.decode(stripOOC(text))) + '<span class="streaming-cursor"></span>';
         // 仅当用户在底部时自动滚动
         if (wasAtBottom) {
           msgsEl.scrollTop = msgsEl.scrollHeight;
@@ -1520,8 +1531,8 @@
         }
       });
 
-      // 流式完成：移除光标，最终渲染
-      var finalReply = CODEC.decode(reply);
+      // 流式完成：过滤 OOC、解码、最终渲染
+      var finalReply = CODEC.decode(stripOOC(reply));
       bubbleEl.innerHTML = fmtMd(finalReply);
 
       // 检测选项并渲染按钮
@@ -1542,9 +1553,9 @@
         bubbleEl.appendChild(choiceDiv);
       }
 
-      // 存入对话历史
+      // 存入对话历史（过滤 OOC 后存储）
       var rts = timeStr();
-      conv.messages.push({ role: 'assistant', content: reply, ts: rts });
+      conv.messages.push({ role: 'assistant', content: stripOOC(reply), ts: rts });
       S.set('convs', conversations);
     } catch(err) {
       addMsg('system', '❌ ' + err.message, timeStr());
