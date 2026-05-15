@@ -1386,6 +1386,7 @@
     try {
       var msgs = [];
       var sys = cfg.persona;
+      var _debugInfo = '';
       if (memory.length > 0) {
         sys += '\n\n你记得关于这位旅人的事情：\n';
         memory.slice(-20).forEach(function(m) { sys += '- ' + m.content + '（' + m.date + '）\n'; });
@@ -1421,21 +1422,30 @@
         historyMsgs.slice(-20).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
       }
       var apiUrl = normalizeApiBase(cfg.apiBase);
+      var reqBody = { model: cfg.model, messages: msgs, temperature: 0.85, max_tokens: activeStory ? 4096 : 1024 };
       var resp = await fetch(apiUrl + '/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-        body: JSON.stringify({ model: cfg.model, messages: msgs, temperature: 0.85, max_tokens: activeStory ? 4096 : 1024 })
+        body: JSON.stringify(reqBody)
       });
-      if (!resp.ok) { var e = {}; try { e = await resp.json(); } catch(x) {} throw new Error((e.error && e.error.message) || 'API 请求失败: ' + resp.status); }
+      if (!resp.ok) {
+        var e = {}; try { e = await resp.json(); } catch(x) {}
+        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + resp.statusText));
+      }
       var data = await resp.json();
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error('API 返回格式异常: ' + JSON.stringify(data).substring(0, 200));
+      }
       var reply = data.choices[0].message.content;
+      if (!reply) {
+        throw new Error('API 返回空内容。choices[0].message = ' + JSON.stringify(data.choices[0].message).substring(0, 200));
+      }
       var rts = timeStr();
       conv.messages.push({ role: 'assistant', content: reply, ts: rts });
       addMsg('assistant', reply, rts);
       S.set('convs', conversations);
     } catch(err) {
-      toast('消息发送失败: ' + err.message, 'err');
-      addMsg('system', '❌ 发送失败: ' + err.message, timeStr());
+      addMsg('system', '❌ ' + err.message, timeStr());
     }
     finally { $('typing').classList.remove('on'); scrollMsgs(); }
   }
