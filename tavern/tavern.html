@@ -3191,6 +3191,31 @@
     return u.indexOf('anthropic') !== -1;
   }
 
+  // 解析 SSE 流式响应（data: 前缀）
+  function parseSSE(text) {
+    var lines = text.split('\n');
+    var result = '';
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line.startsWith('data:')) continue;
+      var payload = line.substring(5).trim();
+      if (payload === '[DONE]') continue;
+      try {
+        var obj = JSON.parse(payload);
+        // Anthropic SSE: {"type":"content_block_delta","delta":{"text":"..."}}
+        if (obj.delta && obj.delta.text) { result += obj.delta.text; continue; }
+        // Anthropic SSE: {"type":"message_stop"} or {"type":"content_block_stop"}
+        if (obj.type === 'message_stop' || obj.type === 'content_block_stop') continue;
+        // OpenAI SSE: {"choices":[{"delta":{"content":"..."}}]}
+        if (obj.choices && obj.choices[0]) {
+          var c = obj.choices[0].delta || obj.choices[0].message;
+          if (c && c.content) { result += c.content; continue; }
+        }
+      } catch(e) {}
+    }
+    return result;
+  }
+
   // 统一 API 调用（兼容 OpenAI 和 Anthropic 格式）
   async function callChatAPI(messages, opts) {
     opts = opts || {};
@@ -3207,7 +3232,7 @@
         else { chatMsgs.push({ role: m.role, content: m.content }); }
       });
       var url = normalizeApiBase(cfg.apiBase).replace(/\/v1$/, '') + '/v1/messages';
-      var body = { model: model, max_tokens: maxTokens, messages: chatMsgs };
+      var body = { model: model, max_tokens: maxTokens, stream: false, messages: chatMsgs };
       if (sysMsg) body.system = sysMsg;
       var resp = await fetch(url, {
         method: 'POST',
@@ -3215,32 +3240,50 @@
         body: JSON.stringify(body)
       });
       if (!resp.ok) {
-        var e = {}; try { e = await resp.json(); } catch(x) {}
-        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status));
+        var raw = ''; try { raw = await resp.text(); } catch(x) {}
+        var e = {}; try { e = JSON.parse(raw); } catch(x) {}
+        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + raw.substring(0, 200)));
       }
-      var data = await resp.json();
-      if (!data.content || !data.content[0]) throw new Error('API 返回格式异常');
-      var text = '';
-      data.content.forEach(function(c) { if (c.type === 'text') text += c.text; });
-      if (!text) throw new Error('API 返回空内容');
-      return text;
+      var raw = await resp.text();
+      // 尝试直接 JSON 解析
+      try {
+        var data = JSON.parse(raw);
+        if (data.content && data.content[0]) {
+          var text = '';
+          data.content.forEach(function(c) { if (c.type === 'text') text += c.text; });
+          if (text) return text;
+        }
+      } catch(x) {}
+      // 回退：SSE 流式解析
+      var sseText = parseSSE(raw);
+      if (sseText) return sseText;
+      throw new Error('API 返回格式异常: ' + raw.substring(0, 200));
     } else {
       // OpenAI 兼容格式
       var url = normalizeApiBase(cfg.apiBase) + '/chat/completions';
       var resp = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-        body: JSON.stringify({ model: model, messages: messages, temperature: temperature, max_tokens: maxTokens })
+        body: JSON.stringify({ model: model, messages: messages, temperature: temperature, max_tokens: maxTokens, stream: false })
       });
       if (!resp.ok) {
-        var e = {}; try { e = await resp.json(); } catch(x) {}
-        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + resp.statusText));
+        var raw = ''; try { raw = await resp.text(); } catch(x) {}
+        var e = {}; try { e = JSON.parse(raw); } catch(x) {}
+        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + raw.substring(0, 200)));
       }
-      var data = await resp.json();
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error('API 返回格式异常');
-      var reply = data.choices[0].message.content;
-      if (!reply) throw new Error('API 返回空内容');
-      return reply;
+      var raw = await resp.text();
+      // 尝试直接 JSON 解析
+      try {
+        var data = JSON.parse(raw);
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+          var reply = data.choices[0].message.content;
+          if (reply) return reply;
+        }
+      } catch(x) {}
+      // 回退：SSE 流式解析
+      var sseText = parseSSE(raw);
+      if (sseText) return sseText;
+      throw new Error('API 返回格式异常: ' + raw.substring(0, 200));
     }
   }
 
