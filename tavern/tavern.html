@@ -1421,25 +1421,7 @@
       } else {
         historyMsgs.slice(-20).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
       }
-      var apiUrl = normalizeApiBase(cfg.apiBase);
-      var reqBody = { model: cfg.model, messages: msgs, temperature: 0.85, max_tokens: activeStory ? 4096 : 1024 };
-      var resp = await fetch(apiUrl + '/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-        body: JSON.stringify(reqBody)
-      });
-      if (!resp.ok) {
-        var e = {}; try { e = await resp.json(); } catch(x) {}
-        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + resp.statusText));
-      }
-      var data = await resp.json();
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-        throw new Error('API 返回格式异常: ' + JSON.stringify(data).substring(0, 200));
-      }
-      var reply = data.choices[0].message.content;
-      if (!reply) {
-        throw new Error('API 返回空内容。choices[0].message = ' + JSON.stringify(data.choices[0].message).substring(0, 200));
-      }
+      var reply = await callChatAPI(msgs, { max_tokens: activeStory ? 4096 : 1024, temperature: 0.85 });
       var rts = timeStr();
       conv.messages.push({ role: 'assistant', content: reply, ts: rts });
       addMsg('assistant', reply, rts);
@@ -1458,15 +1440,10 @@
     }).join('\n');
     var prompt = '请将以下对话总结为简洁的剧情摘要，包含：当前场景、角色状态、关键事件、未完成的选择。200字以内。\n\n对话：\n' + convText;
     try {
-      var apiUrl = normalizeApiBase(cfg.apiBase);
-      var resp = await fetch(apiUrl + '/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-        body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: '你是摘要助手。' }, { role: 'user', content: prompt }], temperature: 0.3, max_tokens: 400 })
-      });
-      if (!resp.ok) return '';
-      var data = await resp.json();
-      var summary = data.choices[0].message.content;
+      var summary = await callChatAPI([
+        { role: 'system', content: '你是摘要助手。' },
+        { role: 'user', content: prompt }
+      ], { max_tokens: 400, temperature: 0.3 });
       summaries[conv.id] = summary;
       S.set('summary', summaries);
       return summary;
@@ -1498,16 +1475,11 @@
       var charName = appearedChars[i];
       var prompt = '你是' + charName + '。请以第一人称写一篇简短日记（100-200字），记录今天与女主的互动，包含你的真实想法和情感。直接写内容，不加标题。';
       try {
-        var apiUrl = normalizeApiBase(cfg.apiBase);
-        var resp = await fetch(apiUrl + '/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-          body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: '你是小说角色' + charName + '，请用第一人称写日记。' }, { role: 'user', content: prompt }], temperature: 0.8, max_tokens: 400 })
-        });
-        if (resp.ok) {
-          var data = await resp.json();
-          result[charName] = data.choices[0].message.content;
-        }
+        var diary = await callChatAPI([
+          { role: 'system', content: '你是小说角色' + charName + '，请用第一人称写日记。' },
+          { role: 'user', content: prompt }
+        ], { max_tokens: 400, temperature: 0.8 });
+        result[charName] = diary;
       } catch(e) {}
     }
 
@@ -1537,15 +1509,11 @@
     var conv = allMsgs.map(function(m) { return (m.role === 'user' ? '旅人' : '掌柜') + ': ' + m.content; }).join('\n');
     var prompt = '你是雾中酒馆掌柜。今天是' + tk + '。根据今天的对话写一篇简短酒馆日志。用掌柜第一人称，记录对话要点，融入酒馆氛围，200-400字中文。直接写内容，不加标题。\n\n对话：\n' + conv;
     try {
-      var apiUrl = normalizeApiBase(cfg.apiBase);
-      var resp = await fetch(apiUrl + '/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-        body: JSON.stringify({ model: cfg.model, messages: [{ role: 'system', content: cfg.persona }, { role: 'user', content: prompt }], temperature: 0.9, max_tokens: 800 })
-      });
-      if (!resp.ok) return;
-      var data = await resp.json();
-      diaries[tk] = data.choices[0].message.content;
+      var diaryText = await callChatAPI([
+        { role: 'system', content: cfg.persona },
+        { role: 'user', content: prompt }
+      ], { max_tokens: 800, temperature: 0.9 });
+      diaries[tk] = diaryText;
       S.set('diary', diaries);
       var ts = timeStr();
       var conv = getCurrentConv();
@@ -3052,17 +3020,10 @@
     if (local) { showResult(local); addTHist(word, local.d[0] ? local.d[0].t : ''); return; }
     if (!cfg.apiKey) { toast('请先配置 API Key', 'warn'); return; }
     try {
-      var apiUrl = normalizeApiBase(cfg.apiBase);
-      var resp = await fetch(apiUrl + '/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-        body: JSON.stringify({ model: cfg.model, messages: [
-          { role: 'system', content: '你是英语词典助手。用户输入英文或中文词，返回JSON：{"word":"原词","phonetic_us":"美式音标","phonetic_uk":"英式音标","meanings":[{"pos":"词性","text":"释义"}]}。只返回JSON。' },
-          { role: 'user', content: word }
-        ], temperature: 0.3, max_tokens: 300 })
-      });
-      if (!resp.ok) return;
-      var data = await resp.json(), c = data.choices[0].message.content;
+      var c = await callChatAPI([
+        { role: 'system', content: '你是英语词典助手。用户输入英文或中文词，返回JSON：{"word":"原词","phonetic_us":"美式音标","phonetic_uk":"英式音标","meanings":[{"pos":"词性","text":"释义"}]}。只返回JSON。' },
+        { role: 'user', content: word }
+      ], { max_tokens: 300, temperature: 0.3 });
       var jm = c.match(/\{[\s\S]*\}/);
       if (jm) {
         var r = JSON.parse(jm[0]);
@@ -3186,18 +3147,11 @@
   async function translatePhrase(text, cb) {
     if (!cfg.apiKey) { cb('请先配置 API Key'); return; }
     try {
-      var apiUrl = normalizeApiBase(cfg.apiBase);
-      var resp = await fetch(apiUrl + '/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
-        body: JSON.stringify({ model: cfg.model, messages: [
-          { role: 'system', content: '你是翻译助手。将用户输入翻译为中文，只返回翻译结果，不加解释。' },
-          { role: 'user', content: text }
-        ], temperature: 0.3, max_tokens: 500 })
-      });
-      if (!resp.ok) { cb('翻译失败'); return; }
-      var data = await resp.json();
-      cb(data.choices[0].message.content.trim());
+      var reply = await callChatAPI([
+        { role: 'system', content: '你是翻译助手。将用户输入翻译为中文，只返回翻译结果，不加解释。' },
+        { role: 'user', content: text }
+      ], { temperature: 0.3, max_tokens: 500 });
+      cb(reply.trim());
     } catch(e) { cb('翻译出错'); }
   }
   // 消息区选词监听
@@ -3225,12 +3179,69 @@
   function normalizeApiBase(url) {
     if (!url) return 'https://api.openai.com/v1';
     url = url.trim().replace(/\/+$/, '');
-    // 如果用户填了完整的 /v1/chat/completions 之类，截取到 /v1
     var idx = url.indexOf('/v1/');
     if (idx !== -1) url = url.substring(0, idx + 3);
-    // 如果没带 /v1，自动补上
     if (!url.endsWith('/v1')) url += '/v1';
     return url;
+  }
+
+  // 检测是否为 Anthropic 原生格式
+  function isAnthropicAPI() {
+    var u = (cfg.apiBase || '').toLowerCase();
+    return u.indexOf('anthropic') !== -1;
+  }
+
+  // 统一 API 调用（兼容 OpenAI 和 Anthropic 格式）
+  async function callChatAPI(messages, opts) {
+    opts = opts || {};
+    var model = opts.model || cfg.model;
+    var maxTokens = opts.max_tokens || 1024;
+    var temperature = opts.temperature !== undefined ? opts.temperature : 0.85;
+
+    if (isAnthropicAPI()) {
+      // Anthropic 格式
+      var sysMsg = '';
+      var chatMsgs = [];
+      messages.forEach(function(m) {
+        if (m.role === 'system') { sysMsg += (sysMsg ? '\n' : '') + m.content; }
+        else { chatMsgs.push({ role: m.role, content: m.content }); }
+      });
+      var url = normalizeApiBase(cfg.apiBase).replace(/\/v1$/, '') + '/v1/messages';
+      var body = { model: model, max_tokens: maxTokens, messages: chatMsgs };
+      if (sysMsg) body.system = sysMsg;
+      var resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': cfg.apiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify(body)
+      });
+      if (!resp.ok) {
+        var e = {}; try { e = await resp.json(); } catch(x) {}
+        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status));
+      }
+      var data = await resp.json();
+      if (!data.content || !data.content[0]) throw new Error('API 返回格式异常');
+      var text = '';
+      data.content.forEach(function(c) { if (c.type === 'text') text += c.text; });
+      if (!text) throw new Error('API 返回空内容');
+      return text;
+    } else {
+      // OpenAI 兼容格式
+      var url = normalizeApiBase(cfg.apiBase) + '/chat/completions';
+      var resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey },
+        body: JSON.stringify({ model: model, messages: messages, temperature: temperature, max_tokens: maxTokens })
+      });
+      if (!resp.ok) {
+        var e = {}; try { e = await resp.json(); } catch(x) {}
+        throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + resp.statusText));
+      }
+      var data = await resp.json();
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error('API 返回格式异常');
+      var reply = data.choices[0].message.content;
+      if (!reply) throw new Error('API 返回空内容');
+      return reply;
+    }
   }
 
   // ── Fetch models ──
