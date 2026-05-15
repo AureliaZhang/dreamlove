@@ -50,6 +50,51 @@
       --text-lg: 18px; --text-xl: 20px; --text-2xl: 28px;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
+    /* 夜间模式 */
+    body.dark {
+      --bg-main: #1a1d23;
+      --bg-panel: #21242b;
+      --bg-card: #282c34;
+      --bg-input: #21242b;
+      --bg-hover: #2c3038;
+      --bg-active: #353a44;
+      --border: #3a3f4a;
+      --border-light: #32363f;
+      --border-accent: #4a5060;
+      --text-primary: #e0e4ea;
+      --text-secondary: #9aa0ae;
+      --text-muted: #6a7080;
+      --text-dim: #4a5060;
+      --accent: #d4b44e;
+      --accent-dim: #b89a3a;
+      --accent-glow: rgba(212,180,78,0.15);
+      --accent2: #7a9cb4;
+      --accent2-dim: #6888a0;
+      --user-bg: #252a34;
+      --user-border: #3a4555;
+      --bot-bg: #282c34;
+      --bot-border: #3a3f4a;
+      --diary-bg: #2a2720;
+      --diary-border: #4a4030;
+      --success: #6a9a6e;
+      --warning: #b89a5a;
+      --error: #b87070;
+      --scrollbar: #3a3f4a;
+      --scrollbar-hover: #4a5060;
+      --shadow: 0 1px 3px rgba(0,0,0,0.2);
+      --shadow-float: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    body.dark .sidebar { background: var(--bg-panel); }
+    body.dark .chat-hdr { background: rgba(33,36,43,0.85); }
+    body.dark .trans-panel { background: var(--bg-panel); }
+    body.dark input, body.dark textarea, body.dark select { background: var(--bg-input); color: var(--text-primary); border-color: var(--border); }
+    body.dark .modal { background: var(--bg-card); }
+    body.dark .sb-overlay { background: rgba(0,0,0,0.6); }
+    body.dark ::-webkit-scrollbar-thumb { background: var(--scrollbar); }
+    body.dark ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+    body.dark .choice-btn { background: var(--bg-card); border-color: var(--border); color: var(--text-primary); }
+    body.dark .choice-btn:hover { border-color: var(--accent); background: var(--bg-hover); }
+
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     input, textarea, select { -webkit-user-select: text; user-select: text; cursor: text; }
     input::selection, textarea::selection { background: rgba(107,140,164,0.3); }
@@ -860,6 +905,10 @@
         </button>
         <button class="hdr-icon-btn" id="toggleTrans" title="翻译面板">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M22 22l-5-10-5 10M14 18h6"/></svg>
+        </button>
+        <button class="hdr-icon-btn" id="toggleDark" title="夜间模式">
+          <svg id="darkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="lightIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </button>
       </div>
     </header>
@@ -3688,6 +3737,19 @@
     $('closeTransMobile').addEventListener('click', function() {
       $('transOverlay').classList.remove('on');
     });
+
+    // 夜间模式
+    function setDarkMode(on) {
+      document.body.classList.toggle('dark', on);
+      $('darkIcon').style.display = on ? 'none' : '';
+      $('lightIcon').style.display = on ? '' : 'none';
+      S.set('darkMode', on);
+    }
+    $('toggleDark').addEventListener('click', function() {
+      setDarkMode(!document.body.classList.contains('dark'));
+    });
+    // 初始化夜间模式
+    if (S.get('darkMode', false)) setDarkMode(true);
 
     // Translate
     $('searchT').addEventListener('click', function() { lookup($('tin').value); });
