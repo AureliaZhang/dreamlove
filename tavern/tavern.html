@@ -2596,8 +2596,8 @@
 
       function calcLevel(clientX) {
         var rect = wrap.getBoundingClientRect();
-        var pct = (clientX - rect.left) / rect.width;
-        return Math.round(pct * 100 / 5) * 5;
+        var pct = (clientX - rect.left) / rect.width * 100;
+        return Math.max(0, Math.min(100, Math.round(pct / 5) * 5));
       }
 
       function onStart(clientX) {
@@ -2607,7 +2607,8 @@
       }
       function onMove(clientX) {
         if (!dragging) return;
-        setSliderLevel(calcLevel(clientX));
+        var v = setSliderLevel(calcLevel(clientX));
+        CODEC.setLevel(v);
       }
       function onEnd() {
         if (!dragging) return;
