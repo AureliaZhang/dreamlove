@@ -825,7 +825,8 @@
         <button class="toggle-btn" id="toggleSidebar" title="切换侧栏">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div class="chat-char-name">酒馆掌柜</div>
+        <div id="chatAvatar" class="char-avatar" style="width:32px;height:32px;font-size:16px">🏮</div>
+        <div class="chat-char-name" id="chatCharName">酒馆掌柜</div>
       </div>
       <div class="chat-hdr-right">
         <div class="clock-mini" id="clock">--:--:--</div>
@@ -1181,7 +1182,7 @@
 
   function newConv() {
     var id = newConvId();
-    var conv = { id: id, title: '新对话', messages: [], createdAt: Date.now() };
+    var conv = { id: id, title: '新对话', messages: [], createdAt: Date.now(), storyKey: activeStory || '' };
     conversations.unshift(conv);
     currentConvId = id;
     S.set('convs', conversations);
@@ -1197,7 +1198,27 @@
     renderConvList();
     renderHistory();
     updateCounts();
+    updateChatHeader();
     closeSidebarMobile();
+  }
+
+  function updateChatHeader() {
+    var conv = getCurrentConv();
+    var sk = conv && conv.storyKey ? conv.storyKey : '';
+    var avatar = $('chatAvatar');
+    var name = $('chatCharName');
+    if (sk && STORY[sk]) {
+      if (avatar) avatar.textContent = STORY[sk].icon;
+      if (name) name.textContent = STORY[sk].name;
+    } else {
+      if (avatar) avatar.textContent = '🏮';
+      if (name) name.textContent = '酒馆掌柜';
+    }
+    // 同步侧栏角色卡
+    var sideName = document.querySelector('.char-name');
+    if (sideName) sideName.textContent = name ? name.textContent : '酒馆掌柜';
+    var sideAv = document.querySelector('.char-avatar');
+    if (sideAv && avatar) sideAv.textContent = avatar.textContent;
   }
 
   function deleteConv(id) {
@@ -2990,6 +3011,8 @@
     if (key && STORY[key]) buildRAGIndex(key);
     // 显示/隐藏角色日记按钮
     var cdb = $('charDiaryBtn'); if (cdb) cdb.style.display = key ? '' : 'none';
+    // 更新聊天头像和名字
+    updateChatHeader();
     // 自动发送开场白启动剧情
     if (key && STORY[key]) {
       var opening = '请开始《' + STORY[key].name + '》的序章，为我介绍世界观和初始场景，等待我输入女主的名字。';
@@ -3354,7 +3377,7 @@
       S.set('convs', conversations);
       S.set('currentConv', currentConvId);
     }
-    renderConvList(); renderHistory(); renderTHist(); renderVocab(); loadDiary(); updateCounts(); initSelPopup();
+    renderConvList(); renderHistory(); renderTHist(); renderVocab(); loadDiary(); updateCounts(); initSelPopup(); updateChatHeader();
 
     // Story selector
     document.querySelectorAll('.story-card').forEach(function(c) {
