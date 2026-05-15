@@ -264,6 +264,27 @@
     }
     .msg-bubble pre code { background: none; padding: 0; }
 
+    /* 流式光标 */
+    .streaming-cursor {
+      display: inline-block; width: 2px; height: 1em;
+      background: var(--text-primary); margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* 选项按钮 */
+    .choice-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .choice-btn {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 8px 16px;
+      font-size: var(--text-sm); color: var(--text-primary);
+      cursor: pointer; text-align: left; line-height: 1.5;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .choice-btn:hover { border-color: var(--amber); background: var(--amber-light); }
+    .choice-btn:active { transform: scale(0.97); }
+
     .typing { display: none; align-self: flex-start; padding: var(--sp-3) var(--sp-4); background: var(--bot-bg); border: 1px solid var(--bot-border); border-radius: var(--radius-lg); border-top-left-radius: var(--radius-sm); gap: 5px; align-items: center; }
     .typing.on { display: flex; }
     .t-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); animation: tB 1.4s infinite ease-in-out; }
@@ -1382,7 +1403,11 @@
       renderConvList();
     }
 
-    $('typing').classList.add('on'); scrollMsgs();
+    // 记录用户是否在底部
+    var msgsEl = $('msgs');
+    var wasAtBottom = msgsEl.scrollTop + msgsEl.clientHeight >= msgsEl.scrollHeight - 50;
+    $('typing').classList.add('on');
+    if (wasAtBottom) scrollMsgs();
     try {
       var msgs = [];
       var sys = cfg.persona;
@@ -1408,12 +1433,10 @@
       if (historyMsgs.length > 10) {
         var summary = summaries[currentConvId] || '';
         if (!summary) {
-          // 生成摘要
           summary = await summarizeConv(conv);
         }
         if (summary) {
           msgs.push({ role: 'system', content: '【之前的对话摘要】\n' + summary });
-          // 只发最近 5 条
           historyMsgs.slice(-5).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
         } else {
           historyMsgs.slice(-20).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
@@ -1421,15 +1444,63 @@
       } else {
         historyMsgs.slice(-20).forEach(function(m) { msgs.push({ role: m.role, content: m.content }); });
       }
-      var reply = await callChatAPI(msgs, { max_tokens: activeStory ? 4096 : 1024, temperature: 0.85 });
+
+      // 创建空的 bot 消息气泡（流式填充）
+      var streamDiv = document.createElement('div');
+      streamDiv.className = 'msg-group bot';
+      var streamAv = activeStory ? (STORY[activeStory] ? STORY[activeStory].icon : '🏮') : '🏮';
+      var streamNm = activeStory ? (STORY[activeStory] ? STORY[activeStory].name : '酒馆掌柜') : '酒馆掌柜';
+      streamDiv.innerHTML =
+        '<div class="msg-av">' + streamAv + '</div>' +
+        '<div class="msg-body">' +
+          '<div class="msg-meta"><span class="msg-sender">' + streamNm + '</span><span class="msg-time">' + timeStr() + '</span></div>' +
+          '<div class="msg-bubble"><span class="streaming-cursor"></span></div>' +
+        '</div>';
+      var typingEl = $('typing');
+      msgsEl.insertBefore(streamDiv, typingEl);
+      $('typing').classList.remove('on');
+      var bubbleEl = streamDiv.querySelector('.msg-bubble');
+
+      // 流式调用
+      var reply = await callChatAPIStream(msgs, { max_tokens: activeStory ? 4096 : 1024, temperature: 0.85 }, function(text) {
+        bubbleEl.innerHTML = fmtMd(CODEC.decode(text)) + '<span class="streaming-cursor"></span>';
+        // 仅当用户在底部时自动滚动
+        if (wasAtBottom) {
+          msgsEl.scrollTop = msgsEl.scrollHeight;
+          wasAtBottom = msgsEl.scrollTop + msgsEl.clientHeight >= msgsEl.scrollHeight - 50;
+        }
+      });
+
+      // 流式完成：移除光标，最终渲染
+      var finalReply = CODEC.decode(reply);
+      bubbleEl.innerHTML = fmtMd(finalReply);
+
+      // 检测选项并渲染按钮
+      var choiceMatch = finalReply.match(/^[A-D][.、．：:]\s*(.+)/gm);
+      if (choiceMatch && choiceMatch.length >= 2 && choiceMatch.length <= 4) {
+        var choiceDiv = document.createElement('div');
+        choiceDiv.className = 'choice-btns';
+        choiceMatch.forEach(function(c) {
+          var btn = document.createElement('button');
+          btn.className = 'choice-btn';
+          btn.textContent = c.trim();
+          btn.addEventListener('click', function() {
+            choiceDiv.remove();
+            sendMsg(c.trim());
+          });
+          choiceDiv.appendChild(btn);
+        });
+        bubbleEl.appendChild(choiceDiv);
+      }
+
+      // 存入对话历史
       var rts = timeStr();
       conv.messages.push({ role: 'assistant', content: reply, ts: rts });
-      addMsg('assistant', reply, rts);
       S.set('convs', conversations);
     } catch(err) {
       addMsg('system', '❌ ' + err.message, timeStr());
     }
-    finally { $('typing').classList.remove('on'); scrollMsgs(); }
+    finally { $('typing').classList.remove('on'); }
   }
 
   // ── Conversation Summary ──
@@ -3289,6 +3360,105 @@
       if (sseText) return sseText;
       throw new Error('API 返回格式异常: ' + raw.substring(0, 200));
     }
+  }
+
+  // 流式 API 调用（逐 chunk 回调）
+  async function callChatAPIStream(messages, opts, onChunk) {
+    opts = opts || {};
+    var model = opts.model || cfg.model;
+    var maxTokens = opts.max_tokens || 4096;
+    var temperature = opts.temperature !== undefined ? opts.temperature : 0.85;
+
+    var url, headers, body;
+    if (isAnthropicAPI()) {
+      var sysMsg = '';
+      var chatMsgs = [];
+      messages.forEach(function(m) {
+        if (m.role === 'system') { sysMsg += (sysMsg ? '\n' : '') + m.content; }
+        else { chatMsgs.push({ role: m.role, content: m.content }); }
+      });
+      url = normalizeApiBase(cfg.apiBase).replace(/\/v1$/, '') + '/v1/messages';
+      headers = { 'Content-Type': 'application/json', 'x-api-key': cfg.apiKey, 'anthropic-version': '2023-06-01' };
+      body = { model: model, max_tokens: maxTokens, stream: true, messages: chatMsgs };
+      if (sysMsg) body.system = sysMsg;
+    } else {
+      url = normalizeApiBase(cfg.apiBase) + '/chat/completions';
+      headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.apiKey };
+      body = { model: model, messages: messages, temperature: temperature, max_tokens: maxTokens, stream: true };
+    }
+
+    var resp = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body) });
+    if (!resp.ok) {
+      var raw = ''; try { raw = await resp.text(); } catch(x) {}
+      var e = {}; try { e = JSON.parse(raw); } catch(x) {}
+      throw new Error((e.error && e.error.message) || ('HTTP ' + resp.status + ': ' + raw.substring(0, 200)));
+    }
+
+    // 如果没有 body（不支持流式），回退
+    if (!resp.body) {
+      var full = await callChatAPI(messages, opts);
+      onChunk(full);
+      return full;
+    }
+
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+    var result = '';
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+
+      var lines = buffer.split('\n');
+      buffer = lines.pop(); // 保留不完整的最后一行
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (!line.startsWith('data:')) continue;
+        var payload = line.substring(5).trim();
+        if (payload === '[DONE]') continue;
+        try {
+          var obj = JSON.parse(payload);
+          var text = '';
+          // Anthropic: {"type":"content_block_delta","delta":{"text":"..."}}
+          if (obj.delta && obj.delta.text) text = obj.delta.text;
+          // OpenAI: {"choices":[{"delta":{"content":"..."}}]}
+          else if (obj.choices && obj.choices[0]) {
+            var c = obj.choices[0].delta || obj.choices[0].message;
+            if (c && c.content) text = c.content;
+          }
+          if (text) {
+            result += text;
+            onChunk(result);
+          }
+        } catch(e) {}
+      }
+    }
+
+    // 处理 buffer 中剩余数据
+    if (buffer.trim()) {
+      var line = buffer.trim();
+      if (line.startsWith('data:')) {
+        var payload = line.substring(5).trim();
+        if (payload !== '[DONE]') {
+          try {
+            var obj = JSON.parse(payload);
+            var text = '';
+            if (obj.delta && obj.delta.text) text = obj.delta.text;
+            else if (obj.choices && obj.choices[0]) {
+              var c = obj.choices[0].delta || obj.choices[0].message;
+              if (c && c.content) text = c.content;
+            }
+            if (text) { result += text; onChunk(result); }
+          } catch(e) {}
+        }
+      }
+    }
+
+    if (!result) throw new Error('API 返回空内容');
+    return result;
   }
 
   // ── Fetch models ──
