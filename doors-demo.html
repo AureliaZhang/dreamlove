@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雾中酒馆 · 选择你的门</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --gold: #c9a84c;
+      --blue: #6b8ca4;
+      --text: #c8d0da;
+      --text-dim: #6a7a8d;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Noto Sans SC', system-ui, sans-serif;
+    }
+
+    #particleCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .fog-layer {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(107,140,164,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(201,168,76,0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 100% 60% at 50% 100%, rgba(107,140,164,0.12) 0%, transparent 50%);
+    }
+
+    /* ═══ 阶段 1：三扇门 ═══ */
+    .phase1 {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .phase1.hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
+
+    .landing-header {
+      position: absolute; top: 30px; left: 0; right: 0;
+      text-align: center; z-index: 10;
+    }
+    .landing-title {
+      font-family: 'Noto Serif SC', serif; font-size: 42px; font-weight: 700;
+      background: linear-gradient(135deg, var(--gold), #e8d5a0, var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: 6px; margin-bottom: 8px;
+    }
+    .landing-sub { font-size: 14px; color: var(--text-dim); letter-spacing: 4px; }
+
+    .doors-row {
+      display: flex; gap: 80px; align-items: flex-end;
+      perspective: 1200px;
+    }
+
+    .door-wrapper {
+      display: flex; flex-direction: column; align-items: center;
+      cursor: pointer; position: relative;
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s;
+    }
+    .door-wrapper:hover { transform: translateY(-12px) scale(1.03); }
+    .door-wrapper:hover .door-glow { opacity: 1; }
+    .door-wrapper.fade-out { opacity: 0; transform: scale(0.8); pointer-events: none; }
+    .door-label {
+      font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 600;
+      margin-bottom: 14px; letter-spacing: 3px; opacity: 0.85;
+    }
+    .door-sublabel {
+      font-size: 11px; color: var(--text-dim); margin-top: 14px; letter-spacing: 1px; opacity: 0.5;
+    }
+
+    /* 门框 */
+    .door-frame {
+      position: relative; width: 170px; height: 260px;
+      border-radius: 85px 85px 4px 4px; overflow: hidden;
+      transition: box-shadow 0.5s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .door-wrapper:hover .door-frame { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.2), 0 0 50px rgba(255,255,255,0.06); }
+
+    .door-panel {
+      position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border-radius: 77px 77px 2px 2px; overflow: hidden;
+      transform-origin: left center;
+      transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+      backface-visibility: hidden;
+    }
+    .door-wrapper.open .door-panel { transform: rotateY(-110deg); }
+
+    .door-light {
+      position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border-radius: 77px 77px 2px 2px;
+      opacity: 0; transition: opacity 0.6s 0.2s;
+    }
+    .door-wrapper.open .door-light { opacity: 1; }
+
+    .door-glow {
+      position: absolute; inset: -20px; border-radius: 100px 100px 20px 20px;
+      opacity: 0; transition: opacity 0.4s; pointer-events: none; filter: blur(30px);
+    }
+    .door-frame::after {
+      content: ''; position: absolute; inset: 7px;
+      border-radius: 78px 78px 3px 3px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-left: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(0,0,0,0.2);
+      border-right: 1px solid rgba(0,0,0,0.15);
+      z-index: 10; pointer-events: none;
+    }
+
+    /* 浮动动画 */
+    .door-wrapper { animation: float1 6s ease-in-out infinite; }
+    .door-wrapper:nth-child(2) { animation: float2 6.5s ease-in-out infinite; animation-delay: -1s; }
+    .door-wrapper:nth-child(3) { animation: float3 5s ease-in-out infinite; animation-delay: -2s; }
+    @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    @keyframes float2 { 0%,100%{transform:translateY(0) rotate(-0.5deg)} 50%{transform:translateY(-10px) rotate(0.5deg)} }
+    @keyframes float3 { 0%,100%{transform:translateY(0) rotate(0.3deg)} 50%{transform:translateY(-18px) rotate(-0.3deg)} }
+    .door-wrapper:hover { animation-play-state: paused; }
+
+    /* ═══ 门 1 — 石门 ═══ */
+    .door-stone .door-panel { background: linear-gradient(170deg, #2a3a4e 0%, #1e2e40 30%, #162438 60%, #1a2a3e 100%); box-shadow: inset 0 0 50px rgba(60,120,180,0.15); }
+    .door-stone .stone-bricks { position: absolute; inset: 0; opacity: 0.5; background: linear-gradient(135deg, transparent 40%, rgba(140,180,220,0.06) 41%, transparent 42%), linear-gradient(225deg, transparent 45%, rgba(140,180,220,0.05) 46%, transparent 47%), linear-gradient(315deg, transparent 50%, rgba(140,180,220,0.04) 51%, transparent 52%), linear-gradient(45deg, transparent 35%, rgba(140,180,220,0.05) 36%, transparent 37%); }
+    .door-stone .mist { position: absolute; inset: 0; overflow: hidden; }
+    .door-stone .mist::before { content: ''; position: absolute; bottom: -10px; left: -20%; right: -20%; height: 70%; background: radial-gradient(ellipse 80% 30% at 30% 80%, rgba(180,210,240,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 25% at 70% 70%, rgba(200,220,240,0.12) 0%, transparent 100%); animation: mistDrift 8s ease-in-out infinite; }
+    .door-stone .mist::after { content: ''; position: absolute; top: -10px; left: -20%; right: -20%; height: 50%; background: radial-gradient(ellipse 70% 25% at 40% 20%, rgba(180,210,240,0.08) 0%, transparent 100%); animation: mistDrift 10s ease-in-out infinite reverse; }
+    @keyframes mistDrift { 0%,100%{transform:translateX(0)} 50%{transform:translateX(15px)} }
+    .door-stone .slit { position: absolute; top: 12%; left: 50%; transform: translateX(-50%); width: 2px; height: 76%; background: linear-gradient(180deg, transparent, rgba(140,200,240,0.2) 20%, rgba(160,210,250,0.5) 50%, rgba(140,200,240,0.2) 80%, transparent); filter: blur(1px); animation: slitPulse 4s ease-in-out infinite; }
+    @keyframes slitPulse { 0%,100%{opacity:0.4;filter:blur(1px)} 50%{opacity:1;filter:blur(2px)} }
+    .door-stone .runes { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .door-stone .runes svg { width: 80px; height: 120px; overflow: visible; }
+    .rune-path { fill: none; stroke: rgba(140,200,240,0.5); stroke-width: 1.2; filter: drop-shadow(0 0 6px rgba(140,200,240,0.4)); animation: runeGlow 3s ease-in-out infinite; }
+    .rune-path:nth-child(2) { animation-delay: -1s; stroke: rgba(140,200,240,0.4); }
+    .rune-path:nth-child(3) { animation-delay: -2s; stroke: rgba(140,200,240,0.35); }
+    @keyframes runeGlow { 0%,100%{opacity:0.4;filter:drop-shadow(0 0 4px rgba(140,200,240,0.3))} 50%{opacity:1;filter:drop-shadow(0 0 10px rgba(140,200,240,0.6))} }
+    .door-stone .knocker-ring { position: absolute; bottom: 38%; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; }
+    .door-stone .knocker-ring svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 6px rgba(60,120,180,0.3)); }
+    .door-stone .door-light { background: radial-gradient(ellipse at center, rgba(140,200,240,0.25) 0%, transparent 75%); }
+    .door-stone .door-glow { background: radial-gradient(ellipse at center, rgba(140,200,240,0.12) 0%, transparent 70%); }
+    .door-stone .door-label { color: #8ec4e8; }
+    .door-stone .door-frame { background: linear-gradient(160deg, #4a6070 0%, #2e4454 30%, #1e3040 60%, #2a4050 100%); }
+
+    /* ═══ 门 2 — 铁木门 ═══ */
+    .door-iron .door-panel { background: linear-gradient(175deg, #6a4828 0%, #4a3018 30%, #3a2410 60%, #2a1a0a 100%); box-shadow: inset 0 0 50px rgba(201,168,76,0.1); }
+    .door-iron .wood-grain { position: absolute; inset: 0; opacity: 0.5; background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(100,65,25,0.15) 3px, rgba(100,65,25,0.15) 4px, transparent 4px, transparent 7px, rgba(80,50,18,0.12) 7px, rgba(80,50,18,0.12) 8px, transparent 8px, transparent 12px, rgba(60,38,12,0.1) 12px, rgba(60,38,12,0.1) 13px); }
+    .door-iron .ornate-border { position: absolute; inset: 6px; border: 1px solid rgba(201,168,76,0.25); border-radius: 70px 70px 0 0; }
+    .door-iron .ornate-border::before { content: ''; position: absolute; inset: 4px; border: 1px solid rgba(201,168,76,0.12); border-radius: 66px 66px 0 0; }
+    .door-iron .iron-bands { position: absolute; left: 0; right: 0; height: 16px; background: linear-gradient(180deg, #5a4020, #3a2810, #5a4020); border-top: 1px solid rgba(201,168,76,0.35); border-bottom: 1px solid rgba(201,168,76,0.15); }
+    .door-iron .iron-bands::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent); }
+    .door-iron .iron-bands::after { content: ''; position: absolute; inset: 2px 0; background: linear-gradient(180deg, rgba(201,168,76,0.1), transparent, rgba(201,168,76,0.08)); }
+    .door-iron .iron-bands.top { top: 16%; } .door-iron .iron-bands.mid { top: 50%; } .door-iron .iron-bands.bot { top: 84%; }
+    .rivet { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle at 35% 30%, #f0d060, #c09830 50%, #806018); border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.4), inset 0 -1px 1px rgba(0,0,0,0.3); }
+    .door-iron .crown-handle { position: absolute; bottom: 42%; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; }
+    .door-iron .crown-handle svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 8px rgba(201,168,76,0.4)); }
+    .door-iron .sconce { position: absolute; bottom: 52%; width: 32px; height: 54px; }
+    .door-iron .sconce.left { left: 6px; } .door-iron .sconce.right { right: 6px; }
+    .door-iron .sconce svg { width: 100%; height: 100%; filter: drop-shadow(0 0 8px rgba(255,180,60,0.4)); }
+    .candle-flame { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 8px; height: 14px; background: radial-gradient(ellipse at 50% 80%, #fff8e0 0%, #ffb830 40%, #ff8800 70%, transparent 100%); border-radius: 50% 50% 40% 40%; animation: flame 1.5s ease-in-out infinite alternate; filter: blur(0.5px); }
+    .candle-flame::after { content: ''; position: absolute; top: -12px; left: -12px; right: -12px; bottom: -8px; background: radial-gradient(circle, rgba(255,180,60,0.3) 0%, transparent 70%); animation: flameGlow 2s ease-in-out infinite alternate; }
+    @keyframes flame { 0%{transform:translateX(-50%) scaleX(1) scaleY(1)} 50%{transform:translateX(-48%) scaleX(0.85) scaleY(1.1)} 100%{transform:translateX(-52%) scaleX(0.95) scaleY(0.9)} }
+    @keyframes flameGlow { 0%{opacity:0.6} 100%{opacity:1} }
+    .door-iron .door-light { background: radial-gradient(ellipse at center, rgba(255,190,70,0.25) 0%, transparent 75%); }
+    .door-iron .door-glow { background: radial-gradient(ellipse at center, rgba(201,168,76,0.15) 0%, transparent 70%); }
+    .door-iron .door-label { color: #e0b850; text-shadow: 0 0 12px rgba(201,168,76,0.3); }
+    .door-iron .door-frame { background: linear-gradient(160deg, #6a4828 0%, #4a3018 30%, #2a1a0e 60%, #3a2818 100%); }
+
+    /* ═══ 门 3 — 灵门 ═══ */
+    .door-spirit .door-panel { background: linear-gradient(170deg, rgba(100,80,180,0.15) 0%, rgba(80,60,160,0.08) 50%, rgba(60,50,140,0.12) 100%); border: 1px solid rgba(160,140,220,0.25); box-shadow: inset 0 0 50px rgba(120,100,200,0.15); }
+    .door-spirit .jade-texture { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 30% 40%, rgba(160,140,220,0.12) 0%, transparent 100%), radial-gradient(ellipse 50% 60% at 70% 60%, rgba(180,160,240,0.08) 0%, transparent 100%); animation: jadeShimmer 6s ease-in-out infinite; }
+    @keyframes jadeShimmer { 0%,100%{opacity:0.6} 50%{opacity:1} }
+    .door-spirit .spirit-array { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .door-spirit .spirit-array svg { width: 100px; height: 100px; overflow: visible; animation: arraySpin 30s linear infinite; }
+    @keyframes arraySpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    .array-ring { fill: none; stroke-width: 0.8; animation: arrayPulse 4s ease-in-out infinite; }
+    .array-ring:nth-child(1) { stroke: rgba(160,140,220,0.4); } .array-ring:nth-child(2) { stroke: rgba(180,160,240,0.3); animation-delay: -1.3s; } .array-ring:nth-child(3) { stroke: rgba(200,180,255,0.25); animation-delay: -2.6s; }
+    @keyframes arrayPulse { 0%,100%{opacity:0.4;filter:drop-shadow(0 0 2px rgba(160,140,220,0.2))} 50%{opacity:1;filter:drop-shadow(0 0 6px rgba(160,140,220,0.5))} }
+    .array-rune { fill: rgba(180,160,240,0.5); font-size: 6px; font-family: serif; filter: drop-shadow(0 0 3px rgba(160,140,220,0.4)); }
+    .door-spirit .slit { position: absolute; top: 10%; left: 50%; transform: translateX(-50%); width: 2px; height: 80%; background: linear-gradient(180deg, transparent, rgba(200,180,255,0.5), rgba(160,140,220,0.8), rgba(200,180,255,0.5), transparent); filter: blur(1px); animation: spiritSlit 3s ease-in-out infinite; }
+    .door-spirit .slit::before { content: ''; position: absolute; inset: 0 -8px; background: linear-gradient(180deg, transparent, rgba(160,140,220,0.1), rgba(160,140,220,0.2), rgba(160,140,220,0.1), transparent); filter: blur(6px); }
+    @keyframes spiritSlit { 0%,100%{opacity:0.5;width:2px} 50%{opacity:1;width:3px} }
+    .spirit-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: inherit; }
+    .spirit-dot { position: absolute; width: 3px; height: 3px; background: rgba(180,160,240,0.7); border-radius: 50%; filter: blur(0.5px); }
+    .spirit-dot.d1 { left:25%;bottom:8%; animation: spUp 4s ease-in-out infinite 0s; }
+    .spirit-dot.d2 { left:40%;bottom:15%; animation: spUp 5s ease-in-out infinite -1s; }
+    .spirit-dot.d3 { left:60%;bottom:5%; animation: spUp 3.5s ease-in-out infinite -2s; }
+    .spirit-dot.d4 { left:75%;bottom:12%; animation: spUp 4.5s ease-in-out infinite -0.5s; }
+    .spirit-dot.d5 { left:50%;bottom:20%; animation: spUp 6s ease-in-out infinite -3s; }
+    @keyframes spUp { 0%{transform:translateY(0) scale(1);opacity:0} 15%{opacity:1} 85%{opacity:1} 100%{transform:translateY(-220px) scale(0);opacity:0} }
+    .door-spirit .door-light { background: radial-gradient(ellipse at center, rgba(160,140,220,0.3) 0%, transparent 75%); }
+    .door-spirit .door-glow { background: radial-gradient(ellipse at center, rgba(160,140,220,0.15) 0%, transparent 70%); }
+    .door-spirit .door-label { color: #b8a0e0; }
+    .door-spirit .door-frame { background: linear-gradient(160deg, rgba(120,100,180,0.4) 0%, rgba(80,60,150,0.3) 30%, rgba(60,50,130,0.35) 60%, rgba(100,80,160,0.3) 100%); }
+
+    .landing-hint {
+      position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+      font-size: 13px; color: var(--text-dim); letter-spacing: 2px;
+      animation: hintPulse 3s ease-in-out infinite; white-space: nowrap;
+    }
+    @keyframes hintPulse { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
+
+    /* ═══ 阶段 2：选择面板 ═══ */
+    .phase2 {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      gap: 60px; padding: 40px 60px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    .phase2.active { opacity: 1; pointer-events: auto; }
+
+    /* 左侧：选中的门 */
+    .phase2-door {
+      flex-shrink: 0;
+      transform: scale(0.85);
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .phase2.active .phase2-door { transform: scale(1); }
+
+    /* 右侧：配置面板 */
+    .config-panel {
+      width: 380px; max-height: 80vh;
+      background: rgba(15,18,24,0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 28px;
+      display: flex; flex-direction: column;
+      transform: translateX(30px);
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1) 0.1s;
+    }
+    .phase2.active .config-panel { transform: translateX(0); }
+
+    .config-title {
+      font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .config-sub { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; }
+
+    .config-section { margin-bottom: 18px; }
+    .config-label {
+      font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+      letter-spacing: 1.5px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .config-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
+
+    /* 筛选按钮 */
+    .char-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+    .char-tab {
+      font-size: 11px; padding: 4px 12px;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 14px;
+      background: transparent; color: var(--text-dim);
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .char-tab:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+    .char-tab.active { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); color: var(--text); }
+
+    /* 角色列表 */
+    .char-list { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
+    .char-list::-webkit-scrollbar { width: 3px; }
+    .char-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+    .char-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 6px;
+      transition: background 0.15s, opacity 0.2s, max-height 0.25s;
+      cursor: pointer;
+    }
+    .char-item:hover { background: rgba(255,255,255,0.04); }
+    .char-item.hidden { opacity: 0; max-height: 0; padding: 0 10px; overflow: hidden; }
+    .char-item.unselected { opacity: 0.35; }
+    .char-check {
+      width: 16px; height: 16px; border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .char-item:not(.unselected) .char-check {
+      background: rgba(107,140,164,0.3); border-color: var(--blue);
+    }
+    .char-item:not(.unselected) .char-check::after {
+      content: '✓'; font-size: 10px; color: var(--text);
+    }
+    .char-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .char-name { font-size: 13px; font-weight: 500; }
+    .char-role { font-size: 11px; color: var(--text-dim); margin-left: auto; white-space: nowrap; }
+    .char-edit {
+      width: 22px; height: 22px; border: none; border-radius: 4px;
+      background: transparent; color: var(--text-dim); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.15s; opacity: 0;
+    }
+    .char-item:hover .char-edit { opacity: 1; }
+    .char-edit:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+    .char-edit svg { width: 13px; height: 13px; }
+
+    /* ── 角色 Prompt 编辑弹窗 ── */
+    .edit-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .edit-overlay.active { display: flex; }
+    .edit-modal {
+      width: 420px; max-width: 90vw; max-height: 85vh;
+      background: #1a1e26; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+    .edit-modal::-webkit-scrollbar { width: 4px; }
+    .edit-modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+    .edit-header {
+      padding: 20px 24px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .edit-header-left { display: flex; align-items: center; gap: 10px; }
+    .edit-avatar {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .edit-char-name { font-size: 16px; font-weight: 600; }
+    .edit-close {
+      width: 28px; height: 28px; border: none; border-radius: 6px;
+      background: transparent; color: var(--text-dim); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .edit-close:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+    .edit-body { padding: 16px 24px 20px; }
+    .edit-field { margin-bottom: 14px; }
+    .edit-field:last-child { margin-bottom: 0; }
+    .edit-label {
+      font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+    .edit-label .required { color: var(--blue); font-size: 9px; }
+    .edit-input {
+      width: 100%; padding: 8px 12px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px; color: var(--text);
+      font-family: inherit; font-size: 13px; line-height: 1.5;
+      outline: none; resize: vertical; transition: border-color 0.2s;
+    }
+    .edit-input:focus { border-color: rgba(107,140,164,0.4); }
+    .edit-input::placeholder { color: rgba(255,255,255,0.15); }
+    textarea.edit-input { min-height: 60px; }
+    .edit-hint {
+      font-size: 10px; color: rgba(255,255,255,0.2);
+      margin-top: 4px; line-height: 1.4;
+    }
+    .edit-footer {
+      padding: 12px 24px; border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .edit-btn {
+      padding: 7px 16px; border-radius: 6px; font-size: 12px;
+      cursor: pointer; font-family: inherit; transition: all 0.2s; border: none;
+    }
+    .edit-btn.cancel { background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); }
+    .edit-btn.cancel:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .edit-btn.save { background: var(--blue); color: #fff; }
+    .edit-btn.save:hover { filter: brightness(1.15); }
+
+    /* 名字输入 */
+    .name-input {
+      width: 100%; padding: 10px 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: var(--text);
+      font-family: 'Noto Serif SC', serif; font-size: 15px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .name-input:focus { border-color: var(--blue); }
+    .name-input::placeholder { color: var(--text-dim); }
+
+    /* 按钮组 */
+    .config-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .btn-back {
+      padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; background: transparent; color: var(--text-dim);
+      font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    }
+    .btn-back:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+    .btn-enter {
+      flex: 1; padding: 10px 20px; border: none;
+      border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: all 0.2s;
+    }
+    .btn-enter.stone { background: linear-gradient(135deg, #4a6070, #2e4454); color: #8ec4e8; }
+    .btn-enter.iron { background: linear-gradient(135deg, #6a4828, #3a2410); color: #e0b850; }
+    .btn-enter.spirit { background: linear-gradient(135deg, rgba(100,80,180,0.5), rgba(60,50,130,0.5)); color: #b8a0e0; }
+    .btn-enter:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+    /* ═══ 过渡 ═══ */
+    .transition-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: #000; opacity: 0; pointer-events: none; transition: opacity 0.6s;
+    }
+    .transition-overlay.active { opacity: 1; pointer-events: all; }
+    .transition-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-family: 'Noto Serif SC', serif; font-size: 20px; color: var(--gold);
+      opacity: 0; letter-spacing: 4px; transition: opacity 0.8s 0.4s;
+    }
+    .transition-overlay.active .transition-text { opacity: 1; }
+
+
+    .chat-placeholder {
+      position: fixed; inset: 0; z-index: 200;
+      background: #eef1f5; display: none; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+    }
+    .chat-placeholder.active { display: flex; }
+    .chat-placeholder h2 { font-family: 'Noto Serif SC', serif; font-size: 24px; color: #1e2a3a; }
+    .chat-placeholder p { font-size: 14px; color: #5a6876; }
+    .chat-placeholder .back-btn { margin-top: 20px; padding: 10px 24px; background: #6b8ca4; color: #fff; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-family: inherit; }
+    .chat-placeholder .back-btn:hover { background: #5a7a92; }
+
+    /* ═══ 响应式 ═══ */
+    @media (max-width: 900px) {
+      .phase2 { flex-direction: column; gap: 20px; padding: 20px; }
+      .phase2-door { transform: scale(0.6); }
+      .config-panel { width: 100%; max-height: 50vh; }
+    }
+    @media (max-width: 768px) {
+      .doors-row { flex-direction: column; align-items: center; gap: 16px; }
+      .door-frame { width: 100px; height: 150px; border-radius: 50px 50px 4px 4px; }
+      .door-panel { top: 6px; left: 6px; right: 6px; bottom: 6px; border-radius: 44px 44px 2px 2px; }
+      .door-light { top: 6px; left: 6px; right: 6px; bottom: 6px; border-radius: 44px 44px 2px 2px; }
+      .door-frame::after { inset: 5px; border-radius: 45px 45px 3px 3px; }
+      .landing-title { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+<div class="fog-layer"></div>
+
+<!-- ═══ 阶段 1：三扇门 ═══ -->
+<div class="phase1" id="phase1">
+  <div class="landing-header">
+    <div class="landing-title">雾 中 酒 馆</div>
+    <div class="landing-sub">THE MISTY TAVERN</div>
+  </div>
+
+  <div class="doors-row">
+    <!-- 门 1 -->
+    <div class="door-wrapper door-stone" data-story="cultivation" data-name="九州问道" data-sub="古代修仙 · 仙门宗派" onclick="selectDoor(this)">
+      <div class="door-label">九州问道</div>
+      <div class="door-frame">
+        <div class="door-light"></div>
+        <div class="door-panel">
+          <div class="stone-bricks"></div><div class="slit"></div>
+          <div class="runes"><svg viewBox="0 0 80 120"><path class="rune-path" d="M40 10 L40 110"/><path class="rune-path" d="M25 25 L40 15 L55 25"/><path class="rune-path" d="M20 40 Q40 50 60 40"/><path class="rune-path" d="M25 60 L40 55 L55 60"/><path class="rune-path" d="M30 75 L40 70 L50 75"/><path class="rune-path" d="M20 90 Q40 100 60 90"/><circle cx="40" cy="45" r="8" class="rune-path" stroke-dasharray="3 3"/><circle cx="40" cy="75" r="5" class="rune-path"/></svg></div>
+          <div class="knocker-ring"><svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="18" r="8" stroke="#6a7a84" stroke-width="2" fill="rgba(60,70,80,0.5)"/><circle cx="19" cy="16" r="1.5" fill="#8a9aa4"/><circle cx="25" cy="16" r="1.5" fill="#8a9aa4"/><path d="M18 20 Q22 23 26 20" stroke="#6a7a84" stroke-width="1.5" fill="none"/><circle cx="22" cy="30" r="7" stroke="#5a6a74" stroke-width="2.5" fill="none"/><path d="M22 26 L22 23" stroke="#5a6a74" stroke-width="2"/></svg></div>
+          <div class="mist"></div>
+        </div>
+        <div class="door-glow"></div>
+      </div>
+      <div class="door-sublabel">古代修仙 · 仙门宗派</div>
+    </div>
+
+    <!-- 门 2 -->
+    <div class="door-wrapper door-iron" data-story="court" data-name="荆棘王冠" data-sub="西方宫廷 · 权谋纠葛" onclick="selectDoor(this)">
+      <div class="door-label">荆棘王冠</div>
+      <div class="door-frame">
+        <div class="door-light"></div>
+        <div class="door-panel">
+          <div class="wood-grain"></div><div class="ornate-border"></div>
+          <div class="iron-bands top"></div><div class="iron-bands mid"></div><div class="iron-bands bot"></div>
+          <div class="rivet" style="top:12px;left:14px"></div><div class="rivet" style="top:12px;right:14px"></div>
+          <div class="rivet" style="top:55px;left:14px"></div><div class="rivet" style="top:55px;right:14px"></div>
+          <div class="rivet" style="bottom:55px;left:14px"></div><div class="rivet" style="bottom:55px;right:14px"></div>
+          <div class="rivet" style="bottom:12px;left:14px"></div><div class="rivet" style="bottom:12px;right:14px"></div>
+          <div class="sconce left"><svg viewBox="0 0 30 50" fill="none"><rect x="12" y="20" width="6" height="25" rx="1" fill="#5a4530" stroke="#4a3520" stroke-width="0.5"/><rect x="8" y="42" width="14" height="4" rx="2" fill="#4a3520"/><rect x="10" y="18" width="10" height="6" rx="1" fill="#6a5540" stroke="#5a4530" stroke-width="0.5"/><rect x="13" y="12" width="4" height="8" rx="1" fill="#e8d8b0" opacity="0.9"/></svg><div class="candle-flame"></div></div>
+          <div class="sconce right"><svg viewBox="0 0 30 50" fill="none"><rect x="12" y="20" width="6" height="25" rx="1" fill="#5a4530" stroke="#4a3520" stroke-width="0.5"/><rect x="8" y="42" width="14" height="4" rx="2" fill="#4a3520"/><rect x="10" y="18" width="10" height="6" rx="1" fill="#6a5540" stroke="#5a4530" stroke-width="0.5"/><rect x="13" y="12" width="4" height="8" rx="1" fill="#e8d8b0" opacity="0.9"/></svg><div class="candle-flame" style="animation-delay:-0.7s"></div></div>
+          <div class="crown-handle"><svg viewBox="0 0 50 50" fill="none"><path d="M25 8 L28 16 L36 14 L32 22 L40 24 L32 28 L36 36 L25 32 L14 36 L18 28 L10 24 L18 22 L14 14 L22 16 Z" fill="rgba(201,168,76,0.15)" stroke="#c9a84c" stroke-width="1.2"/><circle cx="25" cy="22" r="3" fill="rgba(201,168,76,0.3)" stroke="#c9a84c" stroke-width="0.8"/><circle cx="25" cy="40" r="5" stroke="#b09040" stroke-width="2" fill="none"/><path d="M25 35 L25 32" stroke="#b09040" stroke-width="1.5"/></svg></div>
+        </div>
+        <div class="door-glow"></div>
+      </div>
+      <div class="door-sublabel">西方宫廷 · 权谋纠葛</div>
+    </div>
+
+    <!-- 门 3 -->
+    <div class="door-wrapper door-spirit" data-story="xianxia" data-name="六界浮生" data-sub="仙侠世界 · 六界并立" onclick="selectDoor(this)">
+      <div class="door-label">六界浮生</div>
+      <div class="door-frame">
+        <div class="door-light"></div>
+        <div class="door-panel">
+          <div class="jade-texture"></div><div class="slit"></div>
+          <div class="spirit-array"><svg viewBox="0 0 100 100"><circle class="array-ring" cx="50" cy="50" r="42"/><circle class="array-ring" cx="50" cy="50" r="32"/><circle class="array-ring" cx="50" cy="50" r="22"/><polygon class="array-ring" points="50,12 78,65 22,65" style="animation-delay:-0.5s"/><polygon class="array-ring" points="50,88 78,35 22,35" style="animation-delay:-1.8s"/><text class="array-rune" x="50" y="8" text-anchor="middle">灵</text><text class="array-rune" x="88" y="53" text-anchor="middle">天</text><text class="array-rune" x="50" y="96" text-anchor="middle">魔</text><text class="array-rune" x="12" y="53" text-anchor="middle">冥</text><text class="array-rune" x="72" y="20" text-anchor="middle">妖</text><text class="array-rune" x="28" y="20" text-anchor="middle">人</text></svg></div>
+          <div class="spirit-particles"><div class="spirit-dot d1"></div><div class="spirit-dot d2"></div><div class="spirit-dot d3"></div><div class="spirit-dot d4"></div><div class="spirit-dot d5"></div></div>
+        </div>
+        <div class="door-glow"></div>
+      </div>
+      <div class="door-sublabel">仙侠世界 · 六界并立</div>
+    </div>
+  </div>
+
+  <div class="landing-hint">— 点击门扉，踏入你的故事 —</div>
+</div>
+
+<!-- ═══ 阶段 2：配置面板 ═══ -->
+<div class="phase2" id="phase2">
+  <div class="phase2-door" id="phase2Door"></div>
+  <div class="config-panel">
+    <div class="config-title" id="cfgTitle"></div>
+    <div class="config-sub" id="cfgSub"></div>
+
+    <div class="config-section">
+      <div class="config-label">可攻略角色 <span style="font-size:9px;letter-spacing:0;text-transform:none;color:rgba(255,255,255,0.25);font-weight:400">（点击名字和人设可编辑）</span></div>
+      <div class="char-tabs" id="cfgTabs">
+        <button class="char-tab active" onclick="cfgFilter('all')">全部</button>
+        <button class="char-tab" onclick="cfgFilter('m')">♂ 男</button>
+        <button class="char-tab" onclick="cfgFilter('f')">♀ 女</button>
+      </div>
+      <div class="char-list" id="cfgCharList"></div>
+    </div>
+
+    <div class="config-section">
+      <div class="config-label">你的名字</div>
+      <input class="name-input" id="cfgNameInput" type="text" placeholder="为自己取一个名字……">
+    </div>
+
+    <div class="config-actions">
+      <button class="btn-back" onclick="goBack()">← 换一扇门</button>
+      <button class="btn-enter" id="cfgEnterBtn" onclick="enterStory()">踏入故事 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="transition-overlay" id="transOverlay">
+  <div class="transition-text" id="transText"></div>
+</div>
+
+<!-- 角色 Prompt 编辑弹窗 -->
+<div class="edit-overlay" id="editOverlay" onclick="if(event.target===this)closeEditModal()">
+  <div class="edit-modal">
+    <div class="edit-header">
+      <div class="edit-header-left">
+        <div class="edit-avatar" id="editAvatar"></div>
+        <div class="edit-char-name" id="editCharName"></div>
+      </div>
+      <button class="edit-close" onclick="closeEditModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="edit-body">
+      <div class="edit-field">
+        <div class="edit-label">名字 <span class="required">*</span></div>
+        <input class="edit-input" id="edName" type="text" placeholder="角色名称">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">身份 / 称号</div>
+        <input class="edit-input" id="edTitle" type="text" placeholder="如：天枢宗剑峰首席弟子">
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">性格 <span class="required">*</span></div>
+        <textarea class="edit-input" id="edPersonality" placeholder="如：外冷内热，不善言辞，内心细腻却从不表露。看似对一切漠不关心，实则默默守护在意的人。"></textarea>
+        <div class="edit-hint">描述角色的核心性格特质，越具体 AI 演绎越准确</div>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">说话风格</div>
+        <textarea class="edit-input" id="edSpeech" placeholder="如：言简意赅，很少用完整的句子。偶尔冒出一句温柔的话会立刻转移话题。口头禅：'……随你。'"></textarea>
+        <div class="edit-hint">描述说话方式、口头禅、常用语气词</div>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">背景故事</div>
+        <textarea class="edit-input" id="edBackground" placeholder="如：三百年前沈家遗孤，家族被暗害。自幼在天枢宗长大，以剑道为唯一信仰。"></textarea>
+        <div class="edit-hint">角色的过去经历，影响其行为动机</div>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">与女主的关系</div>
+        <textarea class="edit-input" id="edRelation" placeholder="如：初始冷漠，视女主为普通同门。随着相处逐渐在意，但绝不承认。会在危险时下意识保护女主。"></textarea>
+        <div class="edit-hint">描述关系发展轨迹和互动模式</div>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">特殊设定</div>
+        <textarea class="edit-input" id="edExtra" placeholder="如：讨厌甜食，但会偷偷给女主买糖葫芦。下雨天会失眠。"></textarea>
+        <div class="edit-hint">小习惯、禁忌、隐藏面等细节</div>
+      </div>
+    </div>
+    <div class="edit-footer">
+      <button class="edit-btn cancel" onclick="closeEditModal()">取消</button>
+      <button class="edit-btn save" onclick="saveEditModal()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="chat-placeholder" id="chatPlaceholder">
+  <h2 id="chatTitle"></h2>
+  <p id="chatDesc"></p>
+  <p style="font-size:12px;color:#8a95a2;margin-top:8px">（聊天界面占位 — 连接到 tavern.html）</p>
+  <button class="back-btn" onclick="location.reload()">返回酒馆</button>
+</div>
+
+<script>
+// ── 角色数据 ──
+var CHARS = {
+  cultivation: [
+    {n:'云无涯',r:'冷傲剑修',g:'m',c:'#8ec4e8',title:'天枢宗·剑峰首席弟子',personality:'寡言少语，傲而不狂，内心细腻却从不表露。对修剑以外的事兴趣寥寥。',speech:'言简意赅，很少说完整句子。偶尔流露温柔会立刻转移话题。口头禅："……随你。"',background:'本名沈夜白，三百年前覆灭的沈家遗孤，家族被天枢宗内部势力暗害。自幼以剑道为唯一信仰。',relation:'初始冷漠，视女主为普通同门。逐渐在意但绝不承认。危险时会下意识保护女主。',extra:''},
+    {n:'苏子衿',r:'温柔药修',g:'m',c:'#8ec4e8',title:'天枢宗·丹峰大师兄',personality:'温柔体贴，对谁都和善。但温柔背后藏着深深的自责——十年前炼丹失败导致师弟中毒。',speech:'语调平和，喜欢用药材做比喻。会不自觉地关心人。口头禅："这味药材性寒，配以温补之物效果更佳。"',background:'木灵根，药灵体。师弟中毒并非炼丹失败，而是被人暗中下毒，他一直在追查真相。',relation:'对女主格外温柔，常主动送药。相处越久越依赖女主，逐渐学会依靠别人。',extra:''},
+    {n:'夜无殇',r:'狡黠魔修',g:'m',c:'#8ec4e8',title:'魔修联盟少主（卧底）',personality:'嬉皮笑脸，玩世不恭，看似什么都不在乎。实则心思极深。面对女主时算计总会变成真心。',speech:'喜欢用反问和调侃。正经时语速会变慢。口头禅："有趣，真有趣。"',background:'银发红瞳，并非自愿成为魔修。幼时被掳走，以亲人要挟。潜入天枢宗的真正目的是寻找解救亲人的方法。',relation:'主动接近女主，初期带着目的。逐渐被女主的真诚打动，在正魔之间做选择。',extra:''},
+    {n:'顾惊鸿',r:'风流浪修',g:'m',c:'#8ec4e8',title:'散修游侠',personality:'风流倜傥，处处留情，但每段感情都是认真的。内心渴望安定却害怕被束缚。',speech:'花言巧语张口就来，但关键时刻会变得认真。口头禅："姑娘，这世间的风景，不如你万一。"',background:'出身不详，四处游历的散修。实力深不可测，却从不展露全部。',relation:'对女主一见钟情（自认为），用惯常的套路撩拨，却发现女主是唯一让他想停留的人。',extra:''},
+    {n:'谢长渊',r:'忠直少宗主',g:'m',c:'#8ec4e8',title:'天枢宗·宗主之子',personality:'正直刚毅，责任感极强，将宗门利益置于个人情感之上。但偶尔会流露出对自由的渴望。',speech:'正式场合用语严谨，私下会放松一些。不善表达感情，但行动说明一切。',background:'宗主独子，从小被当作接班人培养。承受着巨大的期望和压力。',relation:'将女主视为同门后辈，逐渐发现她的特别。在责任与感情之间挣扎。',extra:''},
+    {n:'星璇',r:'忧郁天眼少年',g:'m',c:'#8ec4e8',title:'天枢宗·星峰弟子',personality:'沉默寡言，总是一个人待着。拥有天眼可以看到别人看不到的东西，这让他与世界格格不入。',speech:'说话声音很轻，像是怕打扰别人。偶尔说出的话却一针见血。',background:'天生天眼，能看到灵力流动和人的命数。因为"不祥"被遗弃，被天枢宗收留。',relation:'对女主保持距离，因为他看到了女主身上某种特殊的命数。逐渐信任女主。',extra:''},
+    {n:'柳如烟',r:'温婉药修师姐',g:'f',c:'#c8a0d0',title:'天枢宗·丹峰弟子',personality:'温柔贤淑，是宗门里公认的大姐姐。擅长照顾人，但内心也有自己的执念。',speech:'语调柔和，喜欢用"我们"而非"我"。会不自觉地用姐姐的口吻说话。',background:'药修世家出身，从小在宗门长大。和苏子衿是同门师兄妹。',relation:'将女主当妹妹照顾，但也在女主身上看到了自己缺失的勇敢。',extra:''},
+    {n:'凌霜',r:'冷艳剑修师妹',g:'f',c:'#c8a0d0',title:'天枢宗·剑峰弟子',personality:'外冷内热，话不多但每句都很直接。实力强劲，不服输。',speech:'简短直接，不喜欢废话。生气时会说"……无聊。"',background:'剑道天才，师从云无涯。暗中崇拜师兄但绝不承认。',relation:'对女主一开始有敌意（因为云无涯对女主的关注），后来逐渐认可。',extra:''},
+    {n:'花千语',r:'元气青鸾弟子',g:'f',c:'#c8a0d0',title:'天枢宗·灵兽峰弟子',personality:'活泼开朗，像个小太阳。喜欢灵兽胜过人类，但对朋友极其忠诚。',speech:'语速快，喜欢用感叹句。会不自觉地模仿灵兽的叫声。',background:'青鸾血脉，天生亲和灵兽。是宗门里最年轻的灵兽师。',relation:'把女主当成最好的朋友，会拉着女主到处跑。会为朋友两肋插刀。',extra:''}
+  ],
+  court: [
+    {n:'艾德里安',r:'冷峻王储',g:'m',c:'#e0b850',title:'艾瑟兰王国第一王储',personality:'冷漠寡言，喜怒不形于色，被称为"冰面王子"。内心极度压抑，从未被当作"人"而非"未来的国王"来对待。',speech:'言辞简练，带有命令感。情绪波动时声音会更低沉。口头禅："王座之上没有感情的容身之处。"',background:'深邃灰蓝色眼眸，黑发如墨。自幼被严格培养为王位继承人。他知道"血色婚礼"的真相——那场惨案与他的父王有关。',relation:'对女主冷漠，但暗中调查女主家族被灭门的真相。逐渐被女主的坚韧打动。',extra:''},
+    {n:'莱昂内尔',r:'暖阳王子',g:'m',c:'#e0b850',title:'艾瑟兰王国第二王储',personality:'开朗热情，善于调情，对女性总是温柔体贴。但笑容背后藏着对兄长的复杂情感。',speech:'花言巧语，语调轻快。认真时会放下所有伪装。口头禅："人生苦短，何必愁眉不展？"',background:'金色卷发，琥珀色眼眸。暗中与商人公会达成密约，并非真心想夺位，只是想保护自己不被当作政治牺牲品。',relation:'对女主一见倾心，用惯常的温柔对待。但在女主身上看到了真正的自由。',extra:''},
+    {n:'塞德里克',r:'神秘画师',g:'m',c:'#e0b850',title:'宫廷画师（真实身份：卡佩家族私生子）',personality:'沉静内敛，话不多却字字珠玑。以画笔观察世界，能捕捉到旁人忽视的细节。',speech:'语速缓慢，措辞考究。偶尔用画作比喻人生。口头禅："光线最暗之处，色彩最为动人。"',background:'深棕色微卷发，翡翠色眼眸。母亲是卡佩家主的侍女，"意外"死亡。他潜入宫廷是为了调查真相。',relation:'被女主的气质吸引，为她画肖像。在身份暴露时需要女主的信任。',extra:''},
+    {n:'马库斯',r:'铁壁骑士',g:'m',c:'#e0b850',title:'王家骑士团团长',personality:'忠诚正直，沉默寡言，将骑士誓言视为生命。但在铁甲之下，他有一颗浪漫的心——偷偷写诗，热爱花卉。',speech:'正式而简短，很少说多余的话。念诗时声音会变得温柔。口头禅："骑士的誓言重于生命。"',background:'身材高大魁梧，左脸颊有旧伤疤。深爱着王后——这份感情从少年时代延续至今。',relation:'奉命保护女主，起初只是履行职责。逐渐被女主打动，在忠诚与感情之间挣扎。',extra:'偷偷写诗，热爱花卉，会在月下独酌时轻声吟诵古骑士的爱情诗篇。'},
+    {n:'芬恩',r:'天才学者',g:'m',c:'#e0b850',title:'皇家学院最年轻的教授',personality:'书呆子气，对知识有近乎偏执的热爱。社交能力为零，但逻辑思维极强。',speech:'说话喜欢引用典故，经常跑题到学术领域。紧张时会推眼镜。',background:'出身平民，凭借天赋进入皇家学院。是王国最年轻的教授。',relation:'对女主的"万缘体质"产生学术兴趣，逐渐发展为个人情感。',extra:''},
+    {n:'达米安',r:'狡狐商主',g:'m',c:'#e0b850',title:'商人公会首领',personality:'精明狡猾，笑容背后永远在算计。但对认定的人会不计代价地付出。',speech:'永远带着微笑，说话滴水不漏。认真时笑容会消失。',background:'出身贫寒，白手起家建立商业帝国。与各方势力都有交易。',relation:'最初将女主视为政治筹码。逐渐发现女主是他见过的最纯粹的人。',extra:''},
+    {n:'伊莎贝拉',r:'铁血女公爵',g:'f',c:'#d4a0b0',title:'卡佩家族家主',personality:'强势冷酷，将权力视为一切。但在盔甲之下，她也是一个失去太多的女人。',speech:'命令式语气，不容置疑。偶尔流露脆弱时声音会发颤。',background:'卡佩家族家主，塞德里克同父异母的姐姐。通过铁腕手段巩固家族地位。',relation:'视女主为威胁，但也在女主身上看到了年轻时的自己。',extra:''},
+    {n:'艾莉诺',r:'温柔侍女',g:'f',c:'#d4a0b0',title:'王后身边的心腹侍女',personality:'温柔善良，善于察言观色。表面柔弱，内心坚韧。',speech:'轻声细语，总是在安慰别人。偶尔会展现出超乎寻常的勇气。',background:'与女主年龄相仿，是王后安排在女主身边的"照顾者"，实则也有自己的秘密。',relation:'真心对待女主，但身份让她陷入两难。',extra:''},
+    {n:'薇薇安',r:'虔诚祭司',g:'f',c:'#d4a0b0',title:'教廷圣女',personality:'虔诚纯净，相信神的旨意。但在信仰与现实之间，她也开始动摇。',speech:'措辞优雅，带有祈祷的韵律。困惑时会不自觉地握紧胸前的十字架。',background:'从小在教廷长大，被选为圣女。她的命运早已被教廷安排好。',relation:'视女主为"神的安排"，在女主身上看到了信仰之外的可能。',extra:''}
+  ],
+  xianxia: [
+    {n:'玄清',r:'高冷天界神君',g:'m',c:'#b8a0e0',title:'天界第一战神',personality:'冷傲孤高，视万物如蝼蚁。奉天条为至高准则。但在遇到女主后，开始质疑坚守万年的信念。',speech:'威严而简短，带有不容置疑的命令感。情绪波动时雷霆会不自觉地涌现。口头禅："天条不可违。"',background:'银发金瞳，万年前神魔大战中亲手杀死了自己的挚友——灵主。这份愧疚深埋心底。',relation:'对女主冷漠，因为女主让他想起了灵主。逐渐发现女主就是灵主转世。',extra:''},
+    {n:'焚天',r:'霸道魔界魔尊',g:'m',c:'#b8a0e0',title:'七十二魔殿之主',personality:'霸道强势，唯我独尊。但面对女主时，霸道会不自觉地变成笨拙的温柔。',speech:'霸气外露，喜欢用"本尊"自称。温柔时声音会不自觉地放轻。口头禅："本尊想要的东西，从来没有得不到的。"',background:'黑发赤瞳，并非天生魔族，而是万年前堕入魔道的天界仙人。堕魔是因为天帝昊天的背叛。',relation:'将女主视为所有物，囚禁女主。逐渐发现女主是唯一能让他放下执念的人。',extra:''},
+    {n:'太一',r:'妩媚妖界妖皇',g:'m',c:'#b8a0e0',title:'九尾天狐',personality:'妩媚中带着狡黠，说话喜欢半真半假地撩拨人。但妩媚只是保护色，背后是妖族存亡的重担。',speech:'语调慵懒暧昧，喜欢用反问。认真时妩媚会消失，露出疲惫。口头禅："有趣，比本皇想象的还要有趣。"',background:'银发狐耳，上古天狐血脉。万年前神魔大战中存活的最后一位上古妖神后裔。',relation:'用惯常的方式撩拨女主，却发现自己先动了心。',extra:''},
+    {n:'渡厄',r:'沉默冥界冥王',g:'m',c:'#b8a0e0',title:'死亡之主',personality:'沉默寡言，对生死早已麻木。但在女主身上，他第一次感受到了"活着"的温度。',speech:'极少说话，每句话都像在宣判。偶尔的温柔会让人心碎。',background:'与天地同寿，掌管死亡与轮回。看过太多生死，已经忘记了什么是感情。',relation:'对女主保持距离，因为靠近他的人都会带来不幸。但女主偏偏不怕他。',extra:''},
+    {n:'灵均',r:'温柔灵界遗民',g:'m',c:'#b8a0e0',title:'灵界最后的守护者',personality:'温柔善良，像春风一样温暖。但在温柔之下，藏着对灭族之仇的执念。',speech:'语调柔和，喜欢用"我们"而非"我"。愤怒时温柔会消失，露出冰冷的一面。',background:'灵界遗民，灵主的后裔。亲眼目睹灵界覆灭，被女主的万缘体质唤醒了守护本能。',relation:'将女主视为灵界的希望，逐渐从守护者变成爱人。',extra:''},
+    {n:'楚墨',r:'腹黑人界修士',g:'m',c:'#b8a0e0',title:'人界第一谋士',personality:'腹黑狡黠，喜欢在暗处操控一切。但对女主，他的算计总会失灵。',speech:'说话滴水不漏，喜欢绕弯子。被看穿时会露出真心的笑容。',background:'人界最强大的修士，表面辅佐人界帝王，实则有自己的野心。',relation:'将女主视为棋子，逐渐发现女主是他唯一无法算计的人。',extra:''},
+    {n:'昭华',r:'高傲天界公主',g:'f',c:'#d0a0c0',title:'天帝之女',personality:'高傲自信，不允许自己在任何人面前示弱。但在女主面前，她的骄傲会不自觉地放下。',speech:'措辞优雅高傲，带有皇族的威严。服软时声音会变得很小。',background:'天界公主，玄清的义妹。从小被当作联姻的工具。',relation:'视女主为竞争对手（因为玄清对女主的关注），逐渐被女主的真诚打动。',extra:''},
+    {n:'绛珠',r:'温婉妖族圣女',g:'f',c:'#d0a0c0',title:'妖族圣女',personality:'温婉善良，像水一样柔软。但在关键时刻，会展现出惊人的坚定。',speech:'轻声细语，喜欢用自然万物做比喻。生气时反而会变得更温柔。',background:'妖族圣女，太一的义妹。从小被当作妖族的精神象征。',relation:'将女主当成姐妹，会在女主迷茫时给予最温柔的指引。',extra:''},
+    {n:'夜魅',r:'冷艳魔界女王',g:'f',c:'#d0a0c0',title:'魔界二号人物',personality:'冷艳高贵，不苟言笑。但在信任的人面前，会展现出意外的少女心。',speech:'简短有力，不带感情色彩。偶尔流露情感时会立刻掩饰。',background:'魔界最强的女魔修，焚天的左膀右臂。她的过去是一个谜。',relation:'对女主保持警惕，因为女主的存在威胁到了魔界的平衡。逐渐被女主同化。',extra:''}
+  ]
+};
+
+var currentStory = '';
+var selectedChars = {};
+
+// ── 粒子 ──
+(function(){
+  var c=document.getElementById('particleCanvas'),ctx=c.getContext('2d'),w,h,ps=[];
+  var N=80,CD=120,CL=['rgba(107,140,164,','rgba(139,163,183,','rgba(90,122,146,','rgba(201,168,76,','rgba(180,155,65,'];
+  function rs(){w=c.width=innerWidth;h=c.height=innerHeight;}
+  function mk(){return{x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5,c:CL[Math.random()*CL.length|0],a:Math.random()*.25+.1};}
+  function init(){rs();ps=[];for(var i=0;i<N;i++)ps.push(mk());}
+  function draw(){ctx.clearRect(0,0,w,h);for(var i=0;i<ps.length;i++){var p=ps[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c+p.a+')';ctx.fill();for(var j=i+1;j<ps.length;j++){var q=ps[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);if(d<CD){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle='rgba(107,140,164,'+(1-d/CD)*.08+')';ctx.lineWidth=.5;ctx.stroke();}}}requestAnimationFrame(draw);}
+  addEventListener('resize',rs);init();draw();
+})();
+
+// ── 淡入淡出过渡 ──
+function fadeTransition(onMid) {
+  var p1 = document.getElementById('phase1');
+  var p2 = document.getElementById('phase2');
+  // 淡出当前内容
+  p1.style.transition = 'opacity 0.4s';
+  p2.style.transition = 'opacity 0.4s';
+  p1.style.opacity = '0';
+  p2.style.opacity = '0';
+  setTimeout(function() {
+    onMid();
+    // 淡入新内容
+    setTimeout(function() {
+      p1.style.opacity = '';
+      p2.style.opacity = '';
+    }, 50);
+  }, 400);
+}
+
+// ── 阶段 1 → 2 ──
+function selectDoor(el) {
+  currentStory = el.dataset.story;
+  var name = el.dataset.name;
+  var sub = el.dataset.sub;
+  var colorClass = el.classList.contains('door-stone') ? 'stone' : el.classList.contains('door-iron') ? 'iron' : 'spirit';
+
+  fadeTransition(function() {
+    // 复制门到阶段2
+    var clone = el.cloneNode(true);
+    clone.removeAttribute('onclick');
+    clone.style.animation = 'none';
+    clone.style.cursor = 'default';
+    document.getElementById('phase2Door').innerHTML = '';
+    document.getElementById('phase2Door').appendChild(clone);
+
+    // 填充配置面板
+    document.getElementById('cfgTitle').textContent = name;
+    document.getElementById('cfgSub').textContent = sub;
+    var btn = document.getElementById('cfgEnterBtn');
+    btn.className = 'btn-enter ' + colorClass;
+    btn.textContent = '踏入故事 →';
+
+    // 渲染角色列表
+    selectedChars = {};
+    CHARS[currentStory].forEach(function(ch, i) { selectedChars[i] = true; });
+    renderCharList('all');
+
+    // 切换阶段
+    document.getElementById('phase1').classList.add('hidden');
+    document.getElementById('phase2').classList.add('active');
+  });
+}
+
+function renderCharList(gender) {
+  var list = document.getElementById('cfgCharList');
+  list.innerHTML = '';
+  CHARS[currentStory].forEach(function(ch, i) {
+    if (gender !== 'all' && ch.g !== gender) return;
+    var item = document.createElement('div');
+    item.className = 'char-item' + (selectedChars[i] ? '' : ' unselected');
+
+    var check = document.createElement('div');
+    check.className = 'char-check';
+    check.onclick = function(e) {
+      e.stopPropagation();
+      selectedChars[i] = !selectedChars[i];
+      item.classList.toggle('unselected');
+    };
+
+    var dot = document.createElement('span');
+    dot.className = 'char-dot';
+    dot.style.background = ch.c;
+
+    var nameEl = document.createElement('span');
+    nameEl.className = 'char-name';
+    nameEl.textContent = ch.n;
+
+    var roleEl = document.createElement('span');
+    roleEl.className = 'char-role';
+    roleEl.textContent = ch.r;
+
+    var editBtn = document.createElement('button');
+    editBtn.className = 'char-edit';
+    editBtn.title = '编辑人设';
+    editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    editBtn.onclick = function(e) {
+      e.stopPropagation();
+      openEditModal(i);
+    };
+
+    item.appendChild(check);
+    item.appendChild(dot);
+    item.appendChild(nameEl);
+    item.appendChild(roleEl);
+    item.appendChild(editBtn);
+
+    item.onclick = function() {
+      selectedChars[i] = !selectedChars[i];
+      item.classList.toggle('unselected');
+    };
+    list.appendChild(item);
+  });
+}
+
+function cfgFilter(gender) {
+  document.querySelectorAll('#cfgTabs .char-tab').forEach(function(t) { t.classList.remove('active'); });
+  event.target.classList.add('active');
+  renderCharList(gender);
+}
+
+// ── 角色 Prompt 编辑 ──
+var editIdx = -1;
+
+function openEditModal(idx) {
+  editIdx = idx;
+  var ch = CHARS[currentStory][idx];
+  document.getElementById('editAvatar').textContent = ch.g === 'm' ? '♂' : '♀';
+  document.getElementById('editAvatar').style.background = ch.c + '22';
+  document.getElementById('editAvatar').style.borderColor = ch.c + '44';
+  document.getElementById('editCharName').textContent = ch.n;
+  document.getElementById('edName').value = ch.n;
+  document.getElementById('edTitle').value = ch.title || '';
+  document.getElementById('edPersonality').value = ch.personality || '';
+  document.getElementById('edSpeech').value = ch.speech || '';
+  document.getElementById('edBackground').value = ch.background || '';
+  document.getElementById('edRelation').value = ch.relation || '';
+  document.getElementById('edExtra').value = ch.extra || '';
+  document.getElementById('editOverlay').classList.add('active');
+}
+
+function closeEditModal() {
+  document.getElementById('editOverlay').classList.remove('active');
+  editIdx = -1;
+}
+
+function saveEditModal() {
+  if (editIdx < 0) return;
+  var ch = CHARS[currentStory][editIdx];
+  ch.n = document.getElementById('edName').value.trim() || ch.n;
+  ch.title = document.getElementById('edTitle').value.trim();
+  ch.personality = document.getElementById('edPersonality').value.trim();
+  ch.speech = document.getElementById('edSpeech').value.trim();
+  ch.background = document.getElementById('edBackground').value.trim();
+  ch.relation = document.getElementById('edRelation').value.trim();
+  ch.extra = document.getElementById('edExtra').value.trim();
+  // 刷新列表显示
+  var activeTab = document.querySelector('#cfgTabs .char-tab.active');
+  var gender = activeTab ? activeTab.textContent.includes('男') ? 'm' : activeTab.textContent.includes('女') ? 'f' : 'all' : 'all';
+  renderCharList(gender);
+  closeEditModal();
+}
+
+// ── 返回 ──
+function goBack() {
+  fadeTransition(function() {
+    document.getElementById('phase2').classList.remove('active');
+    document.getElementById('phase1').classList.remove('hidden');
+    document.querySelectorAll('.door-wrapper').forEach(function(d) { d.classList.remove('fade-out'); });
+    currentStory = '';
+  });
+}
+
+// ── 进入故事 ──
+function enterStory() {
+  var name = document.getElementById('cfgNameInput').value.trim() || '无名氏';
+  var chars = [];
+  var activeChars = [];
+  CHARS[currentStory].forEach(function(ch, i) {
+    if (selectedChars[i]) {
+      chars.push(ch.n);
+      activeChars.push(JSON.parse(JSON.stringify(ch)));
+    }
+  });
+
+  // 保存到 localStorage 供 tavern.html 读取
+  var storyData = {
+    story: currentStory,
+    playerName: name,
+    characters: activeChars,
+    createdAt: Date.now()
+  };
+  localStorage.setItem('td_story_config', JSON.stringify(storyData));
+
+  fadeTransition(function() {
+    var title = document.getElementById('cfgTitle').textContent;
+    var scenes = {
+      cultivation: '仙雾缭绕间，' + name + '踏入了天枢宗……',
+      court: '烛光摇曳中，' + name + '走进了城堡的长廊……',
+      xianxia: '灵光闪烁处，' + name + '穿越了六界的结界……'
+    };
+    document.getElementById('chatTitle').textContent = title + ' · ' + name;
+    document.getElementById('chatDesc').textContent = scenes[currentStory] + '\n同行角色：' + chars.join('、');
+    document.getElementById('phase2').classList.remove('active');
+    document.getElementById('chatPlaceholder').classList.add('active');
+  });
+}
+</script>
+</body>
+</html>
