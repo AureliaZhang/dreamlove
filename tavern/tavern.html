@@ -186,6 +186,12 @@
     .conv-item-title { font-size: var(--text-sm); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .conv-item-time { font-size: var(--text-xs); color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
     .conv-item.active .conv-item-title { font-weight: 600; color: var(--accent-dim); }
+    .conv-toggle {
+      text-align: center; padding: 6px 0; font-size: var(--text-xs);
+      color: var(--text-muted); cursor: pointer; user-select: none;
+      border-top: 1px solid var(--border-light); margin-top: 4px;
+    }
+    .conv-toggle:hover { color: var(--accent); }
     .sb-nav { margin-top: auto; border-top: 1px solid var(--border); padding: var(--sp-2); }
     .sb-btn {
       display: flex; align-items: center; gap: var(--sp-3);
@@ -329,6 +335,22 @@
     }
     .choice-btn:hover { border-color: var(--amber); background: var(--amber-light); }
     .choice-btn:active { transform: scale(0.97); }
+
+    /* 重试按钮 */
+    .retry-btn {
+      display: none; position: absolute; bottom: -8px; right: 8px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-muted); cursor: pointer;
+      align-items: center; justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out);
+      box-shadow: var(--shadow);
+    }
+    .retry-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .retry-btn svg { width: 14px; height: 14px; }
+    .msg-group.bot { position: relative; }
+    .msg-group.bot:hover .retry-btn { display: flex; }
+    .msg-group.diary .retry-btn { display: none !important; }
 
     .typing { display: none; align-self: flex-start; padding: var(--sp-3) var(--sp-4); background: var(--bot-bg); border: 1px solid var(--bot-border); border-radius: var(--radius-lg); border-top-left-radius: var(--radius-sm); gap: 5px; align-items: center; }
     .typing.on { display: flex; }
@@ -1377,6 +1399,7 @@
   }
 
   // ── Render Chat ──
+  var RETRY_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
   function addMsg(role, content, ts, type) {
     var msgs = $('msgs'), typing = $('typing');
     var div = document.createElement('div');
@@ -1386,13 +1409,16 @@
     var tm = ts || timeStr();
     // CODEC: AI 回复自动解码（将编码词还原为用户可见的原文）
     var displayContent = (role !== 'user') ? CODEC.decode(content) : content;
+    var retryBtn = (role === 'bot' && type !== 'diary') ? '<button class="retry-btn" title="重试">' + RETRY_SVG + '</button>' : '';
     div.innerHTML =
       '<div class="msg-av">' + av + '</div>' +
       '<div class="msg-body">' +
         '<div class="msg-meta"><span class="msg-sender">' + nm + '</span><span class="msg-time">' + tm + '</span></div>' +
         '<div class="msg-bubble">' + fmtMd(displayContent) + '</div>' +
-      '</div>';
+      '</div>' +
+      retryBtn;
     msgs.insertBefore(div, typing);
+    if (role === 'bot' && type !== 'diary') bindRetry(div);
     scrollMsgs(); updateCounts();
   }
 
@@ -1409,10 +1435,13 @@
     scrollMsgs();
   }
 
+  var convListExpanded = false;
   function renderConvList() {
     var list = $('convList');
     list.innerHTML = '';
-    conversations.forEach(function(c) {
+    var showCount = convListExpanded ? conversations.length : 2;
+    var items = conversations.slice().reverse(); // 最新在前
+    items.slice(0, showCount).forEach(function(c) {
       var d = document.createElement('div');
       d.className = 'conv-item' + (c.id === currentConvId ? ' active' : '');
       var time = new Date(c.createdAt);
@@ -1426,6 +1455,17 @@
       d.addEventListener('click', function() { switchConv(c.id); });
       list.appendChild(d);
     });
+    // 展开/收起按钮
+    if (conversations.length > 2) {
+      var toggle = document.createElement('div');
+      toggle.className = 'conv-toggle';
+      toggle.textContent = convListExpanded ? '收起对话' : '展开全部 (' + conversations.length + ')';
+      toggle.addEventListener('click', function() {
+        convListExpanded = !convListExpanded;
+        renderConvList();
+      });
+      list.appendChild(toggle);
+    }
   }
 
   // ── Memory ──
@@ -1441,6 +1481,31 @@
       if (m) { memory.push({ type: p.k, content: m[0], date: todayKey(), convId: currentConvId }); S.set('mem', memory); }
     });
     updateCounts();
+  }
+
+  // ── Retry ──
+  function bindRetry(msgDiv) {
+    var btn = msgDiv.querySelector('.retry-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      var conv = getCurrentConv();
+      if (!conv) return;
+      // 找到这条 bot 消息之前的最后一条 user 消息
+      var lastUserMsg = null;
+      for (var i = conv.messages.length - 1; i >= 0; i--) {
+        if (conv.messages[i].role === 'user') { lastUserMsg = conv.messages[i]; break; }
+      }
+      if (!lastUserMsg) { toast('没有可重试的消息', 'warn'); return; }
+      // 删除最后一条 assistant 消息
+      for (var i = conv.messages.length - 1; i >= 0; i--) {
+        if (conv.messages[i].role === 'assistant') { conv.messages.splice(i, 1); break; }
+      }
+      S.set('convs', conversations);
+      // 删除 DOM 中这条消息
+      msgDiv.remove();
+      // 重发最后一条用户消息
+      sendMsg(lastUserMsg.content);
+    });
   }
 
   // ── Send ──
@@ -1515,7 +1580,8 @@
         '<div class="msg-body">' +
           '<div class="msg-meta"><span class="msg-sender">' + streamNm + '</span><span class="msg-time">' + timeStr() + '</span></div>' +
           '<div class="msg-bubble"><span class="streaming-cursor"></span></div>' +
-        '</div>';
+        '</div>' +
+        '<button class="retry-btn" title="重试">' + RETRY_SVG + '</button>';
       var typingEl = $('typing');
       msgsEl.insertBefore(streamDiv, typingEl);
       $('typing').classList.remove('on');
@@ -1534,6 +1600,7 @@
       // 流式完成：过滤 OOC、解码、最终渲染
       var finalReply = CODEC.decode(stripOOC(reply));
       bubbleEl.innerHTML = fmtMd(finalReply);
+      bindRetry(streamDiv);
 
       // 检测选项并渲染按钮
       var choiceMatch = finalReply.match(/^[A-D][.、．：:]\s*(.+)/gm);
